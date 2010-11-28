@@ -75,6 +75,7 @@ static const char *it_msg =
     "\bgCopyright (c) 2010 Simon Robertshaw (\brhttp://powdertoy.co.uk\bg, \bbirc.freenode.net #powder\bg)\n"
     "\bgCopyright (c) 2010 Skresanov Savely (Stickman)\n"
     "\bgCopyright (c) 2010 Bryan Hoyle (New elements)\n"
+	"\bgCopyright (c) 2010 Ian Christian Fernandez (New elements)\n"
     "\bgCopyright (c) 2010 Nathan Cousins (New elements, small engine mods.)\n"
     "\n"
     "\bgSpecial thanks to Brian Ledbetter for maintaining ports.\n"
@@ -1260,6 +1261,10 @@ int main(int argc, char *argv[])
         {
             set_cmode(6);
         }
+		if(sdl_key=='8')
+        {
+            set_cmode(7);
+        }
         if(sdl_key==SDLK_LEFTBRACKET) {
             if(sdl_zoom_trig==1)
             {
@@ -1339,7 +1344,7 @@ int main(int argc, char *argv[])
         }
         else if(sdl_key=='c')
         {
-            set_cmode((cmode+1) % 7);
+            set_cmode((cmode+1) % 8);
             if(it > 50)
                 it = 50;
         }
@@ -1776,9 +1781,9 @@ int main(int argc, char *argv[])
                     if(x>=(XRES+BARSIZE-(510-476)) && x<=(XRES+BARSIZE-(510-491)) && !bq)
                     {
                         if(b & SDL_BUTTON_LMASK)
-                            set_cmode((cmode+1) % 7);
+                            set_cmode((cmode+1) % 8);
                         if(b & SDL_BUTTON_RMASK)
-                            set_cmode((cmode+6) % 7);
+                            set_cmode((cmode+6) % 8);
                         save_presets(0);
                     }
                     if(x>=(XRES+BARSIZE-(510-494)) && x<=(XRES+BARSIZE-(510-509)) && !bq)
@@ -2054,8 +2059,12 @@ int main(int argc, char *argv[])
             if(currentTime-pastFPS>=1000)
             {
 #ifdef BETA
-                sprintf(uitext, "Version %d (Beta %d) FPS:%d", SAVE_VERSION, MINOR_VERSION, FPS);
+	#ifdef MOD
+				sprintf(uitext, "Version %d Beta %d (%s's mod %02.1f) FPS:%d", REAL_SAVE_VERSION, REAL_MINOR_VERSION, CREATOR, MODVERSION, FPS);
+	#else 
+				sprintf(uitext, "Version %d (Beta %d) FPS:%d", SAVE_VERSION, MINOR_VERSION, FPS);
                 //printf("%s\n", uitext);
+	#endif
 #else
                 sprintf(uitext, "Version %d.%d FPS:%d", SAVE_VERSION, MINOR_VERSION, FPS);
 #endif

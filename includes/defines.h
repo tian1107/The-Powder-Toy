@@ -7,10 +7,17 @@
 #define PATH_SEP "/"
 #endif
 
-#define SAVE_VERSION 43
-#define MINOR_VERSION 1
+#define REAL_SAVE_VERSION 43
+#define REAL_MINOR_VERSION 0
+#define SAVE_VERSION (REAL_SAVE_VERSION + 10)		//To remove update thing
+#define MINOR_VERSION 100							//To remove update thing
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
 #define BETA
+#define MOD		//Add if it is a mod
+#ifdef MOD
+	#define MODVERSION 3.5
+	#define CREATOR "tian1107"
+#endif
 
 #define SERVER "powdertoy.co.uk"
 

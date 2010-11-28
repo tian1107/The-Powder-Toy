@@ -536,6 +536,9 @@ void draw_svf_ui(pixel *vid_buf)
     case 6:
         drawtext(vid_buf, XRES-29+BARSIZE/*481*/, YRES+(MENUSIZE-13), "\xC4", 100, 150, 255, 255);
         break;
+	case 7:
+        drawtext(vid_buf, XRES-29+BARSIZE/*481*/, YRES+(MENUSIZE-14), "\xC6", 255, 0, 0, 255);
+        break;
     }
     drawrect(vid_buf, XRES-32+BARSIZE/*478*/, YRES+(MENUSIZE-16), 14, 14, 255, 255, 255, 255);
 
@@ -1717,6 +1720,12 @@ void set_cmode(int cm)
     }
     else if(cmode==1)
         strcpy(itc_msg, "Pressure Display");
+	else if(cmode == 7){
+		memset(fire_r, 0, sizeof(fire_r));
+        memset(fire_g, 0, sizeof(fire_g));
+        memset(fire_b, 0, sizeof(fire_b));
+		strcpy(itc_msg, "Radio Wave Display");
+		}
     else
         strcpy(itc_msg, "Velocity Display");
 }
@@ -2395,15 +2404,27 @@ int search_ui(pixel *vid_buf)
             if(!img_id[i])
             {
                 for(pos=0; pos<GRID_X*GRID_Y; pos++)
-                    if(search_ids[pos] && !search_thumbs[pos])
+                    if(search_ids[pos] && !search_thumbs[pos] && !search_dates[pos])
                     {
                         for(gi=0; gi<IMGCONNS; gi++)
-                            if(img_id[gi] && !strcmp(search_ids[pos], img_id[gi]))
-                                break;
+							if(img_id[gi] && !strcmp(search_ids[pos], img_id[gi]))
+								break;
                         if(gi<IMGCONNS)
                             continue;
                         break;
-                    }
+                    } else if(search_ids[pos] && !search_thumbs[pos] && search_dates[pos]) {
+						char *id_d_temp = malloc(strlen(search_ids[pos])+strlen(search_dates[pos])+1);
+                        strcpy(id_d_temp, search_ids[pos]);
+                        strappend(id_d_temp, "_");
+                        strappend(id_d_temp, search_dates[pos]);
+
+						for(gi=0; gi<IMGCONNS; gi++)
+							if(img_id[gi] && !strcmp(id_d_temp, img_id[gi]))
+								break;
+                        if(gi<IMGCONNS)
+                            continue;
+                        break;
+					}
                 if(pos<GRID_X*GRID_Y)
                 {
                     if(search_dates[pos]) {
@@ -3139,6 +3160,7 @@ int search_results(char *str, int votes)
         }
         else if(!strncmp(str, "HISTORY ", 8))
         {
+			char *id_d_temp;
             if(i>=GRID_X*GRID_Y)
                 break;
             if(votes)
@@ -3205,7 +3227,13 @@ int search_results(char *str, int votes)
 
             if(s)
                 search_votes[i] = atoi(s);
-            thumb_cache_find(str+8, search_thumbs+i, search_thsizes+i);
+
+			*id_d_temp = malloc(strlen(search_ids[i])+strlen(search_dates[i])+1);
+            strcpy(id_d_temp, search_ids[i]);
+            strappend(id_d_temp, "_");
+            strappend(id_d_temp, search_dates[i]);
+
+            thumb_cache_find(id_d_temp, search_thumbs+i, search_thsizes+i);
             i++;
         }
         else if(!strncmp(str, "TAG ", 4))
