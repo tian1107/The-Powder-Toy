@@ -8,5 +8,14 @@
 #define PT_WAVE OFFCOUNT + 6
 #define PT_EWAVE OFFCOUNT + 7
 #define PT_INTF OFFCOUNT + 8
+#define PT_AEMT OFFCOUNT + 9
+#define PT_AREC OFFCOUNT + 10
+#define PT_AWAVE OFFCOUNT + 11
+#define PT_BEMT OFFCOUNT + 12
+#define PT_BREC OFFCOUNT + 13
+#define PT_BWAVE OFFCOUNT + 14
+#define PT_CEMT OFFCOUNT + 15
+#define PT_CREC OFFCOUNT + 16
+#define PT_CWAVE OFFCOUNT + 17
 //Unofficial Count
-#define PT_NUM  OFFCOUNT + 9
+#define PT_NUM  OFFCOUNT + 18

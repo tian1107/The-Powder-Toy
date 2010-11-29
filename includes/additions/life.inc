@@ -4,6 +4,15 @@ if(t == PT_WAVE){
 if(t == PT_EWAVE){
 	parts[i].life = 10;
 	}
+if(t == PT_AWAVE){
+	parts[i].life = 10;
+	}
+if(t == PT_BWAVE){
+	parts[i].life = 10;
+	}
+if(t == PT_CWAVE){
+	parts[i].life = 10;
+	}
 if(t==PT_PROT)
     {
         float r = (rand()%128+128)/127.0f;

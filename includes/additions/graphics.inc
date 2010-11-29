@@ -3,6 +3,21 @@ else if(t==PT_WAVE || t == PT_EWAVE){
 		blendpixel(vid, nx, ny, 0xFF, 0x00, 0x00, 192);
 		}
 	}
+else if(t==PT_AWAVE){
+	if(cmode == 7){
+		blendpixel(vid, nx, ny, 0xFF, 0x00, 0xFF, 192);
+		}
+	}
+else if(t==PT_BWAVE){
+	if(cmode == 7){
+		blendpixel(vid, nx, ny, 0x00, 0xFF, 0x00, 192);
+		}
+	}
+else if(t==PT_CWAVE){
+	if(cmode == 7){
+		blendpixel(vid, nx, ny, 0x00, 0x00, 0xFF, 192);
+		}
+	}
 else if(t==PT_PROT)
 {
     if(cmode == 3||cmode==4 || cmode==6)

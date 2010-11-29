@@ -45,19 +45,19 @@ if(t==PT_FPLT){
 					((r&0xFF)!=PT_SLTW) &&
 					((r&0xFF)!=PT_SOAP) && 
 					((r&0xFF)!=PT_PROT))
-					{
-						int n, o;
-						for(n = -1; n < 2; n++){
-							for(o = -1; o < 2; o++){
-								if(x+nx+o>=0 && y+ny+n>0 &&
-									(x+nx+o<XRES && y+ny+n<YRES && (nx || ny)) &&
-									(pmap[y+ny+n][x+nx+o]&0xFF)!=0xFF){
-										if(!(n == 0 && o == 0)){
-											create_part(-1, nx+x+o, ny+y+n, PT_FPLT);
-										}
-								}
+				{
+					int n, o;
+					for(n = -1; n < 2; n++){
+						for(o = -1; o < 2; o++){
+							if(x+nx+o>=0 && y+ny+n>0 &&
+								(x+nx+o<XRES && y+ny+n<YRES && (nx || ny)) &&
+								(pmap[y+ny+n][x+nx+o]&0xFF)!=0xFF){
+									if(!(n == 0 && o == 0)){
+										create_part(-1, nx+x+o, ny+y+n, PT_FPLT);
+									}
 							}
 						}
+					}
 				}
 			}
 		}
@@ -88,7 +88,7 @@ if(t==PT_SOAP)
 					}
 					else if(parts[r>>8].type == PT_DSTW && rand()% 50 > 1){
 						parts[r>>8].type = PT_SOAP;
-						}
+					}
 					else if(((ptypes[parts[r>>8].type].menusection == SC_LIQUID) || (ptypes[parts[r>>8].type].menusection == SC_GAS) || (ptypes[parts[r>>8].type].menusection == SC_POWDERS) || ((ptypes[parts[r>>8].type].menusection == SC_EXPLOSIVE) && parts[r>>8].type != PT_PLEX && parts[r>>8].type != PT_RBDM) || parts[r>>8].type == PT_URAN || parts[r>>8].type == PT_PLUT)&& (rand()%100<1))
 					{
 						delete_part(x+nx,y+ny);
@@ -136,14 +136,11 @@ if(t==PT_RREC && parts[i].life <= 1){
 						parts[i].ctype = PT_RREC;
 						break;
 					}
-					else if(parts[r>>8].type == PT_EWAVE){
-						int remt = parts[r>>8].any;
-						if(inbetween(i, remt, PT_INTF) == -1){
-							parts[i].type = PT_SPRK;
-							parts[i].life = 9;
-							parts[i].ctype = PT_RREC;
-							break;
-						}
+					else if(parts[r>>8].type == PT_EWAVE || parts[r>>8].type == PT_AWAVE || parts[r>>8].type == PT_BWAVE || parts[r>>8].type == PT_CWAVE){
+						parts[i].type = PT_SPRK;
+						parts[i].life = 9;
+						parts[i].ctype = PT_RREC;
+						break;
 					}
 				}
 			}
@@ -215,4 +212,83 @@ if(t == PT_INTF){
 				}
 
 			}
+}
+//Other Waves
+if(t == PT_AWAVE && parts[i].life == 1){
+	circle(parts[parts[i].any].x,parts[parts[i].any].y, parts[i].any2 + 50,PT_AWAVE);
+}
+if(t == PT_BWAVE && parts[i].life == 1){
+	circle(parts[parts[i].any].x,parts[parts[i].any].y, parts[i].any2 + 50,PT_BWAVE);
+}
+if(t == PT_CWAVE && parts[i].life == 1){
+	circle(parts[parts[i].any].x,parts[parts[i].any].y, parts[i].any2 + 50,PT_CWAVE);
+}
+if(t == PT_AEMT && parts[i].life == 1){
+	circle(parts[i].x, parts[i].y, 50, PT_AWAVE);
+}
+if(t == PT_BEMT && parts[i].life == 1){
+	circle(parts[i].x, parts[i].y, 50, PT_BWAVE);
+}
+if(t == PT_CEMT && parts[i].life == 1){
+	circle(parts[i].x, parts[i].y, 50, PT_CWAVE);
+}
+if(t==PT_AREC && parts[i].life <= 1){
+	for(nx=-24; nx<24; nx++){
+		for(ny=-24; ny<24; ny++){
+			if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
+			{
+				r = pmap[y+ny][x+nx];
+				if((r>>8)>=NPART || !r)
+					continue;
+				if((r&0xFF)!=PT_AREC){
+					if(parts[r>>8].type == PT_EWAVE || parts[r>>8].type == PT_AWAVE){
+						parts[i].type = PT_SPRK;
+						parts[i].life = 9;
+						parts[i].ctype = PT_AREC;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+if(t==PT_BREC && parts[i].life <= 1){
+	for(nx=-24; nx<24; nx++){
+		for(ny=-24; ny<24; ny++){
+			if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
+			{
+				r = pmap[y+ny][x+nx];
+				if((r>>8)>=NPART || !r)
+					continue;
+				if((r&0xFF)!=PT_BREC){
+					if(parts[r>>8].type == PT_EWAVE || parts[r>>8].type == PT_BWAVE){
+						parts[i].type = PT_SPRK;
+						parts[i].life = 9;
+						parts[i].ctype = PT_BREC;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+if(t==PT_CREC && parts[i].life <= 1){
+	for(nx=-24; nx<24; nx++){
+		for(ny=-24; ny<24; ny++){
+			if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
+			{
+				r = pmap[y+ny][x+nx];
+				if((r>>8)>=NPART || !r)
+					continue;
+				if((r&0xFF)!=PT_CREC){
+					if(parts[r>>8].type == PT_EWAVE || parts[r>>8].type == PT_CWAVE){
+						parts[i].type = PT_SPRK;
+						parts[i].life = 9;
+						parts[i].ctype = PT_CREC;
+						break;
+					}
+				}
+			}
+		}
+	}
 }
