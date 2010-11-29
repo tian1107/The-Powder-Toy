@@ -193,7 +193,7 @@ if(t == PT_EWAVE && parts[i].life == 1){
 	circle(parts[parts[i].any].x,parts[parts[i].any].y, parts[i].any2 + 50,PT_EWAVE);
 }
 //Less Waves
-if(t == PT_INTF){
+/*if(t == PT_INTF){
 	//Remove Signal Waves
 	for(nx=-30; nx<30; nx++)
 		for(ny=-30; ny<30; ny++)
@@ -212,7 +212,7 @@ if(t == PT_INTF){
 				}
 
 			}
-}
+}*/
 //Other Waves
 if(t == PT_AWAVE && parts[i].life == 1){
 	circle(parts[parts[i].any].x,parts[parts[i].any].y, parts[i].any2 + 50,PT_AWAVE);

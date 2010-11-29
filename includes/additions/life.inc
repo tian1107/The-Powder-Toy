@@ -2,13 +2,13 @@ if(t == PT_WAVE){
 	parts[i].life = rand()%50 + 50;
 	}
 if(t == PT_EWAVE){
-	parts[i].life = 10;
+	parts[i].life = 25;
 	}
 if(t == PT_AWAVE){
-	parts[i].life = 10;
+	parts[i].life = 20;
 	}
 if(t == PT_BWAVE){
-	parts[i].life = 10;
+	parts[i].life = 15;
 	}
 if(t == PT_CWAVE){
 	parts[i].life = 10;
