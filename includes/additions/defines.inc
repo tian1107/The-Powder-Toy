@@ -17,5 +17,7 @@
 #define PT_CEMT OFFCOUNT + 15
 #define PT_CREC OFFCOUNT + 16
 #define PT_CWAVE OFFCOUNT + 17
+#define PT_WEMT	OFFCOUNT + 18
+#define PT_WREC	OFFCOUNT + 19
 //Unofficial Count
-#define PT_NUM  OFFCOUNT + 18
+#define PT_NUM  OFFCOUNT + 20

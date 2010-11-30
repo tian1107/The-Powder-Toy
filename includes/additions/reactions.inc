@@ -117,9 +117,16 @@ if(t==PT_SPRK&&parts[i].ctype==PT_REMT&&parts[i].life==1){
 	}
 	nearp = next_part(nearp,PT_RREC);
 	}*/
-	circle(parts[i].x, parts[i].y, 50, PT_EWAVE); 
+	circle(parts[i].x, parts[i].y, 50, PT_EWAVE);
 }
 //Radio Wave Receiver
+/*if(t==PT_SPRK && parts[i].ctype == PT_RREC){
+	if(parts[i].any != -1){
+		parts[i].type = PT_RREC;
+		parts[i].ctype = PT_NONE;
+		parts[i].life = 20;
+		}
+	}*/
 if(t==PT_RREC && parts[i].life <= 1){
 	for(nx=-24; nx<24; nx++){
 		for(ny=-24; ny<24; ny++){
