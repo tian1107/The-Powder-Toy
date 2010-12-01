@@ -453,12 +453,12 @@ inline int create_part(int p, int x, int y, int t)
         parts[pmap[y][x]>>8].ctype = pmap[y][x]&0xFF;
 		if(parts[pmap[y][x]>>8].ctype == PT_WEMT)
 			parts[pmap[y][x]>>8].any = -1;
-		else
-			parts[pmap[y][x]>>8].any = 0;
-		if(parts[pmap[y][x]>>8].ctype == PT_WREC){
+		else if(parts[pmap[y][x]>>8].ctype == PT_WREC){
 			parts[pmap[y][x]>>8].type = PT_WREC;
 			parts[pmap[y][x]>>8].ctype = PT_NONE;
 			}
+		else
+			parts[pmap[y][x]>>8].any = 0;
         pmap[y][x] = (pmap[y][x]&~0xFF) | PT_SPRK;
         return pmap[y][x]>>8;
     }
@@ -2206,7 +2206,7 @@ void update_particles_i(pixel *vid, int start, int inc)
 											parts[r>>8].life = 4;
 											parts[r>>8].ctype = rt;
 											parts[r>>8].any = parts[i].any;
-											parts[i].any = 0;
+											//parts[i].any = 0; Problem?
 											if(parts[r>>8].ctype == PT_WEMT){
 												parts[r>>8].any = -1;
 												}
