@@ -15,4 +15,7 @@
 /* CEMT */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* CREC */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* CAVE */ {ST_GAS,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* WEMT */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* WREC */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* PGLW */ {ST_NONE,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 // Name		Original	Solid	 Frzp		Liquid   Mpnt		Gas	   Bpoint		Burn	Burning point

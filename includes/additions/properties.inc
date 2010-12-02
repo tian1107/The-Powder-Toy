@@ -16,8 +16,9 @@
 {"CEMT",	PIXPACK(0x8080FF),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_RWAV,	R_TEMP+0.0f	+273.15f,	251,	"C Radio Wave Emitter. Transfers signals to C Radio Wave Receiver."			, TYPE_SOLID | PROP_CONDUCTS},
 {"CREC",	PIXPACK(0xA0A0FF),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_RWAV,	R_TEMP+0.0f	+273.15f,	251,	"C Radio Wave Receiver. Gets signals from C Radio Wave Emitter."			, TYPE_SOLID | PROP_CONDUCTS},
 {"WAVE",	PIXPACK(0x000000),	0.2f,	0.00f * CFDS,	1.00f,	1.00f,	0.0f,	0.0f,	0.1f,	0.000f  * CFDS,	0,	0,		0,	0,	0,	0,	-1,		SC_RWAV,	R_TEMP+0.0f +273.15f,	60,		"Radio Waves from Emitters. Signals that are floating freely and happily."	, TYPE_ENERGY},
-{"WEMT",	PIXPACK(0xA0A0A0),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_ADD,		R_TEMP+0.0f	+273.15f,	251,	"Wired Emitter. Transfers signals to any Wired Receiver."			, TYPE_SOLID | PROP_CONDUCTS},
-{"WREC",	PIXPACK(0xD0D0D0),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_ADD,		R_TEMP+0.0f	+273.15f,	251,	"Wired Receiver. Gets signals from any Wired Emitter."			, TYPE_SOLID | PROP_CONDUCTS},
+{"WEMT",	PIXPACK(0xA0A0A0),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_ADD,		R_TEMP+0.0f	+273.15f,	251,	"Wired Emitter. Transfers signals to any Wired Receiver."					, TYPE_SOLID | PROP_CONDUCTS},
+{"WREC",	PIXPACK(0xD0D0D0),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_ADD,		R_TEMP+0.0f	+273.15f,	251,	"Wired Receiver. Gets signals from any Wired Emitter."						, TYPE_SOLID | PROP_CONDUCTS},
+{"PGLW",	PIXPACK(0x63AD5F),	0.7f,	0.02f * CFDS,	0.96f,	0.80f,	0.0f,	0.1f,	0.00f,	0.000f	* CFDS,	1,	0,		0,	0,	30,	1,	70,		SC_ADD,		R_TEMP+0.0f	+273.15f,	70,		"Glow Powder. Mix to water to become GLOW."									, TYPE_PART},
 //Name		Colour				Advec	Airdrag			Airloss	Loss	Collid	Grav	Diffus	Hotair			Fal	Burn	Exp	Mel	Hrd	M	Weights	Section			H						Ins(real world, by triclops200)		Description										Properties
 
 //Name			- 4 letter name of the element

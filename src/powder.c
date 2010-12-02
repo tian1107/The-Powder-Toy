@@ -2040,12 +2040,12 @@ void update_particles_i(pixel *vid, int start, int inc)
                             rt = parts[r>>8].type;
                             if(parts_avg(i,r>>8) != PT_INSL)
                             {
-                                if((rt==PT_METL||rt==PT_IRON||rt==PT_ETRD||rt==PT_BMTL||rt==PT_BRMT||rt==PT_LRBD||rt==PT_RBDM||rt==PT_PSCN||rt==PT_NSCN||rt==PT_NBLE||rt==PT_REMT||rt==PT_RREC||rt==PT_AEMT||rt==PT_AREC||rt==PT_BEMT||rt==PT_BREC||rt==PT_CEMT||rt==PT_CREC||rt==PT_WEMT||rt==PT_WREC)&&parts[r>>8].life==0 && abs(nx)+abs(ny) < 4)
+                                if((rt==PT_METL||rt==PT_IRON||rt==PT_ETRD||rt==PT_BMTL||rt==PT_BRMT||rt==PT_LRBD||rt==PT_RBDM||rt==PT_PSCN||rt==PT_NSCN||rt==PT_NBLE||rt==PT_REMT||rt==PT_RREC||rt==PT_AEMT||rt==PT_AREC||rt==PT_BEMT||rt==PT_BREC||rt==PT_CEMT||rt==PT_CREC||rt==PT_WEMT)&&parts[r>>8].life==0 && abs(nx)+abs(ny) < 4)
                                 {
-                                    if(rt == PT_WEMT){
-										parts[r>>8].type = PT_SPRK;
-										parts[r>>8].life = 4;
-										parts[r>>8].ctype = rt;
+									parts[r>>8].type = PT_SPRK;
+									parts[r>>8].life = 4;
+									parts[r>>8].ctype = rt;
+									if(parts_avg(i, r>>8) == PT_WEMT){
 										parts[r>>8].any = -1;
 										}
                                 }

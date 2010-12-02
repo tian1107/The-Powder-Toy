@@ -200,10 +200,10 @@ if(t == PT_EWAVE && parts[i].life == 1){
 	circle(parts[parts[i].any].x,parts[parts[i].any].y, parts[i].any2 + 50,PT_EWAVE);
 }
 //Less Waves
-/*if(t == PT_INTF){
+if(t == PT_INTF){
 	//Remove Signal Waves
-	for(nx=-30; nx<30; nx++)
-		for(ny=-30; ny<30; ny++)
+	for(nx=-1; nx<1; nx++)
+		for(ny=-1; ny<1; ny++)
 			if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
 			{
 				r = pmap[y+ny][x+nx];
@@ -211,15 +211,13 @@ if(t == PT_EWAVE && parts[i].life == 1){
 					continue;
 				if((r&0xFF)!=PT_INTF)
 				{	
-					if(parts[r>>8].type == PT_EWAVE){
+					if(parts[r>>8].type == PT_WAVE){
 						delete_part(x+nx, y+ny);
-						create_part(-1, x+nx, y+ny, PT_WAVE);
-						parts[r>>8].life = 10;
 					}
 				}
 
 			}
-}*/
+}
 //Other Waves
 if(t == PT_AWAVE && parts[i].life == 1){
 	circle(parts[parts[i].any].x,parts[parts[i].any].y, parts[i].any2 + 50,PT_AWAVE);
@@ -288,7 +286,7 @@ if(t==PT_CREC && parts[i].life <= 1){
 				if((r>>8)>=NPART || !r)
 					continue;
 				if((r&0xFF)!=PT_CREC){
-					if(parts[r>>8].type == PT_EWAVE || parts[r>>8].type == PT_CWAVE){
+					if((parts[r>>8].type == PT_EWAVE || parts[r>>8].type == PT_CWAVE)){
 						parts[i].type = PT_SPRK;
 						parts[i].life = 9;
 						parts[i].ctype = PT_CREC;
@@ -298,4 +296,24 @@ if(t==PT_CREC && parts[i].life <= 1){
 			}
 		}
 	}
+}
+//Powdered Glow
+if(t==PT_PGLW)
+{
+	for(nx=-1; nx<1; nx++)
+		for(ny=-1; ny<1; ny++)
+			if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
+			{
+				r = pmap[y+ny][x+nx];
+				if((r>>8)>=NPART || !r)
+					continue;
+				if((r&0xFF)!=PT_PGLW)
+				{	
+					if ((parts[r>>8].type == PT_DSTW || parts[r>>8].type == PT_WATR) && rand()%10<1){
+						delete_part(x+nx,y+ny);
+						delete_part(x,y);
+						create_part(-1, x, y, PT_GLOW);
+					}
+				}
+			}
 }

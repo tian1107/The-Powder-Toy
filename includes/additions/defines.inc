@@ -19,5 +19,6 @@
 #define PT_CWAVE OFFCOUNT + 17
 #define PT_WEMT	OFFCOUNT + 18
 #define PT_WREC	OFFCOUNT + 19
+#define PT_PGLW OFFCOUNT + 20
 //Unofficial Count
-#define PT_NUM  OFFCOUNT + 20
+#define PT_NUM  OFFCOUNT + 21
