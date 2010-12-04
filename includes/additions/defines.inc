@@ -20,5 +20,8 @@
 #define PT_WEMT	OFFCOUNT + 18
 #define PT_WREC	OFFCOUNT + 19
 #define PT_PGLW OFFCOUNT + 20
+#define PT_IEMT OFFCOUNT + 21
+#define PT_IREC OFFCOUNT + 22
+#define PT_IWAVE OFFCOUNT + 23
 //Unofficial Count
-#define PT_NUM  OFFCOUNT + 21
+#define PT_NUM  OFFCOUNT + 24

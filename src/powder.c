@@ -446,6 +446,8 @@ inline int create_part(int p, int x, int y, int t)
 				(pmap[y][x]&0xFF)!=PT_BREC &&
 				(pmap[y][x]&0xFF)!=PT_CREC &&
 				(pmap[y][x]&0xFF)!=PT_WREC &&
+				(pmap[y][x]&0xFF)!=PT_IEMT &&
+				(pmap[y][x]&0xFF)!=PT_IREC &&
 				(pmap[y][x]&0xFF)!=PT_WEMT)
             return -1;
         parts[pmap[y][x]>>8].type = PT_SPRK;
@@ -863,7 +865,7 @@ void update_particles_i(pixel *vid, int start, int inc)
             {
                 if(!(parts[i].life==10&&(parts[i].type==PT_LCRY||parts[i].type==PT_PCLN||parts[i].type==PT_HSWC)))
                     parts[i].life--;
-                if(parts[i].life<=0 && t!=PT_METL && t!=PT_IRON && t!=PT_FIRW && t!=PT_PCLN && t!=PT_HSWC && t!=PT_WATR && t!=PT_RBDM && t!=PT_LRBD && t!=PT_SLTW && t!=PT_BRMT && t!=PT_PSCN && t!=PT_NSCN && t!=PT_NTCT && t!=PT_PTCT && t!=PT_BMTL && t!=PT_SPRK && t!=PT_LAVA && t!=PT_ETRD&&t!=PT_LCRY && t!=PT_INWR && t!=PT_GLOW && t!=PT_REMT && t!=PT_RREC && t!=PT_AEMT && t!=PT_AREC && t!=PT_BEMT && t!=PT_BREC && t!=PT_CEMT && t!=PT_CREC && t!=PT_WEMT && t!=PT_WREC)
+                if(parts[i].life<=0 && t!=PT_METL && t!=PT_IRON && t!=PT_FIRW && t!=PT_PCLN && t!=PT_HSWC && t!=PT_WATR && t!=PT_RBDM && t!=PT_LRBD && t!=PT_SLTW && t!=PT_BRMT && t!=PT_PSCN && t!=PT_NSCN && t!=PT_NTCT && t!=PT_PTCT && t!=PT_BMTL && t!=PT_SPRK && t!=PT_LAVA && t!=PT_ETRD&&t!=PT_LCRY && t!=PT_INWR && t!=PT_GLOW && t!=PT_REMT && t!=PT_RREC && t!=PT_AEMT && t!=PT_AREC && t!=PT_BEMT && t!=PT_BREC && t!=PT_CEMT && t!=PT_CREC && t!=PT_WEMT && t!=PT_WREC && t!=PT_IEMT && t!=PT_IREC)
                 {
                     kill_part(i);
                     continue;
@@ -1234,7 +1236,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                 pt = parts[i].temp -= 2.5f;
             }
 
-            if(t==PT_WATR || t==PT_ETRD || t==PT_SLTW || t==PT_METL || t==PT_IRON || t==PT_RBDM || t==PT_LRBD || t==PT_BRMT || t==PT_PSCN || t==PT_NSCN || t==PT_NTCT || t==PT_PTCT || t==PT_BMTL || t==PT_SPRK|| t == PT_NBLE || t==PT_INWR || t==PT_REMT || t==PT_RREC || t==PT_AEMT || t==PT_AREC || t==PT_BEMT || t==PT_BREC || t==PT_CEMT || t==PT_CREC || t==PT_WEMT || t==PT_WREC)
+            if(t==PT_WATR || t==PT_ETRD || t==PT_SLTW || t==PT_METL || t==PT_IRON || t==PT_RBDM || t==PT_LRBD || t==PT_BRMT || t==PT_PSCN || t==PT_NSCN || t==PT_NTCT || t==PT_PTCT || t==PT_BMTL || t==PT_SPRK|| t == PT_NBLE || t==PT_INWR || t==PT_REMT || t==PT_RREC || t==PT_AEMT || t==PT_AREC || t==PT_BEMT || t==PT_BREC || t==PT_CEMT || t==PT_CREC || t==PT_WEMT || t==PT_WREC || t==PT_IEMT || t==PT_IREC)
             {
                 nx = x % CELL;
                 if(nx == 0)
@@ -1252,7 +1254,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                     ny = y/CELL;
                 if(nx>=0 && ny>=0 && nx<XRES/CELL && ny<YRES/CELL)
                 {
-                    if(t==PT_WATR || t==PT_ETRD || t==PT_SLTW || t==PT_METL || t==PT_IRON || t==PT_RBDM || t==PT_LRBD || t==PT_NSCN || t==PT_NTCT || t==PT_PTCT || t==PT_PSCN || t==PT_BRMT || t==PT_BMTL||t==PT_NBLE || t==PT_INWR || t==PT_REMT || t==PT_RREC || t==PT_AEMT || t==PT_AREC || t==PT_BEMT || t==PT_BREC || t==PT_CEMT || t==PT_CREC || t==PT_WEMT || t==PT_WREC)
+                    if(t==PT_WATR || t==PT_ETRD || t==PT_SLTW || t==PT_METL || t==PT_IRON || t==PT_RBDM || t==PT_LRBD || t==PT_NSCN || t==PT_NTCT || t==PT_PTCT || t==PT_PSCN || t==PT_BRMT || t==PT_BMTL||t==PT_NBLE || t==PT_INWR || t==PT_REMT || t==PT_RREC || t==PT_AEMT || t==PT_AREC || t==PT_BEMT || t==PT_BREC || t==PT_CEMT || t==PT_CREC || t==PT_WEMT || t==PT_WREC || t==PT_IEMT || t==PT_IREC)
                     {
                         if(emap[ny][nx]==12 && !parts[i].life)
                         {
@@ -1283,7 +1285,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                             r = pmap[y+ny][x+nx];
                             if((r>>8)>=NPART || !r)
                                 continue;
-                            if(((r&0xFF)==PT_METL || (r&0xFF)==PT_IRON || (r&0xFF)==PT_ETRD || (r&0xFF)==PT_PSCN || (r&0xFF)==PT_NSCN || (r&0xFF)==PT_NTCT || (r&0xFF)==PT_PTCT || (r&0xFF)==PT_BMTL || (r&0xFF)==PT_RBDM || (r&0xFF)==PT_LRBD || (r&0xFF)==PT_BRMT || (r&0xFF)==PT_NBLE || (r&0xFF)==PT_INWR || (r&0xFF)==PT_REMT || (r&0xFF)==PT_RREC || (r&0xFF)==PT_AEMT || (r&0xFF)==PT_AREC || (r&0xFF)==PT_BEMT || (r&0xFF)==PT_BREC || (r&0xFF)==PT_CEMT || (r&0xFF)==PT_CREC || (r&0xFF)==PT_WEMT || (r&0xFF)==PT_WREC) && parts[r>>8].ctype!=PT_SPRK)
+                            if(((r&0xFF)==PT_METL || (r&0xFF)==PT_IRON || (r&0xFF)==PT_ETRD || (r&0xFF)==PT_PSCN || (r&0xFF)==PT_NSCN || (r&0xFF)==PT_NTCT || (r&0xFF)==PT_PTCT || (r&0xFF)==PT_BMTL || (r&0xFF)==PT_RBDM || (r&0xFF)==PT_LRBD || (r&0xFF)==PT_BRMT || (r&0xFF)==PT_NBLE || (r&0xFF)==PT_INWR || (r&0xFF)==PT_REMT || (r&0xFF)==PT_RREC || (r&0xFF)==PT_AEMT || (r&0xFF)==PT_AREC || (r&0xFF)==PT_BEMT || (r&0xFF)==PT_BREC || (r&0xFF)==PT_CEMT || (r&0xFF)==PT_CREC || (r&0xFF)==PT_WEMT || (r&0xFF)==PT_WREC || (r&0xFF)==PT_IEMT || (r&0xFF)==PT_IREC) && parts[r>>8].ctype!=PT_SPRK)
                             {
                                 t = parts[i].type = PT_NONE;
                                 parts[r>>8].ctype = parts[r>>8].type;
@@ -2097,7 +2099,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                             rt = parts[r>>8].type;
                             if((a || ptypes[rt].explosive) && ((rt!=PT_RBDM && rt!=PT_LRBD && rt!=PT_INSL && rt!=PT_SWCH) || t!=PT_SPRK) &&
                                     !(t==PT_PHOT && rt==PT_INSL) &&
-                                    (t!=PT_LAVA || parts[i].life>0 || (rt!=PT_STNE && rt!=PT_PSCN && rt!=PT_NSCN && rt!=PT_NTCT && rt!=PT_PTCT && rt!=PT_METL  && rt!=PT_IRON && rt!=PT_ETRD && rt!=PT_BMTL && rt!=PT_BRMT && rt!=PT_SWCH && rt!=PT_INWR && rt!=PT_REMT && rt!=PT_RREC && rt!=PT_AEMT && rt!=PT_AREC && rt!=PT_BEMT && rt!=PT_BREC && rt!=PT_CEMT && rt!=PT_CREC && rt!=PT_WEMT && rt!=PT_WREC)) &&
+                                    (t!=PT_LAVA || parts[i].life>0 || (rt!=PT_STNE && rt!=PT_PSCN && rt!=PT_NSCN && rt!=PT_NTCT && rt!=PT_PTCT && rt!=PT_METL  && rt!=PT_IRON && rt!=PT_ETRD && rt!=PT_BMTL && rt!=PT_BRMT && rt!=PT_SWCH && rt!=PT_INWR && rt!=PT_REMT && rt!=PT_RREC && rt!=PT_AEMT && rt!=PT_AREC && rt!=PT_BEMT && rt!=PT_BREC && rt!=PT_CEMT && rt!=PT_CREC && rt!=PT_WEMT && rt!=PT_WREC && rt!=PT_IEMT && rt!=PT_IREC)) &&
                                     ptypes[rt].flammable && (ptypes[rt].flammable + (int)(pv[(y+ny)/CELL][(x+nx)/CELL]*10.0f))>(rand()%1000))
                             {
                                 parts[r>>8].type = PT_FIRE;
@@ -2111,7 +2113,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                             if(lpv < 1) lpv = 1;
                             if(legacy_enable)
                             {
-                                if(t!=PT_SPRK && ptypes[rt].meltable  && ((rt!=PT_RBDM && rt!=PT_LRBD) || t!=PT_SPRK) && ((t!=PT_FIRE&&t!=PT_PLSM) || (rt!=PT_METL && rt!=PT_IRON && rt!=PT_ETRD && rt!=PT_PSCN && rt!=PT_NSCN && rt!=PT_NTCT && rt!=PT_PTCT && rt!=PT_BMTL && rt!=PT_BRMT && rt!=PT_SALT && rt!=PT_INWR && rt!=PT_REMT && rt!=PT_RREC && rt!=PT_AEMT && rt!=PT_AREC && rt!=PT_BEMT && rt!=PT_BREC && rt!=PT_CEMT && rt!=PT_CREC && rt!=PT_WEMT && rt!=PT_WREC)) &&
+                                if(t!=PT_SPRK && ptypes[rt].meltable  && ((rt!=PT_RBDM && rt!=PT_LRBD) || t!=PT_SPRK) && ((t!=PT_FIRE&&t!=PT_PLSM) || (rt!=PT_METL && rt!=PT_IRON && rt!=PT_ETRD && rt!=PT_PSCN && rt!=PT_NSCN && rt!=PT_NTCT && rt!=PT_PTCT && rt!=PT_BMTL && rt!=PT_BRMT && rt!=PT_SALT && rt!=PT_INWR && rt!=PT_REMT && rt!=PT_RREC && rt!=PT_AEMT && rt!=PT_AREC && rt!=PT_BEMT && rt!=PT_BREC && rt!=PT_CEMT && rt!=PT_CREC && rt!=PT_WEMT && rt!=PT_WREC && rt!=PT_IEMT && rt!=PT_IREC)) &&
                                         ptypes[rt].meltable*lpv>(rand()%1000))
                                 {
                                     if(t!=PT_LAVA || parts[i].life>0)
@@ -2196,7 +2198,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                             pavg = parts_avg(i, r>>8);
                             if(pavg != PT_INSL)
                             {
-                                if(t==PT_SPRK && (rt==PT_METL||rt==PT_IRON||rt==PT_ETRD||rt==PT_BMTL||rt==PT_BRMT||rt==PT_LRBD||rt==PT_RBDM||rt==PT_PSCN||rt==PT_NSCN||rt==PT_NBLE||rt==PT_REMT||rt==PT_RREC||rt==PT_AEMT||rt==PT_AREC||rt==PT_BEMT||rt==PT_BREC||rt==PT_CEMT||rt==PT_CREC||rt==PT_WEMT||rt==PT_WREC) && parts[r>>8].life==0 &&
+                                if(t==PT_SPRK && (rt==PT_METL||rt==PT_IRON||rt==PT_ETRD||rt==PT_BMTL||rt==PT_BRMT||rt==PT_LRBD||rt==PT_RBDM||rt==PT_PSCN||rt==PT_NSCN||rt==PT_NBLE||rt==PT_REMT||rt==PT_RREC||rt==PT_AEMT||rt==PT_AREC||rt==PT_BEMT||rt==PT_BREC||rt==PT_CEMT||rt==PT_CREC||rt==PT_WEMT||rt==PT_WREC||rt==PT_IEMT||rt==PT_IREC) && parts[r>>8].life==0 &&
                                         (parts[i].life<3 || ((r>>8)<i && parts[i].life<4)) && abs(nx)+abs(ny)<4)
                                 {
                                     if(!(rt==PT_PSCN&&parts[i].ctype==PT_NSCN)&&!(rt!=PT_PSCN&&!(rt==PT_NSCN&&parts[i].temp>=373.0f)&&parts[i].ctype==PT_NTCT)&&!(rt!=PT_PSCN&&!(rt==PT_NSCN&&parts[i].temp<=373.0f)&&parts[i].ctype==PT_PTCT)&&!(rt!=PT_PSCN&&!(rt==PT_NSCN)&&parts[i].ctype==PT_INWR) && pavg != PT_INSL &&!(parts[i].ctype==PT_SWCH&&(rt==PT_PSCN||rt==PT_NSCN)) )
@@ -2264,7 +2266,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                                     parts[r>>8].life = 5;
                                     parts[r>>8].ctype = rt;
                                 }
-                                if(t==PT_SPRK&&(parts[i].ctype==PT_ETRD || parts[i].ctype == PT_REMT || parts[i].ctype == PT_RREC || parts[i].ctype == PT_AEMT || parts[i].ctype == PT_AREC || parts[i].ctype == PT_BEMT || parts[i].ctype == PT_BREC || parts[i].ctype == PT_CEMT || parts[i].ctype == PT_CREC || parts[i].ctype == PT_WEMT || parts[i].ctype == PT_WREC)&&parts[i].life==5)
+                                if(t==PT_SPRK&&(parts[i].ctype==PT_ETRD || parts[i].ctype == PT_REMT || parts[i].ctype == PT_RREC || parts[i].ctype == PT_AEMT || parts[i].ctype == PT_AREC || parts[i].ctype == PT_BEMT || parts[i].ctype == PT_BREC || parts[i].ctype == PT_CEMT || parts[i].ctype == PT_CREC || parts[i].ctype == PT_WEMT || parts[i].ctype == PT_WREC || parts[i].ctype == PT_IEMT || parts[i].ctype == PT_IREC)&&parts[i].life==5)
                                 {
                                     if(rt==PT_METL||rt==PT_ETRD||rt==PT_BMTL||rt==PT_BRMT||rt==PT_LRBD||rt==PT_RBDM||rt==PT_PSCN||rt==PT_NSCN||rt==PT_REMT||rt==PT_AEMT||rt==PT_BEMT||rt==PT_CEMT)
                                     {

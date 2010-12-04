@@ -3,6 +3,11 @@ else if(t == PT_EWAVE || t == PT_WAVE){
 		blendpixel(vid, nx, ny, 0xFF, 0xFF, 0xFF, 192);
 		}
 	}
+else if(t==PT_IWAVE){
+	if(cmode == 7){
+		blendpixel(vid, nx, ny, 0xFF, 0xFF, 0x00, 192);
+		}
+	}
 else if(t==PT_AWAVE){
 	if(cmode == 7){
 		blendpixel(vid, nx, ny, 0xFF, 0x00, 0x00, 192);

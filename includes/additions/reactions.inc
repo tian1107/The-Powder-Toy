@@ -121,12 +121,12 @@ if(t==PT_SPRK&&parts[i].ctype==PT_REMT&&parts[i].life==1){
 }
 //Radio Wave Receiver
 /*if(t==PT_SPRK && parts[i].ctype == PT_RREC){
-	if(parts[i].any != -1){
-		parts[i].type = PT_RREC;
-		parts[i].ctype = PT_NONE;
-		parts[i].life = 20;
-		}
-	}*/
+if(parts[i].any != -1){
+parts[i].type = PT_RREC;
+parts[i].ctype = PT_NONE;
+parts[i].life = 20;
+}
+}*/
 if(t==PT_RREC && parts[i].life <= 1){
 	for(nx=-24; nx<24; nx++){
 		for(ny=-24; ny<24; ny++){
@@ -313,6 +313,33 @@ if(t==PT_PGLW)
 						delete_part(x+nx,y+ny);
 						delete_part(x,y);
 						create_part(-1, x, y, PT_GLOW);
+					}
+				}
+			}
+}
+//Infrared emitter
+if(t==PT_SPRK && parts[i].ctype == PT_IEMT && parts[i].life == 1){
+	create_line(x, 0, x, YRES, 0, PT_IWAVE);
+	create_line(0, y, XRES, y, 0, PT_IWAVE);
+	create_line(x - y, 0, YRES + x - y, YRES, 0, PT_IWAVE);
+	create_line(x+y, 0, -YRES+x+y, YRES, 0, PT_IWAVE);
+}
+//Infrared receiver
+if(t == PT_IREC){
+	for(nx=-1; nx<1; nx++)
+		for(ny=-1; ny<1; ny++)
+			if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
+			{
+				r = pmap[y+ny][x+nx];
+				if((r>>8)>=NPART || !r)
+					continue;
+				if((r&0xFF)!=PT_IREC)
+				{	
+					if (parts[r>>8].type == PT_IWAVE){
+						parts[i].type = PT_SPRK;
+						parts[i].life = 9;
+						parts[i].ctype = PT_IREC;
+						break;
 					}
 				}
 			}

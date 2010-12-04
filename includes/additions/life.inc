@@ -13,6 +13,10 @@ if(t == PT_BWAVE){
 if(t == PT_CWAVE){
 	parts[i].life = 10;
 	}
+if(t==PT_IWAVE)
+    {
+        parts[i].life = 10;
+    }
 if(t==PT_PROT)
     {
         float r = (rand()%128+128)/127.0f;

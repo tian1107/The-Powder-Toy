@@ -7,8 +7,8 @@
 #define PATH_SEP "/"
 #endif
 
-#define REAL_SAVE_VERSION 43
-#define REAL_MINOR_VERSION 0
+#define REAL_SAVE_VERSION 44
+#define REAL_MINOR_VERSION 1
 #define SAVE_VERSION (REAL_SAVE_VERSION + 10)		//To remove update thing
 #define MINOR_VERSION 100							//To remove update thing
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
