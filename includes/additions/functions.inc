@@ -1,47 +1,47 @@
 //Declarations
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline int inrange(int i, int t, int range);
 #else
 inline int inrange(int i, int t, int range);
 #endif
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline int sqdistance(int i, int t);
 #else
 inline int sqdistance(int i, int t);
 #endif
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline int isbetween(int a, int b, int c);
 #else
 inline int isbetween(int a, int b, int c);
 #endif
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline int inbetweeen(int i, int j, int t);
 #else
 inline int inbetween(int i, int j, int t);
 #endif
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline int next_part(int j, int t);
 #else
 inline int next_part(int j, int t);
 #endif
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline void circle(int cx, int cy, int radius, int t);
 #else
 inline void circle(int cx, int cy, int radius, int t);
 #endif
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline void plot4points(int cx, int cy, int x, int y, int t, int r);
 #else
 inline void plot4points(int cx, int cy, int x, int y, int t, int r);
 #endif
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 _inline void plot8points(int cx, int cy, int x, int y, int t, int r);
 #else
 inline void plot8points(int cx, int cy, int x, int y, int t, int r);

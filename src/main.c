@@ -6,6 +6,7 @@
  * Copyright (c) 2010 Skresanov Savely
  * Copyright (c) 2010 Bryan Hoyle
  * Copyright (c) 2010 Nathan Cousins
+ * Copyright (c) 2010 cracker64
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02111-1301  USA
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +30,8 @@
 #include <SDL/SDL.h>
 #include <bzlib.h>
 #include <time.h>
-#ifdef WIN32
+
+#if defined(_WIN32) && !defined(__GNUC__)
 #include <direct.h>
 #else
 #include <sys/stat.h>
@@ -49,7 +52,7 @@
 #include <icon.h>
 
 static const char *it_msg =
-    "\brThe Powder Toy\n"
+    "\brThe Powder Toy - http://powdertoy.co.uk/\n"
     "\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\x7F\n"
     "\n"
     "\bgControl+C/V/X are Copy, Paste and cut respectively.\n"
@@ -66,19 +69,17 @@ static const char *it_msg =
     "'L' will load the most recent stamp, 'K' shows a library of stamps you saved.\n"
     "'C' will cycle the display mode (Fire, Blob, Velocity and Pressure). The numbers 1 to 7 will do the same\n"
     "Use the mouse scroll wheel to change the tool size for particles.\n"
-    "'Q' will quit the application.\n"
     "The spacebar can be used to pause physics.\n"
     "'P' will take a screenshot and save it into the current directory.\n"
     "\n"
-    "\brhttp://powdertoy.co.uk/\n"
     "\bgCopyright (c) 2008-10 Stanislaw K Skowronek (\brhttp://powder.unaligned.org\bg, \bbirc.unaligned.org #wtf\bg)\n"
     "\bgCopyright (c) 2010 Simon Robertshaw (\brhttp://powdertoy.co.uk\bg, \bbirc.freenode.net #powder\bg)\n"
     "\bgCopyright (c) 2010 Skresanov Savely (Stickman)\n"
+	"\bgCopyright (c) 2010 cracker64\n"
     "\bgCopyright (c) 2010 Bryan Hoyle (New elements)\n"
 	"\bgCopyright (c) 2010 Ian Christian Fernandez (New elements)\n"
     "\bgCopyright (c) 2010 Nathan Cousins (New elements, small engine mods.)\n"
     "\n"
-    "\bgSpecial thanks to Brian Ledbetter for maintaining ports.\n"
     "\bgTo use online features such as saving, you need to register at: \brhttp://powdertoy.co.uk/Register.html"
     ;
 
@@ -100,6 +101,9 @@ int legacy_enable = 0; //Used to disable new features such as heat, will be set 
 int death = 0, framerender = 0;
 int amd = 1;
 int FPSB = 0;
+int MSIGN =-1;
+//int CGOL = 0;
+//int GSPEED = 1;//causes my .exe to crash..
 
 sign signs[MAXSIGNS];
 
@@ -109,7 +113,7 @@ int core_count()
 {
     int numCPU = 1;
 #ifdef MT
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
     SYSTEM_INFO sysinfo;
     GetSystemInfo( &sysinfo );
     numCPU = sysinfo.dwNumberOfProcessors;
@@ -134,7 +138,7 @@ int mousex = 0, mousey = 0;  //They contain mouse position
 
 void sdl_seticon(void)
 {
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
     //SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(app_icon_w32, 32, 32, 32, 128, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
     //SDL_WM_SetIcon(icon, NULL/*app_icon_mask*/);
 #else
@@ -246,7 +250,7 @@ void *build_save(int *size, int x0, int y0, int w, int h)
             d[p++] = bmap[y][x];
     for(y=by0; y<by0+bh; y++)
         for(x=bx0; x<bx0+bw; x++)
-            if(bmap[y][x]==4)
+            if(bmap[y][x]==WL_FAN)
             {
                 i = (int)(fvx[y][x]*64.0f+127.5f);
                 if(i<0) i=0;
@@ -255,7 +259,7 @@ void *build_save(int *size, int x0, int y0, int w, int h)
             }
     for(y=by0; y<by0+bh; y++)
         for(x=bx0; x<bx0+bw; x++)
-            if(bmap[y][x]==4)
+            if(bmap[y][x]==WL_FAN)
             {
                 i = (int)(fvy[y][x]*64.0f+127.5f);
                 if(i<0) i=0;
@@ -326,7 +330,7 @@ void *build_save(int *size, int x0, int y0, int w, int h)
     for(j=0; j<w*h; j++)
     {
         i = m[j];
-        if(i && (parts[i-1].type==PT_CLNE || parts[i-1].type==PT_PCLN || parts[i-1].type==PT_SPRK || parts[i-1].type==PT_LAVA))
+        if(i && (parts[i-1].type==PT_CLNE || parts[i-1].type==PT_PCLN || parts[i-1].type==PT_SPRK || parts[i-1].type==PT_LAVA || parts[i-1].type==PT_PIPE))
             d[p++] = parts[i-1].ctype;
     }
 
@@ -482,7 +486,36 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
         for(x=bx0; x<bx0+bw; x++)
         {
             if(d[p])
+		{
                 bmap[y][x] = d[p];
+		if(bmap[y][x]==1)
+			bmap[y][x]=WL_WALL;
+		if(bmap[y][x]==2)
+			bmap[y][x]=WL_DESTROYALL;
+		if(bmap[y][x]==3)
+			bmap[y][x]=WL_ALLOWLIQUID;
+		if(bmap[y][x]==4)
+			bmap[y][x]=WL_FAN;
+		if(bmap[y][x]==5)
+			bmap[y][x]=WL_STREAM;
+		if(bmap[y][x]==6)
+			bmap[y][x]=WL_DETECT;
+		if(bmap[y][x]==7)
+			bmap[y][x]=WL_EWALL;
+		if(bmap[y][x]==8)
+			bmap[y][x]=WL_WALLELEC;
+		if(bmap[y][x]==9)
+			bmap[y][x]=WL_ALLOWAIR;
+		if(bmap[y][x]==10)
+			bmap[y][x]=WL_ALLOWSOLID;
+		if(bmap[y][x]==11)
+			bmap[y][x]=WL_ALLOWALLELEC;
+		if(bmap[y][x]==12)
+			bmap[y][x]=WL_EHOLE;
+		if(bmap[y][x]==13)
+			bmap[y][x]=WL_ALLOWGAS;
+		}
+
             p++;
         }
     for(y=by0; y<by0+bh; y++)
@@ -515,6 +548,7 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
                 //TODO: Possibly some server side translation
                 j = PT_DUST;//goto corrupt;
             }
+	    gol[x][y]=0;
             if(j)// && !(isplayer == 1 && j==PT_STKM))
             {
                 if(pmap[y][x])
@@ -530,6 +564,10 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
                 else if(i < nf)
                 {
                     parts[fp[i]].type = j;
+		    if(j == PT_COAL)
+			parts[fp[i]].tmp = 50;
+		    if(j == PT_FUSE)
+			parts[fp[i]].tmp = 50;
                     if(j == PT_PHOT)
                         parts[fp[i]].ctype = 0x3fffffff;
                     parts[fp[i]].x = (float)x;
@@ -655,7 +693,7 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
     {
         i = m[j];
         ty = d[pty+j];
-        if(i && (ty==PT_CLNE || (ty==PT_PCLN && ver>=43) || (ty==PT_SPRK && ver>=21) || (ty==PT_LAVA && ver>=34)))
+        if(i && (ty==PT_CLNE || (ty==PT_PCLN && ver>=43) || (ty==PT_SPRK && ver>=21) || (ty==PT_LAVA && ver>=34) || (ty==PT_PIPE && ver>=43)))
         {
             if(p >= size)
                 goto corrupt;
@@ -800,7 +838,7 @@ void stamp_save(int x, int y, int w, int h)
     char fn[64], sn[16];
     void *s=build_save(&n, x, y, w, h);
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
     _mkdir("stamps");
 #else
     mkdir("stamps", 0755);
@@ -1004,7 +1042,7 @@ int main(int argc, char *argv[])
     int vs = 0;
 #endif
     int x, y, b = 0, sl=1, sr=0, su=0, c, lb = 0, lx = 0, ly = 0, lm = 0;//, tx, ty;
-    int da = 0, db = 0, it = 2047, mx, my, bs = 2;
+    int da = 0, db = 0, it = 2047, mx, my, bsx = 2, bsy = 2;
     float nfvx, nfvy;
     int load_mode=0, load_w=0, load_h=0, load_x=0, load_y=0, load_size=0;
     void *load_data=NULL;
@@ -1119,7 +1157,7 @@ int main(int argc, char *argv[])
         {
             for(i=1; i<XRES/CELL; i++)
             {
-                if(bmap[j][i]==1 || bmap[j][i]==8 || (bmap[j][i]==7 && !emap[j][i]))
+                if(bmap[j][i]==WL_WALL || bmap[j][i]==WL_WALLELEC || (bmap[j][i]==WL_EWALL && !emap[j][i]))
                 {
                     vx[j][i] = 0.0f;
                     vx[j][i-1] = 0.0f;
@@ -1136,11 +1174,11 @@ int main(int argc, char *argv[])
 #ifdef OpenGL
         ClearScreen();
 #else
-        if(cmode==0 || cmode==1)
+        if(cmode==CM_VEL || cmode==CM_PRESS || cmode==CM_CRACK)
         {
             draw_air(vid_buf);
         }
-        else if(cmode==2)
+        else if(cmode==CM_PERS)
         {
             memcpy(vid_buf, fire_bg, XRES*YRES*PIXELSIZE);
             memset(vid_buf+(XRES*YRES), 0, ((XRES+BARSIZE)*YRES*PIXELSIZE)-(XRES*YRES*PIXELSIZE));
@@ -1153,7 +1191,7 @@ int main(int argc, char *argv[])
         update_particles(vid_buf);
         draw_parts(vid_buf);
 
-        if(cmode==2)
+        if(cmode==CM_PERS)
         {
             if(!fire_fc)
             {
@@ -1165,7 +1203,7 @@ int main(int argc, char *argv[])
             }
             fire_fc = (fire_fc+1) % 3;
         }
-        if(cmode==3||cmode==4||cmode==6)
+        if(cmode==CM_FIRE||cmode==CM_BLOB||cmode==CM_FANCY)
             render_fire(vid_buf);
 
         render_signs(vid_buf);
@@ -1253,80 +1291,138 @@ int main(int argc, char *argv[])
         }
         if(sdl_key=='1')
         {
-            set_cmode(0);
+            set_cmode(CM_VEL);
         }
         if(sdl_key=='2')
         {
-            set_cmode(1);
+            set_cmode(CM_PRESS);
         }
         if(sdl_key=='3')
         {
-            set_cmode(2);
+            set_cmode(CM_PERS);
         }
         if(sdl_key=='4')
         {
-            set_cmode(3);
+            set_cmode(CM_FIRE);
         }
         if(sdl_key=='5')
         {
-            set_cmode(4);
+            set_cmode(CM_BLOB);
         }
         if(sdl_key=='6')
         {
-            set_cmode(5);
+            set_cmode(CM_HEAT);
         }
         if(sdl_key=='7')
         {
-            set_cmode(6);
+            set_cmode(CM_FANCY);
         }
-		if(sdl_key=='8')
+	if(sdl_key=='8')
         {
-            set_cmode(7);
+            set_cmode(CM_NOTHING);
         }
+	if(sdl_key=='9')
+        {
+            set_cmode(CM_CRACK);
+        }
+	if(sdl_key=='0')
+        {
+            set_cmode(CM_GRAD);
+        }
+		if(sdl_key=='-')
+        {
+			set_cmode(CM_WAVE);
+        }
+	if(sdl_key==SDLK_TAB)
+	{
+		CURRENT_BRUSH =(CURRENT_BRUSH + 1)%BRUSH_NUM ;
+	}
         if(sdl_key==SDLK_LEFTBRACKET) {
             if(sdl_zoom_trig==1)
             {
                 ZSIZE -= 1;
-                if(ZSIZE>32)
-                    ZSIZE = 32;
+                if(ZSIZE>60)
+                    ZSIZE = 60;
                 if(ZSIZE<2)
                     ZSIZE = 2;
                 ZFACTOR = 256/ZSIZE;
             }
             else
             {
-                if(sdl_mod & (KMOD_LCTRL|KMOD_RCTRL))
-                    bs -= 1;
+                if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
+		{
+		    bsx -= 1;
+		    bsy -= 1;
+		}
+		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+		{
+		    bsx -= 1;
+		}
+		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+		{
+		    bsy -= 1;
+		}
                 else
-                    bs -= ceil((bs/5)+0.5f);
-                if(bs>1224)
-                    bs = 1224;
-                if(bs<0)
-                    bs = 0;
+		{
+                    bsx -= ceil((bsx/5)+0.5f);
+		    bsy -= ceil((bsy/5)+0.5f);
+		}
+                if(bsx>1180)
+                    bsx = 1180;
+		if(bsy>1180)
+                    bsy = 1180;
+                if(bsx<0)
+                    bsx = 0;
+		if(bsy<0)
+                    bsy = 0;
             }
         }
         if(sdl_key==SDLK_RIGHTBRACKET) {
             if(sdl_zoom_trig==1)
             {
                 ZSIZE += 1;
-                if(ZSIZE>32)
-                    ZSIZE = 32;
+                if(ZSIZE>60)
+                    ZSIZE = 60;
                 if(ZSIZE<2)
                     ZSIZE = 2;
                 ZFACTOR = 256/ZSIZE;
             }
             else
             {
-                if(sdl_mod & (KMOD_LCTRL|KMOD_RCTRL))
-                    bs += 1;
+                if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
+		{
+		    bsx += 1;
+		    bsy += 1;
+		}
+		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+		{
+		    bsx += 1;
+		}
+		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+		{
+		    bsy += 1;
+		}
                 else
-                    bs += ceil((bs/5)+0.5f);
-                if(bs>1224)
-                    bs = 1224;
-                if(bs<0)
-                    bs = 0;
+		{
+                    bsx += ceil((bsx/5)+0.5f);
+		    bsy += ceil((bsy/5)+0.5f);
+		}
+                if(bsx>1180)
+                    bsx = 1180;
+		if(bsy>1180)
+                    bsy = 1180;
+                if(bsx<0)
+                    bsx = 0;
+		if(bsy<0)
+                    bsy = 0;
             }
         }
+	if(sdl_key==SDLK_INSERT)
+	    REPLACE_MODE = !REPLACE_MODE;
+	if(sdl_key=='g')
+            GRID_MODE = (GRID_MODE+1)%10;
+	if(sdl_key=='t')
+            VINE_MODE = !VINE_MODE;
         if(sdl_key==SDLK_SPACE)
             sys_pause = !sys_pause;
         if(sdl_key=='h')
@@ -1362,7 +1458,7 @@ int main(int argc, char *argv[])
         }
         else if(sdl_key=='c')
         {
-            set_cmode((cmode+1) % 8);
+            set_cmode((cmode+1) % CM_COUNT);
             if(it > 50)
                 it = 50;
         }
@@ -1399,8 +1495,8 @@ int main(int argc, char *argv[])
             if(sdl_zoom_trig==1)
             {
                 ZSIZE += sdl_wheel;
-                if(ZSIZE>32)
-                    ZSIZE = 32;
+                if(ZSIZE>60)
+                    ZSIZE = 60;
                 if(ZSIZE<2)
                     ZSIZE = 2;
                 ZFACTOR = 256/ZSIZE;
@@ -1408,11 +1504,27 @@ int main(int argc, char *argv[])
             }
             else
             {
-                bs += sdl_wheel;
-                if(bs>1224)
-                    bs = 1224;
-                if(bs<0)
-                    bs = 0;
+		if(!(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
+		{
+		    bsx += sdl_wheel;
+		    bsy += sdl_wheel;
+		}
+		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+		{
+		    bsx += sdl_wheel;
+		}
+		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+		{
+		    bsy += sdl_wheel;
+		}
+                if(bsx>1180)
+                    bsx = 1180;
+                if(bsx<0)
+                    bsx = 0;
+		if(bsy>1180)
+                    bsy = 1180;
+                if(bsy<0)
+                    bsy = 0;
                 sdl_wheel = 0;
                 /*if(su >= PT_NUM) {
                 	if(sl < PT_NUM)
@@ -1799,9 +1911,9 @@ int main(int argc, char *argv[])
                     if(x>=(XRES+BARSIZE-(510-476)) && x<=(XRES+BARSIZE-(510-491)) && !bq)
                     {
                         if(b & SDL_BUTTON_LMASK)
-                            set_cmode((cmode+1) % 8);
+                            set_cmode((cmode+1) % CM_COUNT);
                         if(b & SDL_BUTTON_RMASK)
-                            set_cmode((cmode+6) % 8);
+                            set_cmode((cmode+(CM_COUNT-1)) % CM_COUNT);
                         save_presets(0);
                     }
                     if(x>=(XRES+BARSIZE-(510-494)) && x<=(XRES+BARSIZE-(510-509)) && !bq)
@@ -1813,7 +1925,7 @@ int main(int argc, char *argv[])
             {
                 c = (b&1) ? sl : sr;
                 su = c;
-                if(c==126)
+                if(c==WL_SIGN+100)
                 {
                     if(!bq)
                         add_sign_ui(vid_buf, x, y);
@@ -1823,18 +1935,18 @@ int main(int argc, char *argv[])
                     if(lm == 1)
                     {
                         xor_line(lx, ly, x, y, vid_buf);
-                        if(c==127 && lx>=0 && ly>=0 && lx<XRES && ly<YRES && bmap[ly/CELL][lx/CELL]==4)
+                        if(c==WL_FAN+100 && lx>=0 && ly>=0 && lx<XRES && ly<YRES && bmap[ly/CELL][lx/CELL]==WL_FAN)
                         {
                             nfvx = (x-lx)*0.005f;
                             nfvy = (y-ly)*0.005f;
-                            flood_parts(lx, ly, 255, -1, 4);
+                            flood_parts(lx, ly, WL_FANHELPER, -1, WL_FAN);
                             for(j=0; j<YRES/CELL; j++)
                                 for(i=0; i<XRES/CELL; i++)
-                                    if(bmap[j][i] == 255)
+                                    if(bmap[j][i] == WL_FANHELPER)
                                     {
                                         fvx[j][i] = nfvx;
                                         fvy[j][i] = nfvy;
-                                        bmap[j][i] = 4;
+                                        bmap[j][i] = WL_FAN;
                                     }
                         }
                     }
@@ -1847,14 +1959,14 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        create_line(lx, ly, x, y, bs, c);
+                        create_line(lx, ly, x, y, bsx, bsy, c);
                         lx = x;
                         ly = y;
                     }
                 }
                 else
                 {
-                    if((sdl_mod & (KMOD_LSHIFT|KMOD_RSHIFT)) && !(sdl_mod & (KMOD_LCTRL|KMOD_RCTRL)))
+                    if((sdl_mod & (KMOD_LSHIFT|KMOD_RSHIFT)) && !(sdl_mod & (KMOD_LCTRL|KMOD_RCTRL|KMOD_LALT)))
                     {
                         lx = x;
                         ly = y;
@@ -1868,16 +1980,18 @@ int main(int argc, char *argv[])
                         lb = b;
                         lm = 2;
                     }
-                    else if((sdl_mod & (KMOD_LCTRL|KMOD_RCTRL)) && (sdl_mod & (KMOD_LSHIFT|KMOD_RSHIFT)))
+                    else if((sdl_mod & (KMOD_LCTRL|KMOD_RCTRL)) && (sdl_mod & (KMOD_LSHIFT|KMOD_RSHIFT)) && !(sdl_mod & (KMOD_LALT)))
                     {
-                        if(c!=125&&c!=SPC_AIR&&c!=SPC_HEAT&&c!=SPC_COOL&&c!=SPC_VACUUM)
+			if(sdl_mod & (KMOD_CAPS))
+				c = 0;
+                        if(c!=WL_STREAM&&c!=SPC_AIR&&c!=SPC_HEAT&&c!=SPC_COOL&&c!=SPC_VACUUM&&!REPLACE_MODE)
                             flood_parts(x, y, c, -1, -1);
                         lx = x;
                         ly = y;
                         lb = 0;
                         lm = 0;
                     }
-                    else if((sdl_mod & (KMOD_LALT||KMOD_RALT)) || b==SDL_BUTTON_MIDDLE)
+                    else if(((sdl_mod & (KMOD_LALT|KMOD_RALT)) && !(sdl_mod & (KMOD_SHIFT))) || b==SDL_BUTTON_MIDDLE)
                     {
                         if(y>0 && y<sdl_scale*YRES && x>0 && x<sdl_scale*XRES)
                         {
@@ -1919,7 +2033,7 @@ int main(int argc, char *argv[])
                                 cb_emap[cby][cbx] = emap[cby][cbx];
                             }
 
-                        create_parts(x, y, bs, c);
+                        create_parts(x, y, bsx, bsy, c);
                         lx = x;
                         ly = y;
                         lb = b;
@@ -1938,8 +2052,8 @@ int main(int argc, char *argv[])
                 su = c;
                 if(lm == 1)
                 {
-                    if(c!=127 || lx<0 || ly<0 || lx>=XRES || ly>=YRES || bmap[ly/CELL][lx/CELL]!=4)
-                        create_line(lx, ly, x, y, bs, c);
+                    if(c!=WL_FAN+100 || lx<0 || ly<0 || lx>=XRES || ly>=YRES || bmap[ly/CELL][lx/CELL]!=WL_FAN)
+                        create_line(lx, ly, x, y, bsx, bsy, c);
                 }
                 else
                     create_box(lx, ly, x, y, c);
@@ -1963,7 +2077,7 @@ int main(int argc, char *argv[])
 
         if(zoom_en!=1 && !load_mode && !save_mode)
         {
-            render_cursor(vid_buf, mx/sdl_scale, my/sdl_scale, su, bs);
+            render_cursor(vid_buf, mx/sdl_scale, my/sdl_scale, su, bsx, bsy);
             mousex = mx/sdl_scale;
             mousey = my/sdl_scale;
         }
@@ -2076,7 +2190,7 @@ int main(int argc, char *argv[])
             }
             if(currentTime-pastFPS>=1000)
             {
-#ifdef BETA
+/*#ifdef BETA
 	#ifdef MOD
 				sprintf(uitext, "Version %d Beta %d (%s's mod %02.1f) FPS:%d", REAL_SAVE_VERSION, REAL_MINOR_VERSION, CREATOR, MODVERSION, FPS);
 	#else 
@@ -2085,11 +2199,24 @@ int main(int argc, char *argv[])
 	#endif
 #else
                 sprintf(uitext, "Version %d.%d FPS:%d", SAVE_VERSION, MINOR_VERSION, FPS);
-#endif
+#endif*/
                 FPSB = FPS;
                 FPS = 0;
                 pastFPS = currentTime;
             }
+			
+#ifdef BETA
+			sprintf(uitext, "Version %d Beta %d FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, FPSB, NUM_PARTS);
+#else
+			sprintf(uitext, "Version %d.%d FPS:%d", SAVE_VERSION, MINOR_VERSION, FPSB);
+#endif
+			if(REPLACE_MODE)
+				strappend(uitext, " [REPLACE MODE]");
+			if(sdl_mod&(KMOD_CAPS))
+				strappend(uitext, " [CAP LOCKS]");
+			if(GRID_MODE)
+				sprintf(uitext, "%s [GRID: %d]", uitext, GRID_MODE);
+			
             if(sdl_zoom_trig||zoom_en)
             {
                 if(zoom_x<XRES/2)

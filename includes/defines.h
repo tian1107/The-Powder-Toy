@@ -1,14 +1,14 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#ifdef WIN32
+#if defined(_WIN32) && !defined(__GNUC__)
 #define PATH_SEP "\\"
 #else
 #define PATH_SEP "/"
 #endif
 
 #define REAL_SAVE_VERSION 44
-#define REAL_MINOR_VERSION 1
+#define REAL_MINOR_VERSION 2
 #define SAVE_VERSION (REAL_SAVE_VERSION + 10)		//To remove update thing
 #define MINOR_VERSION 100							//To remove update thing
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
@@ -63,6 +63,12 @@ extern unsigned char ZSIZE;
 #define STAMP_Y 4
 #define STAMP_MAX 120
 
+#define NGOL 13
+
+#define CIRCLE_BRUSH 0
+#define SQUARE_BRUSH 1
+#define BRUSH_NUM 2
+
 #ifdef PIX16
 typedef unsigned short pixel;
 #else
@@ -87,6 +93,15 @@ extern int amd;
 
 extern int FPSB;
 
+int NUM_PARTS;
+int GRAV;
+int GRAV_R;
+int GRAV_G;
+int GRAV_B;
+int GRAV_R2;
+int GRAV_G2;
+int GRAV_B2;
+
 extern int legacy_enable;
 
 extern int sys_pause;
@@ -110,6 +125,24 @@ struct stamp
 };
 typedef struct stamp stamp;
 
+int MSIGN;
+int CGOL;
+int ISGOL;
+int ISLOVE;
+int ISLOLZ;
+int ISGRAV;
+int ISWIRE;
+int GSPEED;
+int love[XRES/9][YRES/9];
+int lolz[XRES/9][YRES/9];
+int gol[XRES][YRES];
+int gol2[XRES][YRES][NGOL];
+int SEC;
+int SEC2;
+int REPLACE_MODE;
+int CURRENT_BRUSH;
+int GRID_MODE;
+int VINE_MODE;
 extern sign signs[MAXSIGNS];
 extern stamp stamps[STAMP_MAX];
 extern int stamp_count;

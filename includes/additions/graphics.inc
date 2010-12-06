@@ -1,31 +1,31 @@
-else if(t == PT_EWAVE || t == PT_WAVE){
-	if(cmode == 7){
+if(t == PT_EWAVE || t == PT_WAVE){
+	if(cmode == CM_WAVE){
 		blendpixel(vid, nx, ny, 0xFF, 0xFF, 0xFF, 192);
 		}
 	}
 else if(t==PT_IWAVE){
-	if(cmode == 7){
+	if(cmode == CM_WAVE){
 		blendpixel(vid, nx, ny, 0xFF, 0xFF, 0x00, 192);
 		}
 	}
 else if(t==PT_AWAVE){
-	if(cmode == 7){
+	if(cmode == CM_WAVE){
 		blendpixel(vid, nx, ny, 0xFF, 0x00, 0x00, 192);
 		}
 	}
 else if(t==PT_BWAVE){
-	if(cmode == 7){
+	if(cmode == CM_WAVE){
 		blendpixel(vid, nx, ny, 0x00, 0xFF, 0x00, 192);
 		}
 	}
 else if(t==PT_CWAVE){
-	if(cmode == 7){
+	if(cmode == CM_WAVE){
 		blendpixel(vid, nx, ny, 0x00, 0x00, 0xFF, 192);
 		}
 	}
 else if(t==PT_PROT)
 {
-    if(cmode == 3||cmode==4 || cmode==6)
+	if(cmode == CM_FIRE||cmode==CM_BLOB || cmode==CM_FANCY)
     {
         vid[ny*(XRES+BARSIZE)+nx] = ptypes[t].pcolors;
         cr = 12;
