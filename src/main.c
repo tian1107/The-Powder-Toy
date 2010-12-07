@@ -234,7 +234,7 @@ void *build_thumb(int *size, int bzip2)
 
 void *build_save(int *size, int x0, int y0, int w, int h)
 {
-    unsigned char *d=calloc(1,3*(XRES/CELL)*(YRES/CELL)+(XRES*YRES)*8+MAXSIGNS*262), *c;
+    unsigned char *d=calloc(1,3*(XRES/CELL)*(YRES/CELL)+(XRES*YRES)*11+MAXSIGNS*262), *c;
     int i,j,x,y,p=0,*m=calloc(XRES*YRES, sizeof(int));
     int bx0=x0/CELL, by0=y0/CELL, bw=(w+CELL-1)/CELL, bh=(h+CELL-1)/CELL;
 
@@ -250,7 +250,7 @@ void *build_save(int *size, int x0, int y0, int w, int h)
             d[p++] = bmap[y][x];
     for(y=by0; y<by0+bh; y++)
         for(x=bx0; x<bx0+bw; x++)
-            if(bmap[y][x]==WL_FAN)
+            if(bmap[y][x]==WL_FAN||bmap[y][x]==4)
             {
                 i = (int)(fvx[y][x]*64.0f+127.5f);
                 if(i<0) i=0;
@@ -259,7 +259,7 @@ void *build_save(int *size, int x0, int y0, int w, int h)
             }
     for(y=by0; y<by0+bh; y++)
         for(x=bx0; x<bx0+bw; x++)
-            if(bmap[y][x]==WL_FAN)
+            if(bmap[y][x]==WL_FAN||bmap[y][x]==4)
             {
                 i = (int)(fvy[y][x]*64.0f+127.5f);
                 if(i<0) i=0;
@@ -316,6 +316,17 @@ void *build_save(int *size, int x0, int y0, int w, int h)
             d[p++] = (ttlife&0x00FF);
 		}
     }
+	for(j=0; j<w*h; j++)
+    {
+        i = m[j];
+        if(i){
+			//Now saving tmp!
+            //d[p++] = (parts[i-1].life+3)/4;
+			int tttmp = (int)parts[i-1].tmp;
+            d[p++] = ((tttmp&0xFF00)>>8);
+            d[p++] = (tttmp&0x00FF);
+		}
+    }
     for(j=0; j<w*h; j++)
     {
         i = m[j];
@@ -330,7 +341,7 @@ void *build_save(int *size, int x0, int y0, int w, int h)
     for(j=0; j<w*h; j++)
     {
         i = m[j];
-        if(i && (parts[i-1].type==PT_CLNE || parts[i-1].type==PT_PCLN || parts[i-1].type==PT_SPRK || parts[i-1].type==PT_LAVA || parts[i-1].type==PT_PIPE))
+        if(i && (parts[i-1].type==PT_CLNE || parts[i-1].type==PT_PCLN || parts[i-1].type==PT_BCLN || parts[i-1].type==PT_SPRK || parts[i-1].type==PT_LAVA || parts[i-1].type==PT_PIPE))
             d[p++] = parts[i-1].ctype;
     }
 
@@ -366,7 +377,7 @@ void *build_save(int *size, int x0, int y0, int w, int h)
     c[0] = 0x50;	//0x66;
     c[1] = 0x53;	//0x75;
     c[2] = 0x76;	//0x43;
-    c[3] = legacy_enable;
+    c[3] = legacy_enable|((sys_pause<<1)&0x02);
     c[4] = SAVE_VERSION;
     c[5] = CELL;
     c[6] = bw;
@@ -417,10 +428,16 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
     }
     else
     {
-        if(c[3]==1||c[3]==0)
-            legacy_enable = c[3];
-        else
-            legacy_beta = 1;
+		if(ver>=44){
+			legacy_enable = c[3]&0x01;
+			sys_pause = (c[3]>>1)&0x01;
+		} else {
+			if(c[3]==1||c[3]==0){
+				legacy_enable = c[3];
+			} else {
+				legacy_beta = 1;
+			}
+		}
     }
 
     bw = c[6];
@@ -520,7 +537,7 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
         }
     for(y=by0; y<by0+bh; y++)
         for(x=bx0; x<bx0+bw; x++)
-            if(d[(y-by0)*bw+(x-bx0)]==4)
+            if(d[(y-by0)*bw+(x-bx0)]==4||d[(y-by0)*bw+(x-bx0)]==WL_FAN)
             {
                 if(p >= size)
                     goto corrupt;
@@ -528,7 +545,7 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
             }
     for(y=by0; y<by0+bh; y++)
         for(x=bx0; x<bx0+bw; x++)
-            if(d[(y-by0)*bw+(x-bx0)]==4)
+            if(d[(y-by0)*bw+(x-bx0)]==4||d[(y-by0)*bw+(x-bx0)]==WL_FAN)
             {
                 if(p >= size)
                     goto corrupt;
@@ -649,6 +666,25 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
 			}
         }
     }
+	if(ver>=44){
+		for(j=0; j<w*h; j++)
+		{
+			i = m[j];
+			if(i)
+			{
+				if(p >= size) {
+					goto corrupt;
+				}
+				if(i <= NPART) {
+					ttv = (d[p++])<<8;
+					ttv |= (d[p++]);
+					parts[i-1].tmp = ttv;
+				} else {
+					p+=2;
+				}
+			}
+		}
+	}
     for(j=0; j<w*h; j++)
     {
         i = m[j];
@@ -693,7 +729,7 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
     {
         i = m[j];
         ty = d[pty+j];
-        if(i && (ty==PT_CLNE || (ty==PT_PCLN && ver>=43) || (ty==PT_SPRK && ver>=21) || (ty==PT_LAVA && ver>=34) || (ty==PT_PIPE && ver>=43)))
+        if(i && (ty==PT_CLNE || (ty==PT_PCLN && ver>=43) || (ty==PT_BCLN && ver>=44) || (ty==PT_SPRK && ver>=21) || (ty==PT_LAVA && ver>=34) || (ty==PT_PIPE && ver>=43)))
         {
             if(p >= size)
                 goto corrupt;
@@ -1169,7 +1205,7 @@ int main(int argc, char *argv[])
 
         if(!sys_pause||framerender)
         {
-            update_air();
+			update_air();
         }
 #ifdef OpenGL
         ClearScreen();
@@ -1188,6 +1224,17 @@ int main(int argc, char *argv[])
             memset(vid_buf, 0, (XRES+BARSIZE)*YRES*PIXELSIZE);
         }
 #endif
+		
+		//Can't be too sure...
+		if(bsx>1180)
+			bsx = 1180;
+		if(bsx<0)
+			bsx = 0;
+		if(bsy>1180)
+			bsy = 1180;
+		if(bsy<0)
+			bsy = 0;
+		
         update_particles(vid_buf);
         draw_parts(vid_buf);
 
@@ -1362,18 +1409,18 @@ int main(int argc, char *argv[])
 		{
 		    bsy -= 1;
 		}
-                else
+		else
 		{
-                    bsx -= ceil((bsx/5)+0.5f);
+            bsx -= ceil((bsx/5)+0.5f);
 		    bsy -= ceil((bsy/5)+0.5f);
 		}
                 if(bsx>1180)
                     bsx = 1180;
-		if(bsy>1180)
+				if(bsy>1180)
                     bsy = 1180;
                 if(bsx<0)
                     bsx = 0;
-		if(bsy<0)
+				if(bsy<0)
                     bsy = 0;
             }
         }
@@ -1389,7 +1436,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
+		if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
 		{
 		    bsx += 1;
 		    bsy += 1;
@@ -1402,18 +1449,18 @@ int main(int argc, char *argv[])
 		{
 		    bsy += 1;
 		}
-                else
+		else
 		{
-                    bsx += ceil((bsx/5)+0.5f);
+			bsx += ceil((bsx/5)+0.5f);
 		    bsy += ceil((bsy/5)+0.5f);
 		}
                 if(bsx>1180)
                     bsx = 1180;
-		if(bsy>1180)
+				if(bsy>1180)
                     bsy = 1180;
                 if(bsx<0)
                     bsx = 0;
-		if(bsy<0)
+				if(bsy<0)
                     bsy = 0;
             }
         }
@@ -1521,7 +1568,7 @@ int main(int argc, char *argv[])
                     bsx = 1180;
                 if(bsx<0)
                     bsx = 0;
-		if(bsy>1180)
+				if(bsy>1180)
                     bsy = 1180;
                 if(bsy<0)
                     bsy = 0;

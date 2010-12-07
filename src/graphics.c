@@ -1409,7 +1409,7 @@ void draw_parts(pixel *vid)
                	 	cb = PIXB(ptypes[t].pcolors);
                 	blendpixel(vid, nx, ny, cr, cg, cb, 255);
 	    	}
-		if(cmode==CM_GRAD)
+		else if(cmode==CM_GRAD)
 		{
 			float frequency = 0.05;
 			int q = parts[i].temp;
@@ -2796,12 +2796,18 @@ pixel *prerender_save(void *save, int size, int *width, int *height)
                         if(!(j%2) && !(i%2))
                             fb[(ry+j)*w+(rx+i)] = PIXPACK(0xC0C0C0);
                 break;
-            case 4:
-                for(j=0; j<CELL; j+=2)
-                    for(i=(j>>1)&1; i<CELL; i+=2)
-                        fb[(ry+j)*w+(rx+i)] = PIXPACK(0x8080FF);
-                k++;
-                break;
+				case 4:
+					for(j=0; j<CELL; j+=2)
+						for(i=(j>>1)&1; i<CELL; i+=2)
+							fb[(ry+j)*w+(rx+i)] = PIXPACK(0x8080FF);
+					k++;
+					break;
+				case WL_FAN:
+					for(j=0; j<CELL; j+=2)
+						for(i=(j>>1)&1; i<CELL; i+=2)
+							fb[(ry+j)*w+(rx+i)] = PIXPACK(0x8080FF);
+					k++;
+					break;
             case 6:
                 for(j=0; j<CELL; j+=2)
                     for(i=(j>>1)&1; i<CELL; i+=2)
@@ -2836,7 +2842,7 @@ pixel *prerender_save(void *save, int size, int *width, int *height)
             j=d[p++];
             if(j<PT_NUM && j>0)
             {
-                if(j==PT_STKM)  //Stickman should be drawed another way
+                if(j==PT_STKM)
                 {
                     //Stickman drawing
                     for(k=-2; k<=1; k++)

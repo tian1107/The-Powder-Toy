@@ -2195,7 +2195,7 @@ int search_ui(pixel *vid_buf)
                     drawrect(vid_buf, gx-2, gy-2, XRES/GRID_S+3, YRES/GRID_S+3, 160, 160, 192, 255);
                 else
                     drawrect(vid_buf, gx-2, gy-2, XRES/GRID_S+3, YRES/GRID_S+3, 128, 128, 128, 255);
-                if(own)
+                if(own && search_fav!=1)
                 {
                     if(dp == pos)
                         drawtext(vid_buf, gx+XRES/GRID_S-4, gy-6, "\x86", 255, 48, 32, 255);
@@ -2326,7 +2326,7 @@ int search_ui(pixel *vid_buf)
             lasttime = TIMEOUT;
         }
 
-        if(b && !bq && dp!=-1)
+        if(b && !bq && dp!=-1 && search_fav==0)
             if(confirm_ui(vid_buf, "Do you want to delete?", search_names[dp], "Delete"))
             {
                 execute_delete(vid_buf, search_ids[dp]);
