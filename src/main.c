@@ -77,6 +77,7 @@ static const char *it_msg =
     "\bgCopyright (c) 2010 Skresanov Savely (Stickman)\n"
 	"\bgCopyright (c) 2010 cracker64\n"
     "\bgCopyright (c) 2010 Bryan Hoyle (New elements)\n"
+	"\bgCopyright (c) 2010 Ian Christian Fernandez(New elements)\n"
     "\bgCopyright (c) 2010 Nathan Cousins (New elements, small engine mods.)\n"
     "\n"
     "\bgTo use online features such as saving, you need to register at: \brhttp://powdertoy.co.uk/Register.html"
@@ -2195,7 +2196,7 @@ int main(int argc, char *argv[])
             }
 			
 #ifdef BETA
-			sprintf(uitext, "Version %d Beta %d FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, FPSB, NUM_PARTS);
+			sprintf(uitext, "Version %d Beta %d (tian1107's additions v%.1f) FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS);
 #else
 			sprintf(uitext, "Version %d.%d FPS:%d", SAVE_VERSION, MINOR_VERSION, FPSB);
 #endif

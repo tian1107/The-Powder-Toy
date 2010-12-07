@@ -7,6 +7,7 @@
 #define PATH_SEP "/"
 #endif
 
+#define MODVERSION 3.6
 #define SAVE_VERSION 44
 #define MINOR_VERSION 2
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
