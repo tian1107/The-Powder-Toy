@@ -1712,7 +1712,6 @@ void draw_parts(pixel *vid)
                         blendpixel(vid, nx+1, ny+1, cr, cg, cb, 32);
                         blendpixel(vid, nx-1, ny-1, cr, cg, cb, 32);
                     }
-				
                 } else if(t==PT_PLUT&&cmode == CM_FANCY)
                 {
                     int tempx;
@@ -2348,39 +2347,6 @@ void draw_parts(pixel *vid)
                     // Older Code
                     /*if(cmode == 3||cmode==4 || cmode==6)
                     {
-                        cr = R/8;
-                        cg = G/8;
-                        cb = B/8;
-                        x = nx/CELL;
-                        y = ny/CELL;
-                        cg += fire_g[y][x];
-                        if(cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if(cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                        cr += fire_r[y][x];
-                        if(cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                    }
-                    else
-                    {
-                        cr = R;
-                        cg = G;
-                        cb = B;
-                        blendpixel(vid, nx, ny, cr, cg, cb, 192);
-                        blendpixel(vid, nx+1, ny, cr, cg, cb, 96);
-                        blendpixel(vid, nx-1, ny, cr, cg, cb, 96);
-                        blendpixel(vid, nx, ny+1, cr, cg, cb, 96);
-                        blendpixel(vid, nx, ny-1, cr, cg, cb, 96);
-                        blendpixel(vid, nx+1, ny-1, cr, cg, cb, 32);
-                        blendpixel(vid, nx-1, ny+1, cr, cg, cb, 32);
-                        blendpixel(vid, nx+1, ny+1, cr, cg, cb, 32);
-                        blendpixel(vid, nx-1, ny-1, cr, cg, cb, 32);
-                    }
-					// Older Code
-                    /*if(cmode == 3||cmode==4 || cmode==6)
-                    {
                         cr = parts[i].life / 4;
                         cg = parts[i].life / 16;
                         cb = parts[i].life / 32;
@@ -2562,6 +2528,7 @@ void draw_parts(pixel *vid)
             }
         }
 #endif
+	#include "additions/graphics.inc"
     }
 #ifdef OpenGL
     glFlush ();

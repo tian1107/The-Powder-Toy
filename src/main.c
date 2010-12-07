@@ -31,7 +31,7 @@
 #include <bzlib.h>
 #include <time.h>
 
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
 #include <direct.h>
 #else
 #include <sys/stat.h>
@@ -77,7 +77,6 @@ static const char *it_msg =
     "\bgCopyright (c) 2010 Skresanov Savely (Stickman)\n"
 	"\bgCopyright (c) 2010 cracker64\n"
     "\bgCopyright (c) 2010 Bryan Hoyle (New elements)\n"
-	"\bgCopyright (c) 2010 Ian Christian Fernandez (New elements)\n"
     "\bgCopyright (c) 2010 Nathan Cousins (New elements, small engine mods.)\n"
     "\n"
     "\bgTo use online features such as saving, you need to register at: \brhttp://powdertoy.co.uk/Register.html"
@@ -113,7 +112,7 @@ int core_count()
 {
     int numCPU = 1;
 #ifdef MT
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     SYSTEM_INFO sysinfo;
     GetSystemInfo( &sysinfo );
     numCPU = sysinfo.dwNumberOfProcessors;
@@ -138,7 +137,7 @@ int mousex = 0, mousey = 0;  //They contain mouse position
 
 void sdl_seticon(void)
 {
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     //SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(app_icon_w32, 32, 32, 32, 128, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
     //SDL_WM_SetIcon(icon, NULL/*app_icon_mask*/);
 #else
@@ -838,7 +837,7 @@ void stamp_save(int x, int y, int w, int h)
     char fn[64], sn[16];
     void *s=build_save(&n, x, y, w, h);
 
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     _mkdir("stamps");
 #else
     mkdir("stamps", 0755);
@@ -1329,10 +1328,10 @@ int main(int argc, char *argv[])
         {
             set_cmode(CM_GRAD);
         }
-		if(sdl_key=='-')
+	if(sdl_key=='-')
         {
-			set_cmode(CM_WAVE);
-        }
+            set_cmode(CM_WAVE);
+        }	
 	if(sdl_key==SDLK_TAB)
 	{
 		CURRENT_BRUSH =(CURRENT_BRUSH + 1)%BRUSH_NUM ;
@@ -2190,16 +2189,6 @@ int main(int argc, char *argv[])
             }
             if(currentTime-pastFPS>=1000)
             {
-/*#ifdef BETA
-	#ifdef MOD
-				sprintf(uitext, "Version %d Beta %d (%s's mod %02.1f) FPS:%d", REAL_SAVE_VERSION, REAL_MINOR_VERSION, CREATOR, MODVERSION, FPS);
-	#else 
-				sprintf(uitext, "Version %d (Beta %d) FPS:%d", SAVE_VERSION, MINOR_VERSION, FPS);
-                //printf("%s\n", uitext);
-	#endif
-#else
-                sprintf(uitext, "Version %d.%d FPS:%d", SAVE_VERSION, MINOR_VERSION, FPS);
-#endif*/
                 FPSB = FPS;
                 FPS = 0;
                 pastFPS = currentTime;

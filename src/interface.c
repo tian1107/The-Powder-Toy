@@ -1818,18 +1818,14 @@ void set_cmode(int cm)
     }
     else if(cmode==CM_PRESS)
         strcpy(itc_msg, "Pressure Display");
-	else if(cmode == CM_WAVE){
-		memset(fire_r, 0, sizeof(fire_r));
-        memset(fire_g, 0, sizeof(fire_g));
-        memset(fire_b, 0, sizeof(fire_b));
-		strcpy(itc_msg, "Radio Wave Display");
-		}
     else if(cmode==CM_NOTHING)
         strcpy(itc_msg, "Nothing Display");
     else if(cmode==CM_CRACK)
         strcpy(itc_msg, "Alternate Velocity Display");
     else if(cmode==CM_GRAD)
         strcpy(itc_msg, "Heat Gradient Display");
+	else if(cmode==CM_WAVE)
+        strcpy(itc_msg, "Radio Wave Display");
     else
         strcpy(itc_msg, "Velocity Display");
 }
@@ -2508,27 +2504,15 @@ int search_ui(pixel *vid_buf)
             if(!img_id[i])
             {
                 for(pos=0; pos<GRID_X*GRID_Y; pos++)
-                    if(search_ids[pos] && !search_thumbs[pos] && !search_dates[pos])
+                    if(search_ids[pos] && !search_thumbs[pos])
                     {
                         for(gi=0; gi<IMGCONNS; gi++)
-							if(img_id[gi] && !strcmp(search_ids[pos], img_id[gi]))
-								break;
+                            if(img_id[gi] && !strcmp(search_ids[pos], img_id[gi]))
+                                break;
                         if(gi<IMGCONNS)
                             continue;
                         break;
-                    } else if(search_ids[pos] && !search_thumbs[pos] && search_dates[pos]) {
-						char *id_d_temp = malloc(strlen(search_ids[pos])+strlen(search_dates[pos])+1);
-                        strcpy(id_d_temp, search_ids[pos]);
-                        strappend(id_d_temp, "_");
-                        strappend(id_d_temp, search_dates[pos]);
-
-						for(gi=0; gi<IMGCONNS; gi++)
-							if(img_id[gi] && !strcmp(id_d_temp, img_id[gi]))
-								break;
-                        if(gi<IMGCONNS)
-                            continue;
-                        break;
-					}
+                    }
                 if(pos<GRID_X*GRID_Y)
                 {
                     if(search_dates[pos]) {
@@ -3271,7 +3255,6 @@ int search_results(char *str, int votes)
         }
         else if(!strncmp(str, "HISTORY ", 8))
         {
-			char *id_d_temp;
             if(i>=GRID_X*GRID_Y)
                 break;
             if(votes)
@@ -3338,13 +3321,7 @@ int search_results(char *str, int votes)
 
             if(s)
                 search_votes[i] = atoi(s);
-
-			*id_d_temp = malloc(strlen(search_ids[i])+strlen(search_dates[i])+1);
-            strcpy(id_d_temp, search_ids[i]);
-            strappend(id_d_temp, "_");
-            strappend(id_d_temp, search_dates[i]);
-
-            thumb_cache_find(id_d_temp, search_thumbs+i, search_thsizes+i);
+            thumb_cache_find(str+8, search_thumbs+i, search_thsizes+i);
             i++;
         }
         else if(!strncmp(str, "TAG ", 4))
@@ -3730,7 +3707,7 @@ int execute_vote(pixel *vid_buf, char *id, char *action)
     return 1;
 }
 void open_link(char *uri){
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
 	ShellExecute(0, "OPEN", uri, NULL, NULL, 0);
 #elif MACOSX
 	//char *cmd[] = { "open", uri, (char *)0 };

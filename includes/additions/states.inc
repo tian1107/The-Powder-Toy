@@ -1,3 +1,4 @@
+,
 /* FPLT */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_FIRE, 500.0f + 273.15f},
 /* SOAP */ {ST_LIQUID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* REMT */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},

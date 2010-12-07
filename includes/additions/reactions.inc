@@ -319,10 +319,10 @@ if(t==PT_PGLW)
 }
 //Infrared emitter
 if(t==PT_SPRK && parts[i].ctype == PT_IEMT && parts[i].life == 1){
-	create_line(x, 0, x, YRES, 0, PT_IWAVE);
-	create_line(0, y, XRES, y, 0, PT_IWAVE);
-	create_line(x - y, 0, YRES + x - y, YRES, 0, PT_IWAVE);
-	create_line(x+y, 0, -YRES+x+y, YRES, 0, PT_IWAVE);
+	create_line(x, 0, x, YRES, 1,1, PT_IWAVE);
+	create_line(0, y, XRES, y, 1,1, PT_IWAVE);
+	create_line(x - y, 0, YRES + x - y, YRES, 1,1, PT_IWAVE);
+	create_line(x+y, 0, -YRES+x+y, YRES, 1,1, PT_IWAVE);
 }
 //Infrared receiver
 if(t == PT_IREC){

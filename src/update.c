@@ -25,7 +25,7 @@
 #endif
 #include <string.h>
 
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -83,7 +83,7 @@ static char *exe_name(void)
 int update_start(char *data, int len)
 {
     char *self=exe_name(), *temp;
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     char *p;
 #endif
     FILE *f;
@@ -92,7 +92,7 @@ int update_start(char *data, int len)
     if(!self)
         return 1;
 
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     temp = malloc(strlen(self)+12);
     strcpy(temp, self);
     p = temp + strlen(temp) - 4;
@@ -160,7 +160,7 @@ fail:
 
 int update_finish(void)
 {
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     char *temp, *self=exe_name(), *p;
     int timeout = 60, err;
 
@@ -195,7 +195,7 @@ int update_finish(void)
 
 void update_cleanup(void)
 {
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     update_finish();
 #endif
 }

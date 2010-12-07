@@ -1,23 +1,16 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
 #define PATH_SEP "\\"
 #else
 #define PATH_SEP "/"
 #endif
 
-#define REAL_SAVE_VERSION 44
-#define REAL_MINOR_VERSION 2
-#define SAVE_VERSION (REAL_SAVE_VERSION + 10)		//To remove update thing
-#define MINOR_VERSION 100							//To remove update thing
+#define SAVE_VERSION 44
+#define MINOR_VERSION 2
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
 #define BETA
-#define MOD		//Add if it is a mod
-#ifdef MOD
-	#define MODVERSION 3.5
-	#define CREATOR "tian1107"
-#endif
 
 #define SERVER "powdertoy.co.uk"
 

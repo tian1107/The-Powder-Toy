@@ -27,7 +27,7 @@
 #include <malloc.h>
 #endif
 #include <time.h>
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
 #define _WIN32_WINNT 0x0501
 //#include <iphlpapi.h>
 #include <winsock2.h>
@@ -46,7 +46,7 @@
 #include <http.h>
 #include <md5.h>
 
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
 #define PERROR SOCKET_ERROR
 #define PERRNO WSAGetLastError()
 #define PEAGAIN WSAEWOULDBLOCK
@@ -157,7 +157,7 @@ static int resolve(char *dns, char *srv, struct sockaddr_in *addr)
 void http_init(char *proxy)
 {
     char *host, *port;
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     WSADATA wsadata;
     if(!WSAStartup(MAKEWORD(2,2), &wsadata))
         http_up = 1;
@@ -180,7 +180,7 @@ void http_init(char *proxy)
 
 void http_done(void)
 {
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     WSACleanup();
 #endif
     http_up = 0;
@@ -397,7 +397,7 @@ int http_async_req_status(void *ctx)
     char *dns,*srv,buf[CHUNK];
     int tmp, i;
     time_t now = time(NULL);
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
     unsigned long tmp2;
 #endif
 
@@ -429,7 +429,7 @@ int http_async_req_status(void *ctx)
             if(cx->fd == PERROR)
                 goto fail;
             cx->fdhost = mystrdup(cx->host);
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
             tmp2 = 1;
             if(ioctlsocket(cx->fd, FIONBIO, &tmp2) == SOCKET_ERROR)
                 goto fail;
@@ -443,7 +443,7 @@ int http_async_req_status(void *ctx)
         }
         if(!connect(cx->fd, (struct sockaddr *)&cx->addr, sizeof(cx->addr)))
             cx->state = HTS_IDLE;
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
         else if(PERRNO==WSAEISCONN)
             cx->state = HTS_IDLE;
 #endif
@@ -452,7 +452,7 @@ int http_async_req_status(void *ctx)
             cx->state = HTS_IDLE;
 #endif
         else if(PERRNO!=PEINPROGRESS && PERRNO!=PEALREADY
-#if defined(_WIN32) && !defined(__GNUC__)
+#ifdef WIN32
                 && PERRNO!=PEAGAIN && PERRNO!=WSAEINVAL
 #endif
                )
