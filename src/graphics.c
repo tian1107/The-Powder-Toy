@@ -1429,8 +1429,8 @@ void draw_parts(pixel *vid)
 			if(cb<=0)
 					cb = 0;
 			blendpixel(vid, nx, ny, cr, cg, cb, 255);
-			
-			
+
+
 		}
                 else if(t==PT_MWAX&&cmode == CM_FANCY)
                 {
@@ -1464,7 +1464,7 @@ void draw_parts(pixel *vid)
 		}
 		else if(t==PT_DEUT)
 		{
-                   
+
 			if(parts[i].life>=700&&(cmode == CM_FIRE||cmode==CM_BLOB || cmode==CM_FANCY))
 			{
 						x = nx/CELL;
@@ -1494,7 +1494,7 @@ void draw_parts(pixel *vid)
 				if(cb>=255)
 					cb = 255;
 				blendpixel(vid, nx, ny, cr, cg, cb, 255);
-				
+
 			}
 
 		}
@@ -1539,14 +1539,14 @@ void draw_parts(pixel *vid)
 				cr += (parts[i].vy)*GRAV_G;
 				cg += (parts[i].vy)*GRAV_B;
 				cb += (parts[i].vy)*GRAV_R;
-				
+
 			}
 			if(parts[i].vx<0)
 			{
 				cr -= (parts[i].vx)*GRAV_B;
 				cg -= (parts[i].vx)*GRAV_R;
 				cb -= (parts[i].vx)*GRAV_G;
-				
+
 			}
 			if(parts[i].vy<0)
 			{
@@ -1569,7 +1569,7 @@ void draw_parts(pixel *vid)
 			cr = sin(frequency*q + 0) * 127 + 128;
 			cg = sin(frequency*q + 2) * 127 + 128;
 			cb = sin(frequency*q + 4) * 127 + 128;
-			blendpixel(vid, nx, ny, cr, cg, cb, 255);			
+			blendpixel(vid, nx, ny, cr, cg, cb, 255);
 		}
 		else if(t==PT_PIPE)
 		{
@@ -1625,9 +1625,9 @@ void draw_parts(pixel *vid)
 				cb = PIXB(ptypes[parts[i].tmp].pcolors);
 			}
 			blendpixel(vid, nx, ny, cr, cg, cb, 255);
-			
-			
-			
+
+
+
 		}
 		else if(t==PT_INVIS && (pv[ny/CELL][nx/CELL]>4.0f ||pv[ny/CELL][nx/CELL]<-4.0f))
 			blendpixel(vid, nx, ny, 15, 0, 150, 100);
@@ -2528,7 +2528,7 @@ void draw_parts(pixel *vid)
             }
         }
 #endif
-	#include "additions/graphics.inc"
+	#include "additions/graphics.hpp"
     }
 #ifdef OpenGL
     glFlush ();
@@ -2583,7 +2583,7 @@ void render_signs(pixel *vid_buf)
 		mx /= sdl_scale;
 		my /= sdl_scale;
 		signs[i].x = mx;
-		signs[i].y = my;	
+		signs[i].y = my;
 	    }
         }
 }
@@ -2962,7 +2962,7 @@ corrupt:
 
 void render_cursor(pixel *vid, int x, int y, int t, int rx, int ry)
 {
-    int i,j,c; 
+    int i,j,c;
     if(t<PT_NUM||t==SPC_AIR||t==SPC_HEAT||t==SPC_COOL||t==SPC_VACUUM)
     {
 	if(rx<=0)
