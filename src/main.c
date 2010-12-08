@@ -2245,7 +2245,7 @@ int main(int argc, char *argv[])
 #ifdef BETA
 			sprintf(uitext, "Version %d Beta %d (tian1107's additions v%.1f) FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS);
 #else
-			sprintf(uitext, "Version %d.%d FPS:%d", SAVE_VERSION, MINOR_VERSION, FPSB);
+			sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB);
 #endif
 			if(REPLACE_MODE)
 				strappend(uitext, " [REPLACE MODE]");

@@ -1456,7 +1456,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                 nearp = nearest_part(i, PT_ETRD);
                 if(nearp!=-1&&parts_avg(i, nearp, PT_INSL)!=PT_INSL)
                 {
-                    create_line((int)parts[i].x, (int)parts[i].y, (int)parts[nearp].x, (int)parts[nearp].y, 0, 0, PT_PLSM);
+                    create_line((int)parts[i].x, (int)parts[i].y, (int)parts[nearp].x, (int)parts[nearp].y, 1, 1, PT_PLSM);
                     t = parts[i].type = PT_ETRD;
                     parts[i].ctype = PT_NONE;
                     parts[i].life = 20;
