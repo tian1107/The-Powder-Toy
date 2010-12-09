@@ -54,8 +54,7 @@ static menu_wall mwalls[] =
 #define SC_LIFE 9
 #define SC_CRACKER 10
 #define SC_ADD	11
-#define SC_RWAV 12
-#define SC_TOTAL 13
+#define SC_TOTAL 12
 
 static menu_section msections[] =
 {
@@ -69,9 +68,8 @@ static menu_section msections[] =
     {"\xC6", "Radioactive", 0, 1},
     {"\xCC", "Special", 0, 1},
     {"\xC8", "Life", 0, 1},
-    {"\xC8", "Cracker", 0, 0},
+	{"\xC8", "Cracker", 0, 0},
 	{"\xC2", "tian1107 additions \"plugins\"", 0, 1},
-	{"\xC6", "More Radio Communications", 0, 1},
 };
 
 struct ui_edit

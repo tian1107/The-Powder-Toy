@@ -1,17 +1,23 @@
+/*Moved to powder.c
+if(t == PT_CHAN){
+    int emt = pmap[y][x];
+    if(parts[emt>>8].life != 0)
+        return -1;
+    if((emt&0xFF)==PT_REMT || (emt&0xFF)==PT_RREC){
+        parts[emt>>8].any++;
+        if(parts[emt>>8].any % 2 == 0){
+            parts[emt>>8].any = 0;
+            parts[emt>>8].tmp++;
+            parts[emt>>8].tmp %= 4;
+            }
+        }
+        return emt>>8;
+    }*/
 if(t == PT_WAVE){
 	parts[i].life = rand()%50 + 50;
 	}
 if(t == PT_EWAVE){
 	parts[i].life = 25;
-	}
-if(t == PT_AWAVE){
-	parts[i].life = 20;
-	}
-if(t == PT_BWAVE){
-	parts[i].life = 15;
-	}
-if(t == PT_CWAVE){
-	parts[i].life = 10;
 	}
 if(t==PT_IWAVE)
     {
