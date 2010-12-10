@@ -13,4 +13,8 @@
 /* PGLW */ {ST_NONE,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* IEMT */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* IREC */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* IWAV */ {ST_GAS,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* HGEN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* HWAV */ {ST_GAS,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
+
 // Name		Original	Solid	 Frzp		Liquid   Mpnt		Gas	   Bpoint		Burn	Burning point

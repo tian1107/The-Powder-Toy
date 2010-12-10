@@ -75,9 +75,9 @@ static const char *it_msg =
     "\bgCopyright (c) 2008-10 Stanislaw K Skowronek (\brhttp://powder.unaligned.org\bg, \bbirc.unaligned.org #wtf\bg)\n"
     "\bgCopyright (c) 2010 Simon Robertshaw (\brhttp://powdertoy.co.uk\bg, \bbirc.freenode.net #powder\bg)\n"
     "\bgCopyright (c) 2010 Skresanov Savely (Stickman)\n"
-	"\bgCopyright (c) 2010 cracker64\n"
+    "\bgCopyright (c) 2010 cracker64\n"
     "\bgCopyright (c) 2010 Bryan Hoyle (New elements)\n"
-	"\bgCopyright (c) 2010 Ian Christian Fernandez(New elements)\n"
+    "\bgCopyright (c) 2010 Ian Christian Fernandez (New elements)\n"
     "\bgCopyright (c) 2010 Nathan Cousins (New elements, small engine mods.)\n"
     "\n"
     "\bgTo use online features such as saving, you need to register at: \brhttp://powdertoy.co.uk/Register.html"
@@ -273,7 +273,8 @@ void *build_save(int *size, int x0, int y0, int w, int h)
         {
             x = (int)(parts[i].x+0.5f);
             y = (int)(parts[i].y+0.5f);
-            if(x>=x0 && x<x0+w && y>=y0 && y<y0+h) {
+            if(x>=x0 && x<x0+w && y>=y0 && y<y0+h)
+            {
                 if(!m[(x-x0)+(y-y0)*w] ||
                         parts[m[(x-x0)+(y-y0)*w]-1].type == PT_PHOT)
                     m[(x-x0)+(y-y0)*w] = i+1;
@@ -308,24 +309,26 @@ void *build_save(int *size, int x0, int y0, int w, int h)
     for(j=0; j<w*h; j++)
     {
         i = m[j];
-        if(i){
-			//Everybody loves a 16bit int
+        if(i)
+        {
+            //Everybody loves a 16bit int
             //d[p++] = (parts[i-1].life+3)/4;
-			int ttlife = (int)parts[i-1].life;
+            int ttlife = (int)parts[i-1].life;
             d[p++] = ((ttlife&0xFF00)>>8);
             d[p++] = (ttlife&0x00FF);
-		}
+        }
     }
-	for(j=0; j<w*h; j++)
+    for(j=0; j<w*h; j++)
     {
         i = m[j];
-        if(i){
-			//Now saving tmp!
+        if(i)
+        {
+            //Now saving tmp!
             //d[p++] = (parts[i-1].life+3)/4;
-			int tttmp = (int)parts[i-1].tmp;
+            int tttmp = (int)parts[i-1].tmp;
             d[p++] = ((tttmp&0xFF00)>>8);
             d[p++] = (tttmp&0x00FF);
-		}
+        }
     }
     for(j=0; j<w*h; j++)
     {
@@ -415,7 +418,8 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
         return 1;
     if(!(c[2]==0x43 && c[1]==0x75 && c[0]==0x66) && !(c[2]==0x76 && c[1]==0x53 && c[0]==0x50))
         return 1;
-    if(c[2]==0x76 && c[1]==0x53 && c[0]==0x50) {
+    if(c[2]==0x76 && c[1]==0x53 && c[0]==0x50)
+    {
         new_format = 1;
     }
     if(c[4]>SAVE_VERSION)
@@ -428,18 +432,25 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
     }
     else
     {
-		if(ver>=44){
-			legacy_enable = c[3]&0x01;
-			if(!sys_pause){
-				sys_pause = (c[3]>>1)&0x01;
-			}
-		} else {
-			if(c[3]==1||c[3]==0){
-				legacy_enable = c[3];
-			} else {
-				legacy_beta = 1;
-			}
-		}
+        if(ver>=44)
+        {
+            legacy_enable = c[3]&0x01;
+            if(!sys_pause)
+            {
+                sys_pause = (c[3]>>1)&0x01;
+            }
+        }
+        else
+        {
+            if(c[3]==1||c[3]==0)
+            {
+                legacy_enable = c[3];
+            }
+            else
+            {
+                legacy_beta = 1;
+            }
+        }
     }
 
     bw = c[6];
@@ -505,35 +516,35 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
         for(x=bx0; x<bx0+bw; x++)
         {
             if(d[p])
-		{
+            {
                 bmap[y][x] = d[p];
-		if(bmap[y][x]==1)
-			bmap[y][x]=WL_WALL;
-		if(bmap[y][x]==2)
-			bmap[y][x]=WL_DESTROYALL;
-		if(bmap[y][x]==3)
-			bmap[y][x]=WL_ALLOWLIQUID;
-		if(bmap[y][x]==4)
-			bmap[y][x]=WL_FAN;
-		if(bmap[y][x]==5)
-			bmap[y][x]=WL_STREAM;
-		if(bmap[y][x]==6)
-			bmap[y][x]=WL_DETECT;
-		if(bmap[y][x]==7)
-			bmap[y][x]=WL_EWALL;
-		if(bmap[y][x]==8)
-			bmap[y][x]=WL_WALLELEC;
-		if(bmap[y][x]==9)
-			bmap[y][x]=WL_ALLOWAIR;
-		if(bmap[y][x]==10)
-			bmap[y][x]=WL_ALLOWSOLID;
-		if(bmap[y][x]==11)
-			bmap[y][x]=WL_ALLOWALLELEC;
-		if(bmap[y][x]==12)
-			bmap[y][x]=WL_EHOLE;
-		if(bmap[y][x]==13)
-			bmap[y][x]=WL_ALLOWGAS;
-		}
+                if(bmap[y][x]==1)
+                    bmap[y][x]=WL_WALL;
+                if(bmap[y][x]==2)
+                    bmap[y][x]=WL_DESTROYALL;
+                if(bmap[y][x]==3)
+                    bmap[y][x]=WL_ALLOWLIQUID;
+                if(bmap[y][x]==4)
+                    bmap[y][x]=WL_FAN;
+                if(bmap[y][x]==5)
+                    bmap[y][x]=WL_STREAM;
+                if(bmap[y][x]==6)
+                    bmap[y][x]=WL_DETECT;
+                if(bmap[y][x]==7)
+                    bmap[y][x]=WL_EWALL;
+                if(bmap[y][x]==8)
+                    bmap[y][x]=WL_WALLELEC;
+                if(bmap[y][x]==9)
+                    bmap[y][x]=WL_ALLOWAIR;
+                if(bmap[y][x]==10)
+                    bmap[y][x]=WL_ALLOWSOLID;
+                if(bmap[y][x]==11)
+                    bmap[y][x]=WL_ALLOWALLELEC;
+                if(bmap[y][x]==12)
+                    bmap[y][x]=WL_EHOLE;
+                if(bmap[y][x]==13)
+                    bmap[y][x]=WL_ALLOWGAS;
+            }
 
             p++;
         }
@@ -563,11 +574,12 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
             if(p >= size)
                 goto corrupt;
             j=d[p++];
-            if(j >= PT_NUM) {
+            if(j >= PT_NUM)
+            {
                 //TODO: Possibly some server side translation
                 j = PT_DUST;//goto corrupt;
             }
-	    gol[x][y]=0;
+            gol[x][y]=0;
             if(j)// && !(isplayer == 1 && j==PT_STKM))
             {
                 if(pmap[y][x])
@@ -583,10 +595,10 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
                 else if(i < nf)
                 {
                     parts[fp[i]].type = j;
-		    if(j == PT_COAL)
-			parts[fp[i]].tmp = 50;
-		    if(j == PT_FUSE)
-			parts[fp[i]].tmp = 50;
+                    if(j == PT_COAL)
+                        parts[fp[i]].tmp = 50;
+                    if(j == PT_FUSE)
+                        parts[fp[i]].tmp = 50;
                     if(j == PT_PHOT)
                         parts[fp[i]].ctype = 0x3fffffff;
                     parts[fp[i]].x = (float)x;
@@ -647,46 +659,58 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
         i = m[j];
         if(i)
         {
-			if(ver>=44){
-				if(p >= size) {
-					goto corrupt;
-				}
-				if(i <= NPART) {
-					ttv = (d[p++])<<8;
-					ttv |= (d[p++]);
-					parts[i-1].life = ttv;
-				} else {
-					p+=2;
-				}
-			} else {
-				if(p >= size)
-					goto corrupt;
-				if(i <= NPART)
-					parts[i-1].life = d[p++]*4;
-				else
-					p++;
-			}
+            if(ver>=44)
+            {
+                if(p >= size)
+                {
+                    goto corrupt;
+                }
+                if(i <= NPART)
+                {
+                    ttv = (d[p++])<<8;
+                    ttv |= (d[p++]);
+                    parts[i-1].life = ttv;
+                }
+                else
+                {
+                    p+=2;
+                }
+            }
+            else
+            {
+                if(p >= size)
+                    goto corrupt;
+                if(i <= NPART)
+                    parts[i-1].life = d[p++]*4;
+                else
+                    p++;
+            }
         }
     }
-	if(ver>=44){
-		for(j=0; j<w*h; j++)
-		{
-			i = m[j];
-			if(i)
-			{
-				if(p >= size) {
-					goto corrupt;
-				}
-				if(i <= NPART) {
-					ttv = (d[p++])<<8;
-					ttv |= (d[p++]);
-					parts[i-1].tmp = ttv;
-				} else {
-					p+=2;
-				}
-			}
-		}
-	}
+    if(ver>=44)
+    {
+        for(j=0; j<w*h; j++)
+        {
+            i = m[j];
+            if(i)
+            {
+                if(p >= size)
+                {
+                    goto corrupt;
+                }
+                if(i <= NPART)
+                {
+                    ttv = (d[p++])<<8;
+                    ttv |= (d[p++]);
+                    parts[i-1].tmp = ttv;
+                }
+                else
+                {
+                    p+=2;
+                }
+            }
+        }
+    }
     for(j=0; j<w*h; j++)
     {
         i = m[j];
@@ -701,22 +725,29 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
                 }
                 if(i <= NPART)
                 {
-                    if(ver>=42) {
-                        if(new_format) {
+                    if(ver>=42)
+                    {
+                        if(new_format)
+                        {
                             ttv = (d[p++])<<8;
                             ttv |= (d[p++]);
                             parts[i-1].temp = ttv;
-                        } else {
+                        }
+                        else
+                        {
                             parts[i-1].temp = (d[p++]*((MAX_TEMP+(-MIN_TEMP))/255))+MIN_TEMP;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         parts[i-1].temp = ((d[p++]*((O_MAX_TEMP+(-O_MIN_TEMP))/255))+O_MIN_TEMP)+273;
                     }
                 }
                 else
                 {
                     p++;
-                    if(new_format) {
+                    if(new_format)
+                    {
                         p++;
                     }
                 }
@@ -1207,7 +1238,7 @@ int main(int argc, char *argv[])
 
         if(!sys_pause||framerender)
         {
-			update_air();
+            update_air();
         }
 #ifdef OpenGL
         ClearScreen();
@@ -1226,17 +1257,17 @@ int main(int argc, char *argv[])
             memset(vid_buf, 0, (XRES+BARSIZE)*YRES*PIXELSIZE);
         }
 #endif
-		
-		//Can't be too sure...
-		if(bsx>1180)
-			bsx = 1180;
-		if(bsx<0)
-			bsx = 0;
-		if(bsy>1180)
-			bsy = 1180;
-		if(bsy<0)
-			bsy = 0;
-		
+
+        //Can't be too sure...
+        if(bsx>1180)
+            bsx = 1180;
+        if(bsx<0)
+            bsx = 0;
+        if(bsy>1180)
+            bsy = 1180;
+        if(bsy<0)
+            bsy = 0;
+
         update_particles(vid_buf);
         draw_parts(vid_buf);
 
@@ -1366,27 +1397,28 @@ int main(int argc, char *argv[])
         {
             set_cmode(CM_FANCY);
         }
-	if(sdl_key=='8')
+        if(sdl_key=='8')
         {
             set_cmode(CM_NOTHING);
         }
-	if(sdl_key=='9')
+        if(sdl_key=='9')
         {
             set_cmode(CM_CRACK);
         }
-	if(sdl_key=='0')
+        if(sdl_key=='0')
         {
             set_cmode(CM_GRAD);
         }
-	if(sdl_key=='-')
+        if(sdl_key=='-')
         {
             set_cmode(CM_WAVE);
-        }	
-	if(sdl_key==SDLK_TAB)
-	{
-		CURRENT_BRUSH =(CURRENT_BRUSH + 1)%BRUSH_NUM ;
-	}
-        if(sdl_key==SDLK_LEFTBRACKET) {
+        }
+        if(sdl_key==SDLK_TAB)
+        {
+            CURRENT_BRUSH =(CURRENT_BRUSH + 1)%BRUSH_NUM ;
+        }
+        if(sdl_key==SDLK_LEFTBRACKET)
+        {
             if(sdl_zoom_trig==1)
             {
                 ZSIZE -= 1;
@@ -1399,34 +1431,35 @@ int main(int argc, char *argv[])
             else
             {
                 if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
-		{
-		    bsx -= 1;
-		    bsy -= 1;
-		}
-		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
-		{
-		    bsx -= 1;
-		}
-		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
-		{
-		    bsy -= 1;
-		}
-		else
-		{
-            bsx -= ceil((bsx/5)+0.5f);
-		    bsy -= ceil((bsy/5)+0.5f);
-		}
+                {
+                    bsx -= 1;
+                    bsy -= 1;
+                }
+                else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+                {
+                    bsx -= 1;
+                }
+                else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+                {
+                    bsy -= 1;
+                }
+                else
+                {
+                    bsx -= ceil((bsx/5)+0.5f);
+                    bsy -= ceil((bsy/5)+0.5f);
+                }
                 if(bsx>1180)
                     bsx = 1180;
-				if(bsy>1180)
+                if(bsy>1180)
                     bsy = 1180;
                 if(bsx<0)
                     bsx = 0;
-				if(bsy<0)
+                if(bsy<0)
                     bsy = 0;
             }
         }
-        if(sdl_key==SDLK_RIGHTBRACKET) {
+        if(sdl_key==SDLK_RIGHTBRACKET)
+        {
             if(sdl_zoom_trig==1)
             {
                 ZSIZE += 1;
@@ -1438,39 +1471,39 @@ int main(int argc, char *argv[])
             }
             else
             {
-		if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
-		{
-		    bsx += 1;
-		    bsy += 1;
-		}
-		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
-		{
-		    bsx += 1;
-		}
-		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
-		{
-		    bsy += 1;
-		}
-		else
-		{
-			bsx += ceil((bsx/5)+0.5f);
-		    bsy += ceil((bsy/5)+0.5f);
-		}
+                if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
+                {
+                    bsx += 1;
+                    bsy += 1;
+                }
+                else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+                {
+                    bsx += 1;
+                }
+                else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+                {
+                    bsy += 1;
+                }
+                else
+                {
+                    bsx += ceil((bsx/5)+0.5f);
+                    bsy += ceil((bsy/5)+0.5f);
+                }
                 if(bsx>1180)
                     bsx = 1180;
-				if(bsy>1180)
+                if(bsy>1180)
                     bsy = 1180;
                 if(bsx<0)
                     bsx = 0;
-				if(bsy<0)
+                if(bsy<0)
                     bsy = 0;
             }
         }
-	if(sdl_key==SDLK_INSERT)
-	    REPLACE_MODE = !REPLACE_MODE;
-	if(sdl_key=='g')
+        if(sdl_key==SDLK_INSERT)
+            REPLACE_MODE = !REPLACE_MODE;
+        if(sdl_key=='g')
             GRID_MODE = (GRID_MODE+1)%10;
-	if(sdl_key=='t')
+        if(sdl_key=='t')
             VINE_MODE = !VINE_MODE;
         if(sdl_key==SDLK_SPACE)
             sys_pause = !sys_pause;
@@ -1553,24 +1586,24 @@ int main(int argc, char *argv[])
             }
             else
             {
-		if(!(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
-		{
-		    bsx += sdl_wheel;
-		    bsy += sdl_wheel;
-		}
-		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
-		{
-		    bsx += sdl_wheel;
-		}
-		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
-		{
-		    bsy += sdl_wheel;
-		}
+                if(!(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
+                {
+                    bsx += sdl_wheel;
+                    bsy += sdl_wheel;
+                }
+                else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+                {
+                    bsx += sdl_wheel;
+                }
+                else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+                {
+                    bsy += sdl_wheel;
+                }
                 if(bsx>1180)
                     bsx = 1180;
                 if(bsx<0)
                     bsx = 0;
-				if(bsy>1180)
+                if(bsy>1180)
                     bsy = 1180;
                 if(bsy<0)
                     bsy = 0;
@@ -1955,11 +1988,12 @@ int main(int argc, char *argv[])
                         memset(fire_g, 0, sizeof(fire_g));
                         memset(fire_b, 0, sizeof(fire_b));
                     }
-                    if(x>=19 && x<=35 && svf_last && svf_open && !bq){
-						//int tpval = sys_pause;
-						parse_save(svf_last, svf_lsize, 1, 0, 0);
-						//sys_pause = tpval;
-					}
+                    if(x>=19 && x<=35 && svf_last && svf_open && !bq)
+                    {
+                        //int tpval = sys_pause;
+                        parse_save(svf_last, svf_lsize, 1, 0, 0);
+                        //sys_pause = tpval;
+                    }
                     if(x>=(XRES+BARSIZE-(510-476)) && x<=(XRES+BARSIZE-(510-491)) && !bq)
                     {
                         if(b & SDL_BUTTON_LMASK)
@@ -2034,8 +2068,8 @@ int main(int argc, char *argv[])
                     }
                     else if((sdl_mod & (KMOD_LCTRL|KMOD_RCTRL)) && (sdl_mod & (KMOD_LSHIFT|KMOD_RSHIFT)) && !(sdl_mod & (KMOD_LALT)))
                     {
-			if(sdl_mod & (KMOD_CAPS))
-				c = 0;
+                        if(sdl_mod & (KMOD_CAPS))
+                            c = 0;
                         if(c!=WL_STREAM&&c!=SPC_AIR&&c!=SPC_HEAT&&c!=SPC_COOL&&c!=SPC_VACUUM&&!REPLACE_MODE)
                             flood_parts(x, y, c, -1, -1);
                         lx = x;
@@ -2246,19 +2280,19 @@ int main(int argc, char *argv[])
                 FPS = 0;
                 pastFPS = currentTime;
             }
-			
+
 #ifdef BETA
-			sprintf(uitext, "Version %d Beta %d (tian1107's additions v%.1f) FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS);
+            sprintf(uitext, "Version %d Beta %d (tian1107's additions v%.1f) FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS);
 #else
-			sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB);
+            sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB);
 #endif
-			if(REPLACE_MODE)
-				strappend(uitext, " [REPLACE MODE]");
-			if(sdl_mod&(KMOD_CAPS))
-				strappend(uitext, " [CAP LOCKS]");
-			if(GRID_MODE)
-				sprintf(uitext, "%s [GRID: %d]", uitext, GRID_MODE);
-			
+            if(REPLACE_MODE)
+                strappend(uitext, " [REPLACE MODE]");
+            if(sdl_mod&(KMOD_CAPS))
+                strappend(uitext, " [CAP LOCKS]");
+            if(GRID_MODE)
+                sprintf(uitext, "%s [GRID: %d]", uitext, GRID_MODE);
+
             if(sdl_zoom_trig||zoom_en)
             {
                 if(zoom_x<XRES/2)
