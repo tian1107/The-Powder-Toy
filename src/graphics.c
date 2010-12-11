@@ -2563,7 +2563,7 @@ void draw_parts(pixel *vid)
             }
         }
 #endif
-#include "additions/graphics.hpp"
+#include "additions/graphics.h"
     }
 #ifdef OpenGL
     glFlush ();

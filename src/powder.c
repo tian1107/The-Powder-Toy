@@ -22,7 +22,7 @@ int pfree;
 unsigned pmap[YRES][XRES];
 unsigned cb_pmap[YRES][XRES];
 
-#include "additions/functions.hpp"
+#include "additions/functions.h"
 
 static int pn_junction_sprk(int x, int y, int pt)
 {
@@ -568,7 +568,7 @@ inline int create_part(int p, int x, int y, int t)
     	parts[i].life = 150;
     }
     End Testing*/
-#include "additions/life.hpp"
+#include "additions/life.h"
     if(t==PT_WARP)
     {
         parts[i].life = rand()%95+70;
@@ -3540,7 +3540,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                             }
                         }
             }
-#include "additions/reactions.hpp"
+#include "additions/reactions.h"
             if(t==PT_SWCH)
                 if((parts[i].life>0&&parts[i].life<10)|| parts[i].life > 10)
                 {
