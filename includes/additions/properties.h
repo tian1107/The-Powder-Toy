@@ -16,6 +16,7 @@
 {"IWVE",	PIXPACK(0x000000),	0.2f,	0.00f * CFDS,	1.00f,	1.00f,	1.0f,	0.0f,	0.2f,	0.000f  * CFDS,	0,	0,		0,	0,	0,	0,	-1,		SC_ADD,	    R_TEMP+0.0f +273.15f,	60,		"Infrared. Signals that are lining up in a strict manner."	                , TYPE_ENERGY},
 {"HGEN",	PIXPACK(0x808080),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_ADD,		R_TEMP+0.0f	+273.15f,	251,	"Heat Generator. Generates circular heat waves."            			    , TYPE_SOLID},
 {"HWVE",	PIXPACK(0x000000),	0.3f,	0.00f * CFDS,	1.00f,	1.00f,	0.0f,	0.0f,	0.3f,	0.000f  * CFDS,	0,	0,		0,	0,	0,	1,	-1,		SC_ADD,		    1000.0f +273.15f,	60,		"Heat Waves. Heats surrounding particles."                  				, TYPE_ENERGY},
+{"CHLN",	PIXPACK(0x22FF00),	1.0f,	0.01f * CFDS,	0.99f,	0.330f,	-0.1f,	0.0f,	0.75f,	0.001f	* CFDS,	0,	0,	    0,	0,	0,	1,	1,		SC_ADD,		R_TEMP+2.0f	+273.15f,	42,		"Chlorine gas. Does many reactions.", TYPE_GAS},
 //Name		Colour				Advec	Airdrag			Airloss	Loss	Collid	Grav	Diffus	Hotair			Fal	Burn	Exp	Mel	Hrd	M	Weights	Section			H						Ins(real world, by triclops200)		Description										Properties
 
 //Name			- 4 letter name of the element
