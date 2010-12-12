@@ -138,6 +138,7 @@ int CURRENT_BRUSH;
 int GRID_MODE;
 int VINE_MODE;
 int DEBUG_MODE;
+int GENERATION;
 extern sign signs[MAXSIGNS];
 extern stamp stamps[STAMP_MAX];
 extern int stamp_count;

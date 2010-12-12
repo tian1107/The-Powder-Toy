@@ -1403,11 +1403,11 @@ int main(int argc, char *argv[])
         }
         if(sdl_key=='9')
         {
-            set_cmode(CM_CRACK);
+            set_cmode(CM_GRAD);
         }
         if(sdl_key=='0')
         {
-            set_cmode(CM_GRAD);
+            set_cmode(CM_CRACK);
         }
         if(sdl_key=='-')
         {
@@ -1431,30 +1431,30 @@ int main(int argc, char *argv[])
             else
             {
                 if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
-		{
-		    bsx -= 1;
-		    bsy -= 1;
-		}
-		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
-		{
-		    bsx -= 1;
-		}
-		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
-		{
-		    bsy -= 1;
-		}
+                {
+                    bsx -= 1;
+                    bsy -= 1;
+                }
+                else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+                {
+                    bsx -= 1;
+                }
+                else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+                {
+                    bsy -= 1;
+                }
                 else
-		{
+                {
                     bsx -= ceil((bsx/5)+0.5f);
-		    bsy -= ceil((bsy/5)+0.5f);
-		}
+                    bsy -= ceil((bsy/5)+0.5f);
+                }
                 if(bsx>1180)
                     bsx = 1180;
-		if(bsy>1180)
+                if(bsy>1180)
                     bsy = 1180;
                 if(bsx<0)
                     bsx = 0;
-		if(bsy<0)
+                if(bsy<0)
                     bsy = 0;
             }
         }
@@ -1472,51 +1472,53 @@ int main(int argc, char *argv[])
             else
             {
                 if(sdl_mod & (KMOD_LALT|KMOD_RALT) && !(sdl_mod & (KMOD_SHIFT|KMOD_CTRL)))
-		{
-		    bsx += 1;
-		    bsy += 1;
-		}
-		else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
-		{
-		    bsx += 1;
-		}
-		else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
-		{
-		    bsy += 1;
-		}
+                {
+                    bsx += 1;
+                    bsy += 1;
+                }
+                else if(sdl_mod & (KMOD_SHIFT) && !(sdl_mod & (KMOD_CTRL)))
+                {
+                    bsx += 1;
+                }
+                else if(sdl_mod & (KMOD_CTRL) && !(sdl_mod & (KMOD_SHIFT)))
+                {
+                    bsy += 1;
+                }
                 else
-		{
+                {
                     bsx += ceil((bsx/5)+0.5f);
-		    bsy += ceil((bsy/5)+0.5f);
-		}
+                    bsy += ceil((bsy/5)+0.5f);
+                }
                 if(bsx>1180)
                     bsx = 1180;
-		if(bsy>1180)
+                if(bsy>1180)
                     bsy = 1180;
                 if(bsx<0)
                     bsx = 0;
-		if(bsy<0)
+                if(bsy<0)
                     bsy = 0;
             }
         }
-	if(sdl_key=='d')
-		DEBUG_MODE = !DEBUG_MODE;
-	if(sdl_key=='i')
-	{
-		int nx, ny;
-		for(nx = 0;nx<XRES/CELL;nx++)
-			for(ny = 0;ny<YRES/CELL;ny++)
-			{
-				pv[ny][nx] = -pv[ny][nx];
-				vx[ny][nx] = -vx[ny][nx];
-				vy[ny][nx] = -vy[ny][nx];
-			}
-	}
-	if((sdl_mod & (KMOD_RCTRL) )&&( sdl_mod & (KMOD_RALT)))
-		active_menu = 11;
-	if(sdl_key==SDLK_INSERT)
-	    REPLACE_MODE = !REPLACE_MODE;
-	if(sdl_key=='g')
+        if(sdl_key=='d')
+            DEBUG_MODE = !DEBUG_MODE;
+        if(sdl_key=='r')
+            GENERATION = 0;
+        if(sdl_key=='i')
+        {
+            int nx, ny;
+            for(nx = 0; nx<XRES/CELL; nx++)
+                for(ny = 0; ny<YRES/CELL; ny++)
+                {
+                    pv[ny][nx] = -pv[ny][nx];
+                    vx[ny][nx] = -vx[ny][nx];
+                    vy[ny][nx] = -vy[ny][nx];
+                }
+        }
+        if((sdl_mod & (KMOD_RCTRL) )&&( sdl_mod & (KMOD_RALT)))
+            active_menu = 11;
+        if(sdl_key==SDLK_INSERT)
+            REPLACE_MODE = !REPLACE_MODE;
+        if(sdl_key=='g')
             GRID_MODE = (GRID_MODE+1)%10;
         if(sdl_key=='t')
             VINE_MODE = !VINE_MODE;
@@ -1665,10 +1667,10 @@ int main(int argc, char *argv[])
 #ifdef BETA
                 sprintf(heattext, "%s, Pressure: %3.2f, Temp: %4.2f C, Life: %d", ptypes[cr&0xFF].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f, parts[cr>>8].life);
 #else
-		if(DEBUG_MODE)
-			sprintf(heattext, "%s (%s), Pressure: %3.2f, Temp: %4.2f C, Life: %d", ptypes[cr&0xFF].name, ptypes[parts[cr>>8].ctype].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f, parts[cr>>8].life);
-		else
-			sprintf(heattext, "%s, Pressure: %3.2f, Temp: %4.2f C", ptypes[cr&0xFF].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f);
+                if(DEBUG_MODE)
+                    sprintf(heattext, "%s (%s), Pressure: %3.2f, Temp: %4.2f C, Life: %d", ptypes[cr&0xFF].name, ptypes[parts[cr>>8].ctype].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f, parts[cr>>8].life);
+                else
+                    sprintf(heattext, "%s, Pressure: %3.2f, Temp: %4.2f C", ptypes[cr&0xFF].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f);
 #endif
             }
             else
@@ -2302,9 +2304,9 @@ int main(int argc, char *argv[])
 #ifdef BETA
             sprintf(uitext, "Version %d Beta %d (tian1107's additions v%.1f) FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS);
 #else
-			if(DEBUG_MODE)
-            sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS);
-			else
+            if(DEBUG_MODE)
+                sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d Parts:%d Generation:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS,GENERATION);
+            else
                 sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB);
 #endif
             if(REPLACE_MODE)
