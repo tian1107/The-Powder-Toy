@@ -68,7 +68,7 @@ static menu_section msections[] =
     {"\xD1", "Solids", 0, 1},
     {"\xC6", "Radioactive", 0, 1},
     {"\xCC", "Special", 0, 1},
-    {"\xC8", "Life", 0, 1},
+    {"\xD2", "Life", 0, 1},
     {"\xC8", "Cracker!", 0, 0},
     {"\xC2", "tian1107 additions \"plugins\"", 0, 1},
     {"\xC8", "Cracker", 0, 0},

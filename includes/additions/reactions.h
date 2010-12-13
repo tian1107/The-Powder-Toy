@@ -316,12 +316,14 @@ if(t==PT_CHLN)
                     continue;
                 if((r&0xFF)!=PT_CHLN)
                 {
-                    if(((r&0xFF)==PT_WATR || (r&0xFF)==PT_DSTW) && rand()%10<1){
+                    if(((r&0xFF)==PT_WATR || (r&0xFF)==PT_DSTW) && rand()%10<1)
+                    {
                         delete_part(x, y);
                         parts[r>>8].type = PT_ACID;
                         parts[r>>8].life = 500; //Acidic Acid!
                     }
-                    else if(((r&0xFF)==PT_RBDM || (r&0xFF)==PT_LRBD) && rand()%10<1){
+                    else if(((r&0xFF)==PT_RBDM || (r&0xFF)==PT_LRBD) && rand()%10<1)
+                    {
                         parts[r>>8].type = PT_SALT;
                         delete_part(x, y);
                     }
@@ -329,5 +331,53 @@ if(t==PT_CHLN)
                 }
             }
 }
+//Tunneler
+if(t==PT_TUNN)
+{
+    int ceiling = PT_IRON;
+    if(parts[i].vx > 0)
+    {
+        r = pmap[y][x+1];
+        if((r>>8)>=NPART || !r)
+            continue;
+        if((r&0xFF) != 0xFF && (r&0xFF) != PT_TUNN && (r&0xFF) != PT_DMND && ((ptypes[r&0xFF].properties&TYPE_SOLID) || (ptypes[r&0xFF].properties&TYPE_PART)))
+        {
+            if ((pmap[y-1][x+1]&0xFF) != PT_TUNN && (pmap[y-1][x+1]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x+1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x+1]&0xFF].properties&TYPE_PART)))
+            {
+                delete_part(x+1, y-1);
+                create_part(-1, x+1, y-1, ceiling);
+            }
+            if ((pmap[y-1][x+2]&0xFF) != PT_TUNN && (pmap[y-1][x+2]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x+2]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x+2]&0xFF].properties&TYPE_PART)))
+            {
+                delete_part(x+2, y-1);
+                create_part(-1, x+2, y-1, ceiling);
+            }
+            kill_part(r>>8);
+            kill_part(i);
+        }
+    }
+    else
+    {
+        r = pmap[y][x-1];
+        if((r>>8)>=NPART || !r)
+            continue;
+        if((r&0xFF) != 0xFF && (r&0xFF) != PT_TUNN && (r&0xFF) != PT_DMND && ((ptypes[r&0xFF].properties&TYPE_SOLID) || (ptypes[r&0xFF].properties&TYPE_PART)))
+        {
+            if ((pmap[y-1][x-1]&0xFF) != PT_TUNN && (pmap[y-1][x-1]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x-1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x-1]&0xFF].properties&TYPE_PART)))
+            {
+                delete_part(x-1, y-1);
+                create_part(-1, x-1, y-1, ceiling);
+            }
+            if ((pmap[y-1][x-2]&0xFF) != PT_TUNN && (pmap[y-1][x-2]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x-2]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x-2]&0xFF].properties&TYPE_PART)))
+            {
+                delete_part(x-2, y-1);
+                create_part(-1, x-2, y-1, ceiling);
+            }
+            kill_part(r>>8);
+            kill_part(i);
+        }
+    }
+}
+
 
 

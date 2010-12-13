@@ -42,3 +42,7 @@ if(t==PT_HWAV)
 {
     parts[i].life = 50;
 }
+if(t==PT_TUNN)
+{
+    parts[i].vx = 1;
+}
