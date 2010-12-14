@@ -335,6 +335,7 @@ if(t==PT_CHLN)
 if(t==PT_TUNN)
 {
     int ceiling = PT_IRON;
+    int ceiling2 = PT_BMTL;
     if(parts[i].vx > 0)
     {
         r = pmap[y][x+1];
@@ -345,12 +346,18 @@ if(t==PT_TUNN)
             if ((pmap[y-1][x+1]&0xFF) != PT_TUNN && (pmap[y-1][x+1]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x+1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x+1]&0xFF].properties&TYPE_PART)))
             {
                 delete_part(x+1, y-1);
-                create_part(-1, x+1, y-1, ceiling);
+                if((pmap[y-1][x]&0xFF) == ceiling)
+                    create_part(-1, x+1, y-1, ceiling2);
+                else
+                    create_part(-1, x+1, y-1, ceiling);
             }
             if ((pmap[y-1][x+2]&0xFF) != PT_TUNN && (pmap[y-1][x+2]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x+2]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x+2]&0xFF].properties&TYPE_PART)))
             {
                 delete_part(x+2, y-1);
-                create_part(-1, x+2, y-1, ceiling);
+                if((pmap[y-1][x+1]&0xFF) == ceiling)
+                    create_part(-1, x+2, y-1, ceiling2);
+                else
+                    create_part(-1, x+2, y-1, ceiling);
             }
             kill_part(r>>8);
             kill_part(i);
@@ -366,12 +373,18 @@ if(t==PT_TUNN)
             if ((pmap[y-1][x-1]&0xFF) != PT_TUNN && (pmap[y-1][x-1]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x-1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x-1]&0xFF].properties&TYPE_PART)))
             {
                 delete_part(x-1, y-1);
-                create_part(-1, x-1, y-1, ceiling);
+                if((pmap[y-1][x]&0xFF) == ceiling)
+                    create_part(-1, x-1, y-1, ceiling2);
+                else
+                    create_part(-1, x-1, y-1, ceiling);
             }
             if ((pmap[y-1][x-2]&0xFF) != PT_TUNN && (pmap[y-1][x-2]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x-2]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x-2]&0xFF].properties&TYPE_PART)))
             {
                 delete_part(x-2, y-1);
-                create_part(-1, x-2, y-1, ceiling);
+                if((pmap[y-1][x+1]&0xFF) == ceiling)
+                    create_part(-1, x-2, y-1, ceiling2);
+                else
+                    create_part(-1, x-2, y-1, ceiling);
             }
             kill_part(r>>8);
             kill_part(i);
