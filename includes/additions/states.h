@@ -16,5 +16,7 @@
 /* IWAV */ {ST_GAS,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* HGEN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_LAVA, 1273.15f,	PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* HWAV */ {ST_GAS,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
-
+/* CHLN */ {ST_GAS,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* TUNN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* VTNN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 // Name		Original	Solid	 Frzp		Liquid   Mpnt		Gas	   Bpoint		Burn	Burning point

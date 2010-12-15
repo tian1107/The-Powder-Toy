@@ -46,3 +46,7 @@ if(t==PT_TUNN)
 {
     parts[i].vx = 1;
 }
+if(t==PT_VTNN)
+{
+    parts[i].vy = 1;
+}

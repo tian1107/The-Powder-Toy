@@ -279,7 +279,7 @@ if(t == PT_IREC)
 //Heat generator
 if(t == PT_HGEN && parts[i].life == 1)
 {
-    circle(parts[i].x, parts[i].y, 20,PT_HWAV);
+    circle(parts[i].x, parts[i].y, 40,PT_HWAV);
     parts[i].life = 9;
 }
 if(t == PT_HWAV)
@@ -302,7 +302,7 @@ if(t == PT_HWAV && parts[i].life == 1)
     if(parts[i].any2 != 80)
     {
         if(parts[parts[i].any].type == PT_HGEN)
-            circle(parts[parts[i].any].x, parts[parts[i].any].y, parts[i].any2+20,PT_HWAV);
+            circle(parts[parts[i].any].x, parts[parts[i].any].y, parts[i].any2+40,PT_HWAV);
     }
 }
 if(t==PT_CHLN)
@@ -389,6 +389,73 @@ if(t==PT_TUNN)
             kill_part(r>>8);
             kill_part(i);
         }
+    }
+}
+//Vertical Tunneler
+if(t==PT_VTNN)
+{
+    int ceiling = PT_IRON;
+    int ceiling2 = PT_BMTL;
+    if(parts[i].vy > 0)
+    {
+        if(y+1 > YRES)
+            continue;
+        r = pmap[y+1][x];
+        if((r>>8)>=NPART || !r)
+            continue;
+        if((r&0xFF) != 0xFF && (r&0xFF) != PT_TUNN && (r&0xFF) != PT_DMND && ((ptypes[r&0xFF].properties&TYPE_SOLID) || (ptypes[r&0xFF].properties&TYPE_PART)))
+        {
+            if ((pmap[y+1][x-1]&0xFF) != PT_TUNN && (pmap[y+1][x-1]&0xFF) != PT_DMND && ((ptypes[pmap[y+1][x-1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y+1][x-1]&0xFF].properties&TYPE_PART)))
+            {
+                if((pmap[y][x-1]&0xFF) == ceiling)
+                    parts[pmap[y+1][x-1]>>8].type = ceiling2;
+                else
+                    parts[pmap[y+1][x-1]>>8].type = ceiling;
+            }
+            if ((pmap[y+1][x+1]&0xFF) != PT_TUNN && (pmap[y+1][x+1]&0xFF) != PT_DMND && ((ptypes[pmap[y+1][x+1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y+1][x+1]&0xFF].properties&TYPE_PART)))
+            {
+                if((pmap[y][x+1]&0xFF) == ceiling)
+                    parts[pmap[y+1][x+1]>>8].type = ceiling2;
+                else
+                    parts[pmap[y+1][x+1]>>8].type = ceiling;
+            }
+            kill_part(r>>8);
+            kill_part(i);
+        }
+    }
+    else
+    {
+        if(y-1 <= 0)
+            kill_part(i);
+        r = pmap[y-1][x];
+        if((r>>8)>=NPART || !r)
+            continue;
+        if((r&0xFF) != 0xFF && (r&0xFF) != PT_TUNN && (r&0xFF) != PT_DMND && ((ptypes[r&0xFF].properties&TYPE_SOLID) || (ptypes[r&0xFF].properties&TYPE_PART)))
+        {
+            if ((pmap[y-1][x-1]&0xFF) != PT_TUNN && (pmap[y-1][x-1]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x-1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x-1]&0xFF].properties&TYPE_PART)))
+            {
+                if((pmap[y][x-1]&0xFF) == ceiling)
+                    parts[pmap[y-1][x-1]>>8].type = ceiling2;
+                else
+                    parts[pmap[y-1][x-1]>>8].type = ceiling;
+            }
+            if ((pmap[y-1][x+1]&0xFF) != PT_TUNN && (pmap[y-1][x+1]&0xFF) != PT_DMND && ((ptypes[pmap[y-1][x+1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-1][x+1]&0xFF].properties&TYPE_PART)))
+            {
+                if((pmap[y][x+1]&0xFF) == ceiling)
+                    parts[pmap[y-1][x+1]>>8].type = ceiling2;
+                else
+                    parts[pmap[y-1][x+1]>>8].type = ceiling;
+            }
+            //Needs ceiling, top will fall
+            if ((pmap[y-2][x]&0xFF) != PT_TUNN && (pmap[y-2][x]&0xFF) != PT_DMND && ((ptypes[pmap[y-2][x]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-2][x]&0xFF].properties&TYPE_PART)))
+                parts[pmap[y-2][x]>>8].type = ceiling;
+            if ((pmap[y-2][x+1]&0xFF) != PT_TUNN && (pmap[y-2][x+1]&0xFF) != PT_DMND && ((ptypes[pmap[y-2][x+1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-2][x+1]&0xFF].properties&TYPE_PART)))
+                parts[pmap[y-2][x+1]>>8].type = ceiling2;
+            if ((pmap[y-2][x-1]&0xFF) != PT_TUNN && (pmap[y-2][x-1]&0xFF) != PT_DMND && ((ptypes[pmap[y-2][x-1]&0xFF].properties&TYPE_SOLID) || (ptypes[pmap[y-2][x-1]&0xFF].properties&TYPE_PART)))
+                parts[pmap[y-2][x-1]>>8].type = ceiling2;
+        }
+        kill_part(r>>8);
+        kill_part(i);
     }
 }
 
