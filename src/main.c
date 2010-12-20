@@ -1515,7 +1515,9 @@ int main(int argc, char *argv[])
                 }
         }
         if((sdl_mod & (KMOD_RCTRL) )&&( sdl_mod & (KMOD_RALT)))
-            active_menu = 11;
+            active_menu = SC_LIFE;
+        if((sdl_mod & (KMOD_LCTRL) )&&( sdl_mod & (KMOD_LALT)))
+            active_menu = SC_CRACKER;
         if(sdl_key==SDLK_INSERT)
             REPLACE_MODE = !REPLACE_MODE;
         if(sdl_key=='g')

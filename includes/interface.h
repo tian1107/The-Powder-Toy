@@ -51,10 +51,11 @@ static menu_wall mwalls[] =
 #define SC_GAS 3
 #define SC_LIQUID 4
 #define SC_NUCLEAR 7
-#define SC_LIFE 9
-#define SC_CRACKER2 10
-#define SC_ADD	11
-#define SC_CRACKER 12
+#define SC_CRACKER2 9
+#define SC_WAV	10
+#define SC_NONWAV   11
+#define SC_LIFE 12
+#define SC_CRACKER 13
 #define SC_TOTAL 12
 
 static menu_section msections[] =
@@ -68,9 +69,10 @@ static menu_section msections[] =
     {"\xD1", "Solids", 0, 1},
     {"\xC6", "Radioactive", 0, 1},
     {"\xCC", "Special", 0, 1},
-    {"\xD2", "Life", 0, 1},
     {"\xC8", "Cracker!", 0, 0},
-    {"\xC2", "tian1107 additions \"plugins\"", 0, 1},
+    {"\xC2", "tian1107 additions \"Waves\"", 0, 1},
+    {"\xDA", "tian1107 additions \"Non-waves\"", 0, 1},
+    {"\xD2", "Life", 0, 1},
     {"\xC8", "Cracker", 0, 0},
 };
 
