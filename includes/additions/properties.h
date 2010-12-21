@@ -1,5 +1,5 @@
 //Properties of additions
-, // To continue from powder.h
+// To continue from powder.h
 {"FPLT",	PIXPACK(0x00FF00),	0.0f,	0.00f * CFDS,	0.95f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	20,		0,	0,	10,	1,	100,	SC_NONWAV,	R_TEMP+0.0f	+273.15f,	65,		"Fast Growing Plant. Grows around particles."								, TYPE_SOLID},
 {"SOAP",	PIXPACK(0xFFFFFF),	0.6f,	0.01f * CFDS,	0.98f,	0.95f,	0.0f,	0.1f,	0.00f,	0.000f	* CFDS,	2,	0,		0,	0,	20,	1,	40,		SC_NONWAV,	R_TEMP-2.0f	+273.15f,	29,		"Soap, Basic. Removes Powders, Liquids, and Gases. Neutralizes Acid."		, TYPE_LIQUID},
 {"REMT",	PIXPACK(0x808080),	0.0f,	0.00f * CFDS,	0.90f,	0.00f,	0.0f,	0.0f,	0.00f,	0.000f	* CFDS,	0,	0,		0,	1,	1,	1,	100,	SC_WAV,		R_TEMP+0.0f	+273.15f,	251,	"Radio Wave Emitter. Transfers signals to Radio Wave Receivers."			, TYPE_SOLID | PROP_CONDUCTS},
