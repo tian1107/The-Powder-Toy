@@ -20,6 +20,7 @@
 #define PT_CHLN		OFFCOUNT + 18
 #define PT_TUNN		OFFCOUNT + 19
 #define PT_VTNN		OFFCOUNT + 20
+#define PT_EXPL     OFFCOUNT + 21
 //Unofficial Count
-#define PT_NUM		OFFCOUNT + 21
+#define PT_NUM		OFFCOUNT + 22
 

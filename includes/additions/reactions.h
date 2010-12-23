@@ -458,6 +458,31 @@ if(t==PT_VTNN)
         kill_part(i);
     }
 }
+//Explosive
+if(t == PT_EXPL)
+{
+    for(nx=-5; nx<5; nx++)
+        for(ny=-5; ny<5; ny++)
+            if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
+            {
+                r = pmap[y+ny][x+nx];
+                if((r>>8)>=NPART || !r)
+                    continue;
+                if((r&0xFF)==PT_FIRE || (r&0xFF)==PT_PLSM)
+                {
+                    if(10>(rand()%20))
+                    {
+                        pv[y/CELL][x/CELL] = 500.0f;
+                        parts[i].temp = MAX_TEMP;
+                    }
+                    else
+                    {
+                        pv[y/CELL][x/CELL] = -500.0f;
+                        parts[i].temp = 0.0f;
+                    }
+                }
+            }
+}
 
 
 
