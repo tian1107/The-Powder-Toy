@@ -19,5 +19,5 @@
 /* TUNN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* VTNN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* EXPL */ {ST_LIQUID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_PLSM, 323.15f},
-
+/* PRSN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,      PT_NONE, 0.0f,		PT_FIRE, 373.15f},
 // Name		Original	Solid	 Frzp		Liquid   Mpnt		Gas	   Bpoint		Burn	Burning point

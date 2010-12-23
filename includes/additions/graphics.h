@@ -67,3 +67,43 @@ if(t == PT_RREC)
         break;
     }
 }
+if(t==PT_PRSN){
+    int r = parts[i].any;
+    int g = parts[i].any2;
+    int b = parts[i].tmp;
+    //Draw head
+    drawpixel(vid, nx-2, ny - 2, r, g, b, 255);
+    drawpixel(vid, nx-1, ny - 2, r, g, b, 255);
+    drawpixel(vid, nx  , ny - 2, r, g, b, 255);
+    drawpixel(vid, nx+1, ny - 2, r, g, b, 255);
+    drawpixel(vid, nx+2, ny - 2, r, g, b, 255);
+    drawpixel(vid, nx-2, ny + 2, r, g, b, 255);
+    drawpixel(vid, nx-1, ny + 2, r, g, b, 255);
+    drawpixel(vid, nx  , ny + 2, r, g, b, 255);
+    drawpixel(vid, nx+1, ny + 2, r, g, b, 255);
+    drawpixel(vid, nx+2, ny + 2, r, g, b, 255);
+    drawpixel(vid, nx-2, ny - 1, r, g, b, 255);
+    drawpixel(vid, nx-2, ny    , r, g, b, 255);
+    drawpixel(vid, nx-2, ny + 1, r, g, b, 255);
+    drawpixel(vid, nx+2, ny - 1, r, g, b, 255);
+    drawpixel(vid, nx+2, ny    , r, g, b, 255);
+    drawpixel(vid, nx+2, ny + 1, r, g, b, 255);
+    //Draw legs
+    drawpixel(vid, nx  , ny + 3, r, g, b, 255);
+    drawpixel(vid, nx-1, ny + 4, r, g, b, 255);
+    drawpixel(vid, nx+1, ny + 4, r, g, b, 255);
+    drawpixel(vid, nx-1, ny + 5, r, g, b, 255);
+    drawpixel(vid, nx+1, ny + 5, r, g, b, 255);
+    drawpixel(vid, nx-1, ny + 6, r, g, b, 255);
+    drawpixel(vid, nx+1, ny + 6, r, g, b, 255);
+    drawpixel(vid, nx-2, ny + 7, r, g, b, 255);
+    drawpixel(vid, nx+2, ny + 7, r, g, b, 255);
+    drawpixel(vid, nx-2, ny + 8, r, g, b, 255);
+    drawpixel(vid, nx+2, ny + 8, r, g, b, 255);
+    drawpixel(vid, nx-2, ny + 9, r, g, b, 255);
+    drawpixel(vid, nx+2, ny + 9, r, g, b, 255);
+    drawpixel(vid, nx-2, ny + 10,r, g, b, 255);
+    drawpixel(vid, nx+2, ny + 10,r, g, b, 255);
+    drawpixel(vid, nx-2, ny + 11,r, g, b, 255);
+    drawpixel(vid, nx+2, ny + 11,r, g, b, 255);
+}

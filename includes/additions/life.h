@@ -50,3 +50,10 @@ if(t==PT_VTNN)
 {
     parts[i].vy = 1;
 }
+if(t==PT_PRSN)
+{
+    parts[i].any = rand()%255;
+    parts[i].any2 = rand()%255;
+    parts[i].tmp = rand() %255;
+    parts[i].life = 100;
+}
