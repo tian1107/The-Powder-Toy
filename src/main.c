@@ -1706,6 +1706,14 @@ int main(int argc, char *argv[])
             if(!((cr>>8)>=NPART || !cr))
             {
 #ifdef BETA
+		if(DEBUG_MODE)
+                {
+                    int tctype = parts[cr>>8].ctype;
+                    if(tctype>=PT_NUM)
+                        tctype = 0;
+                    sprintf(heattext, "%s (%s), Pressure: %3.2f, Temp: %4.2f C, Life: %d", ptypes[cr&0xFF].name, ptypes[tctype].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f, parts[cr>>8].life);
+			//sprintf(heattext, "%s (%s), Pressure: %3.2f, Temp: %4.2f C, Life: %d", ptypes[cr&0xFF].name, ptypes[parts[cr>>8].ctype].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f, parts[cr>>8].life);
+		} else
                 sprintf(heattext, "%s, Pressure: %3.2f, Temp: %4.2f C, Life: %d", ptypes[cr&0xFF].name, pv[(y/sdl_scale)/CELL][(x/sdl_scale)/CELL], parts[cr>>8].temp-273.15f, parts[cr>>8].life);
 #else
                 if(DEBUG_MODE)
@@ -2376,19 +2384,12 @@ int main(int argc, char *argv[])
             }
 
 #ifdef BETA
-            sprintf(uitext, "Version %d Beta %d (tian1107's additions v%.1f) FPS:%d Parts:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS);
+			sprintf(uitext, "Version %d Beta %d (tian1107's additions v%.1f) FPS:%d Parts:%d Generation:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS,GENERATION);
 #else
-<<<<<<< HEAD
-            if(DEBUG_MODE)
-                sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d Parts:%d Generation:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB, NUM_PARTS,GENERATION);
-            else
-                sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB);
-=======
 			if(DEBUG_MODE)
-				sprintf(uitext, "Version %d.%d FPS:%d Parts:%d Generation:%d", SAVE_VERSION, MINOR_VERSION, FPSB, NUM_PARTS,GENERATION);
+				sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d Parts:%d Generation:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION,FPSB, NUM_PARTS,GENERATION);
 			else
-				sprintf(uitext, "Version %d.%d FPS:%d", SAVE_VERSION, MINOR_VERSION, FPSB);
->>>>>>> 1e4e7ea4751f2890a4b594e47d3074a69a63cfd1
+				sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB);
 #endif
             if(REPLACE_MODE)
                 strappend(uitext, " [REPLACE MODE]");
