@@ -67,10 +67,17 @@ if(t == PT_RREC)
         break;
     }
 }
-if(t==PT_PRSN){
-    int r = parts[i].any;
-    int g = parts[i].any2;
-    int b = parts[i].tmp;
+if(t==PT_PRSN)
+{
+    /*if(mousex>(nx-3) && mousex<(nx+3) && mousey<(ny+3) && mousey>(ny-3))  //If mous is in the head
+    {
+        itoa(parts[i].life, hp, 10);
+        drawtext(vid, mousex, mousey-12, hp, 255, 255, 255, 255);
+        //drawtext(vid, mousex-8-2*(parts[i].life<100)-2*(parts[i].life<10), mousey-12, ptypes[parts[i].any].name, 255, 255, 255, 255);
+    }*/
+    int r = PIXR(ptypes[parts[i].any].pcolors);
+    int g = PIXG(ptypes[parts[i].any].pcolors);
+    int b = PIXB(ptypes[parts[i].any].pcolors);
     //Draw head
     drawpixel(vid, nx-2, ny - 2, r, g, b, 255);
     drawpixel(vid, nx-1, ny - 2, r, g, b, 255);

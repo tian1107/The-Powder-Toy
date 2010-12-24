@@ -488,8 +488,10 @@ if(t==PT_PRSN)
 {
     int smove = 0;
     parts[i].life++;
+    if(parts[i].life > 100)
+        parts[i].life = 100;
     for(nx=-3; nx<3; nx++)
-        for(ny=1; ny<12; ny++)
+        for(ny=1; ny<13; ny++)
             if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
             {
                 r = pmap[y+ny][x+nx];
@@ -525,22 +527,22 @@ if(t==PT_PRSN)
                     }
                     if(parts[i].life <= 0)
                     {
-                        create_part(-1, x-2, y - 2, PT_DUST);
-                        create_part(-1, x-1, y - 2, PT_DUST);
-                        create_part(-1, x  , y - 2, PT_DUST);
-                        create_part(-1, x+1, y - 2, PT_DUST);
-                        create_part(-1, x+2, y - 2, PT_DUST);
-                        create_part(-1, x-2, y + 2, PT_DUST);
-                        create_part(-1, x-1, y + 2, PT_DUST);
-                        create_part(-1, x  , y + 2, PT_DUST);
-                        create_part(-1, x+1, y + 2, PT_DUST);
-                        create_part(-1, x+2, y + 2, PT_DUST);
-                        create_part(-1, x-2, y - 1, PT_DUST);
-                        create_part(-1, x-2, y    , PT_DUST);
-                        create_part(-1, x-2, y + 1, PT_DUST);
-                        create_part(-1, x+2, y - 1, PT_DUST);
-                        create_part(-1, x+2, y    , PT_DUST);
-                        create_part(-1, x+2, y + 1, PT_DUST);
+                        create_part(-1, x-2, y - 2, parts[i].any);
+                        create_part(-1, x-1, y - 2, parts[i].any);
+                        create_part(-1, x  , y - 2, parts[i].any);
+                        create_part(-1, x+1, y - 2, parts[i].any);
+                        create_part(-1, x+2, y - 2, parts[i].any);
+                        create_part(-1, x-2, y + 2, parts[i].any);
+                        create_part(-1, x-1, y + 2, parts[i].any);
+                        create_part(-1, x  , y + 2, parts[i].any);
+                        create_part(-1, x+1, y + 2, parts[i].any);
+                        create_part(-1, x+2, y + 2, parts[i].any);
+                        create_part(-1, x-2, y - 1, parts[i].any);
+                        create_part(-1, x-2, y    , parts[i].any);
+                        create_part(-1, x-2, y + 1, parts[i].any);
+                        create_part(-1, x+2, y - 1, parts[i].any);
+                        create_part(-1, x+2, y    , parts[i].any);
+                        create_part(-1, x+2, y + 1, parts[i].any);
                         kill_part(i);
                     }
                 }

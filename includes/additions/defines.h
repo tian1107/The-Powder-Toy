@@ -24,4 +24,5 @@
 #define PT_PRSN     OFFCOUNT + 22
 //Unofficial Count
 #define PT_NUM		OFFCOUNT + 23
+char hp[10]; //For person's hp;
 
