@@ -1,4 +1,4 @@
-#define OFFCOUNT 128 //Official Count - 1
+#define OFFCOUNT 129 //Official Count - 1
 //Unofficial additions
 #define PT_FPLT     OFFCOUNT + 1
 #define PT_SOAP     OFFCOUNT + 2
@@ -22,7 +22,7 @@
 #define PT_VTNN		OFFCOUNT + 20
 #define PT_EXPL     OFFCOUNT + 21
 #define PT_PRSN     OFFCOUNT + 22
+#define PT_CLNT     OFFCOUNT + 23
 //Unofficial Count
-#define PT_NUM		OFFCOUNT + 23
-char hp[10]; //For person's hp;
+#define PT_NUM		OFFCOUNT + 24
 

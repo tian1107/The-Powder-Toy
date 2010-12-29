@@ -543,6 +543,11 @@ if(t==PT_PRSN)
                 }
             }
 }
+//Coolant
+if(t==PT_CLNT)
+{
+    parts[i].temp = 0.0f;
+}
 
 
 

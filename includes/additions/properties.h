@@ -22,6 +22,7 @@
 {"VTNN",	PIXPACK(0x909090),	0.0f,	0.00f * CFDS,	1.00f,	1.00f,	-0.99f,	0.0f,	0.00f,	0.002f	* CFDS,	0,	0,		0,	0,	0,	1,	100,	SC_NONWAV,	R_TEMP+0.0f	+273.15f,	60,		"Vertical Tunneler. Creates tunnels vertically."                            , TYPE_PART},
 {"EXPL",	PIXPACK(0xAABBCC),	0.6f,	0.01f * CFDS,	0.98f,	0.95f,	0.0f,	0.1f,	0.00f,	0.000f	* CFDS,	2,	10000,  20,  0,	50,	1,	40,		SC_NONWAV,	R_TEMP+0.0f	+273.15f,	29,		"Sensitive explosive. Keep at room temeperature and minimal pressure."      , TYPE_LIQUID},
 {"PRSN",	PIXPACK(0x000000),	0.0f,	0.00f * CFDS,	0.0f,	1.0f,	0.0f,	0.1f,	0.0f,	0.00f	* CFDS,	1,	0,	    0,	0,	0,	1,	50,		SC_NONWAV,	R_TEMP+14.6f+273.15f,	0,	    "Person. Unmovable version of stickman."                                    , 0},
+{"CLNT",    PIXPACK(0x0000FF),  0.6f,   0.01f * CFDS,   0.98f,  0.95f,  0.0f,   0.1f,   0.0f,   0.00f   * CFDS, 1,  0,      0,  0,  0,  1,  100,    SC_NONWAV,  R_TEMP-22.0f-273.15f,   120,    "Coolant. Stays Cold."                                                      , TYPE_LIQUID},
 //Name		Colour				Advec	Airdrag			Airloss	Loss	Collid	Grav	Diffus	Hotair			Fal	Burn	Exp	Mel	Hrd	M	Weights	Section			H					Ins(real world, by triclops200)		Description										Properties
 
 //Name			- 4 letter name of the element
