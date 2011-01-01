@@ -57,3 +57,8 @@ if(t==PT_PRSN)
     while((ptypes[parts[i].any].falldown==0 || parts[i].any == PT_PRSN || parts[i].any == PT_EWAVE || parts[i].any == PT_STKM || parts[i].any == PT_STKM2 || parts[i].any == PT_NONE) && parts[i].any != PT_PHOT && parts[i].any != PT_NEUT);
     parts[i].life = 100;
 }
+if(t==PT_CSTR)
+{
+    parts[i].any = 0;
+    parts[i].any2 = 0;
+}

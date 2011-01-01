@@ -1,4 +1,4 @@
-#define OFFCOUNT 129 //Official Count - 1
+#define OFFCOUNT 133 //Official Count - 1
 //Unofficial additions
 #define PT_FPLT     OFFCOUNT + 1
 #define PT_SOAP     OFFCOUNT + 2
@@ -23,6 +23,7 @@
 #define PT_EXPL     OFFCOUNT + 21
 #define PT_PRSN     OFFCOUNT + 22
 #define PT_CLNT     OFFCOUNT + 23
+#define PT_CSTR     OFFCOUNT + 24
 //Unofficial Count
-#define PT_NUM		OFFCOUNT + 24
+#define PT_NUM		OFFCOUNT + 25
 
