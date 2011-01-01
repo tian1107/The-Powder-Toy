@@ -551,7 +551,7 @@ if(t==PT_CLNT)
 //C string
 if (t == PT_CSTR)
 {
-    int charge;
+    int charge, dist;
     for(nx=-1; nx<1; nx++)
         for(ny=-1; ny<1; ny++)
             if(x+nx>=0 && y+ny>0 && x+nx<XRES && y+ny<YRES && (nx || ny))
@@ -566,28 +566,38 @@ if (t == PT_CSTR)
                     parts[r>>8].life = 4;
                     parts[i].any--;
                 }
-                if(parts[r>>8].type == PT_SPRK && parts[r>>8].ctype == PT_PSCN && parts[r>>8].life == 1)
+                else if(parts[r>>8].type == PT_SPRK && parts[r>>8].ctype == PT_PSCN && parts[r>>8].life == 1)
                 {
                     parts[r>>8].type = PT_PSCN;
                     parts[r>>8].ctype = PT_NONE;
                     parts[i].any++;
                 }
-                if((r&0xff) == PT_CSTR)
+                else if((r&0xff) == PT_CSTR)
                 {
                     charge = parts[i].any + parts[r>>8].any;
-                    if(charge%2 == 0)
+                    if(charge % 2 == 0)
                     {
                         parts[i].any = charge/2;
                         parts[r>>8].any = charge/2;
                     }
                     else
                     {
-                        parts[r>>8].any = (charge - 1)/2;
-                        parts[i].any = parts[r>>8].any + 1;
+                        dist = rand()%2;
+                        switch(dist)
+                        {
+                            case 0:
+                                parts[i].any = (charge+1)/2;
+                                parts[r>>8].any = (charge-1)/2;
+                                break;
+                            case 1:
+                                parts[i].any = (charge-1)/2;
+                                parts[r>>8].any = (charge+1)/2;
+                                break;
+                        }
                     }
                 }
                 if(parts[i].any <= 0) parts[i].any2 = 0;
-                if(parts[i].any >= 5) parts[i].any2 = 1;
+                else if(parts[i].any >= 5) parts[i].any2 = 1;
             }
 }
 
