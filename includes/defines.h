@@ -9,9 +9,9 @@
 
 #define MODVERSION 3.6
 #define SAVE_VERSION 45
-#define MINOR_VERSION 0
+#define MINOR_VERSION 1
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
-#define BETA
+//#define BETA
 
 #define SERVER "powdertoy.co.uk"
 

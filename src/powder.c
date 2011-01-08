@@ -740,35 +740,31 @@ inline int create_part(int p, int x, int y, int t)
         parts[i].vx = 3.0f*cosf(a);
         parts[i].vy = 3.0f*sinf(a);
     }
-    if(t==PT_BIZR||t==PT_BIZRG)
-	    parts[i].ctype = 0x47FFFF;
-    if(t!=PT_STKM&&t!=PT_STKM2 && t!=PT_PHOT)// && t!=PT_NEUT)  is this needed? it breaks floodfill, Yes photons should not be placed in the PMAP
-        pmap[y][x] = t|(i<<8);
-    else if(t==PT_STKM)
+	if(t==PT_STKM)
     {
         if(isplayer==0)
         {
-            if(pmap[y][x]&0xFF==PT_SPAWN)
-            {
-                parts[pmap[y][x]>>8].type = PT_STKM;
-                parts[pmap[y][x]>>8].vx = 0;
-                parts[pmap[y][x]>>8].vy = 0;
-                parts[pmap[y][x]>>8].life = 100;
-                parts[pmap[y][x]>>8].ctype = 0;
-                parts[pmap[y][x]>>8].temp = ptypes[t].heat;
+			if(pmap[y][x]&0xFF==PT_SPAWN)
+			{
+				parts[pmap[y][x]>>8].type = PT_STKM;
+				parts[pmap[y][x]>>8].vx = 0;
+				parts[pmap[y][x]>>8].vy = 0;
+				parts[pmap[y][x]>>8].life = 100;
+				parts[pmap[y][x]>>8].ctype = 0;
+				parts[pmap[y][x]>>8].temp = ptypes[t].heat;
 
-            }
-            else
-            {
-                parts[i].x = (float)x;
-                parts[i].y = (float)y;
-                parts[i].type = PT_STKM;
-                parts[i].vx = 0;
-                parts[i].vy = 0;
-                parts[i].life = 100;
-                parts[i].ctype = 0;
-                parts[i].temp = ptypes[t].heat;
-            }
+			}
+			else
+			{
+				parts[i].x = (float)x;
+				parts[i].y = (float)y;
+				parts[i].type = PT_STKM;
+				parts[i].vx = 0;
+				parts[i].vy = 0;
+				parts[i].life = 100;
+				parts[i].ctype = 0;
+				parts[i].temp = ptypes[t].heat;
+			}
 
 
 
@@ -794,35 +790,39 @@ inline int create_part(int p, int x, int y, int t)
 
             isplayer = 1;
         }
-        //kill_part(playerspawn);
-        create_part(-1,x,y,PT_SPAWN);
-        ISSPAWN1 = 1;
+		else
+		{
+			return -1;
+		}
+		//kill_part(playerspawn);
+		create_part(-1,x,y,PT_SPAWN);
+		ISSPAWN1 = 1;
     }
-    else if(t==PT_STKM2)
+    if(t==PT_STKM2)
     {
         if(isplayer2==0)
         {
-            if(pmap[y][x]&0xFF==PT_SPAWN2)
-            {
-                parts[pmap[y][x]>>8].type = PT_STKM2;
-                parts[pmap[y][x]>>8].vx = 0;
-                parts[pmap[y][x]>>8].vy = 0;
-                parts[pmap[y][x]>>8].life = 100;
-                parts[pmap[y][x]>>8].ctype = 0;
-                parts[pmap[y][x]>>8].temp = ptypes[t].heat;
+			if(pmap[y][x]&0xFF==PT_SPAWN2)
+			{
+				parts[pmap[y][x]>>8].type = PT_STKM2;
+				parts[pmap[y][x]>>8].vx = 0;
+				parts[pmap[y][x]>>8].vy = 0;
+				parts[pmap[y][x]>>8].life = 100;
+				parts[pmap[y][x]>>8].ctype = 0;
+				parts[pmap[y][x]>>8].temp = ptypes[t].heat;
 
-            }
-            else
-            {
-                parts[i].x = (float)x;
-                parts[i].y = (float)y;
-                parts[i].type = PT_STKM2;
-                parts[i].vx = 0;
-                parts[i].vy = 0;
-                parts[i].life = 100;
-                parts[i].ctype = 0;
-                parts[i].temp = ptypes[t].heat;
-            }
+			}
+			else
+			{
+				parts[i].x = (float)x;
+				parts[i].y = (float)y;
+				parts[i].type = PT_STKM2;
+				parts[i].vx = 0;
+				parts[i].vy = 0;
+				parts[i].life = 100;
+				parts[i].ctype = 0;
+				parts[i].temp = ptypes[t].heat;
+			}
 
 
 
@@ -848,10 +848,18 @@ inline int create_part(int p, int x, int y, int t)
 
             isplayer2 = 1;
         }
-        //kill_part(player2spawn);
-        create_part(-1,x,y,PT_SPAWN2);
-        ISSPAWN2 = 1;
+		else
+		{
+			return -1;
+		}
+		//kill_part(player2spawn);
+		create_part(-1,x,y,PT_SPAWN2);
+		ISSPAWN2 = 1;
     }
+    if(t==PT_BIZR||t==PT_BIZRG)
+	    parts[i].ctype = 0x47FFFF;
+    if(t!=PT_STKM&&t!=PT_STKM2 && t!=PT_PHOT)// && t!=PT_NEUT)  is this needed? it breaks floodfill, Yes photons should not be placed in the PMAP
+        pmap[y][x] = t|(i<<8);
 
     return i;
 }
@@ -1532,6 +1540,68 @@ void update_particles_i(pixel *vid, int start, int inc)
                         pv[y/CELL-1][x/CELL-1] += 0.1f*(singularity-pv[y/CELL-1][x/CELL-1]);
                 }
             }
+	    else if(t==PT_PUMP && parts[i].life==10)
+		{
+			if(parts[i].temp>=256.0+273.15)
+				parts[i].temp=256.0+273.15;
+			if(parts[i].temp<= -256.0+273.15)
+				parts[i].temp = -256.0+273.15;
+
+			if(pv[y/CELL][x/CELL]<(parts[i].temp-273.15))
+				pv[y/CELL][x/CELL] += 0.1f*((parts[i].temp-273.15)-pv[y/CELL][x/CELL]);
+			if(y+CELL<YRES && pv[y/CELL+1][x/CELL]<(parts[i].temp-273.15))
+				pv[y/CELL+1][x/CELL] += 0.1f*((parts[i].temp-273.15)-pv[y/CELL+1][x/CELL]);
+			if(x+CELL<XRES)
+			{
+				pv[y/CELL][x/CELL+1] += 0.1f*((parts[i].temp-273.15)-pv[y/CELL][x/CELL+1]);
+				if(y+CELL<YRES)
+					pv[y/CELL+1][x/CELL+1] += 0.1f*((parts[i].temp-273.15)-pv[y/CELL+1][x/CELL+1]);
+			}
+		}
+	     else if(t==PT_BOYL)
+		{
+			if(pv[y/CELL][x/CELL]<(parts[i].temp/100))
+				pv[y/CELL][x/CELL] += 0.001f*((parts[i].temp/100)-pv[y/CELL][x/CELL]);
+			if(y+CELL<YRES && pv[y/CELL+1][x/CELL]<(parts[i].temp/100))
+				pv[y/CELL+1][x/CELL] += 0.001f*((parts[i].temp/100)-pv[y/CELL+1][x/CELL]);
+			if(x+CELL<XRES)
+			{
+				pv[y/CELL][x/CELL+1] += 0.001f*((parts[i].temp/100)-pv[y/CELL][x/CELL+1]);
+				if(y+CELL<YRES)
+					pv[y/CELL+1][x/CELL+1] += 0.001f*((parts[i].temp/100)-pv[y/CELL+1][x/CELL+1]);
+			}
+			if(y+CELL>0 && pv[y/CELL-1][x/CELL]<(parts[i].temp/100))
+				pv[y/CELL-1][x/CELL] += 0.001f*((parts[i].temp/100)-pv[y/CELL-1][x/CELL]);
+			if(x+CELL>0)
+			{
+				pv[y/CELL][x/CELL-1] += 0.001f*((parts[i].temp/100)-pv[y/CELL][x/CELL-1]);
+				if(y+CELL>0)
+					pv[y/CELL-1][x/CELL-1] += 0.001f*((parts[i].temp/100)-pv[y/CELL-1][x/CELL-1]);
+			}
+		}
+	     else if(t==PT_SING)
+		{
+			int singularity = -parts[i].life;
+
+			if(pv[y/CELL][x/CELL]<singularity)
+				pv[y/CELL][x/CELL] += 0.1f*(singularity-pv[y/CELL][x/CELL]);
+			if(y+CELL<YRES && pv[y/CELL+1][x/CELL]<singularity)
+				pv[y/CELL+1][x/CELL] += 0.1f*(singularity-pv[y/CELL+1][x/CELL]);
+			if(x+CELL<XRES)
+			{
+				pv[y/CELL][x/CELL+1] += 0.1f*(singularity-pv[y/CELL][x/CELL+1]);
+				if(y+CELL<YRES)
+					pv[y/CELL+1][x/CELL+1] += 0.1f*(singularity-pv[y/CELL+1][x/CELL+1]);
+			}
+			if(y+CELL>0 && pv[y/CELL-1][x/CELL]<singularity)
+				pv[y/CELL-1][x/CELL] += 0.1f*(singularity-pv[y/CELL-1][x/CELL]);
+			if(x+CELL>0)
+			{
+				pv[y/CELL][x/CELL-1] += 0.1f*(singularity-pv[y/CELL][x/CELL-1]);
+				if(y+CELL>0)
+					pv[y/CELL-1][x/CELL-1] += 0.1f*(singularity-pv[y/CELL-1][x/CELL-1]);
+			}
+		}
             else
             {
                 pv[y/CELL][x/CELL] += ptypes[t].hotair;
@@ -1688,11 +1758,10 @@ void update_particles_i(pixel *vid, int start, int inc)
             if(t==PT_GAS && pv[y/CELL][x/CELL]<-6.0f)
                 t = parts[i].type = PT_OIL;
             if(t==PT_DESL && pv[y/CELL][x/CELL]>5.0f)
-            {
-                // Only way I know to make it
-                t = parts[i].type = PT_FIRE;    		// combust under pressure.
-                parts[i].life = rand()%50+120;
-            }
+			{
+				t = parts[i].type = PT_FIRE;
+				parts[i].life = rand()%50+120;
+			}
             if(t==PT_GAS && pv[y/CELL][x/CELL]>6.0f)
                 t = parts[i].type = PT_OIL;
             if(t==PT_BMTL && pv[y/CELL][x/CELL]>2.5f)
@@ -1701,21 +1770,21 @@ void update_particles_i(pixel *vid, int start, int inc)
                 t = parts[i].type = PT_BRMT;
             if(t==PT_BRCK && pv[y/CELL][x/CELL]>8.8f)
                 t = parts[i].type = PT_STNE;
-            if(t==PT_PIPE && pv[y/CELL][x/CELL]>10.0f)
+			if(t==PT_PIPE && pv[y/CELL][x/CELL]>10.0f)
                 t = parts[i].type = PT_BRMT;
-            if(t==PT_PSTE && pv[y/CELL][x/CELL]>0.5f)
+			if(t==PT_PSTE && pv[y/CELL][x/CELL]>0.5f)
                 t = parts[i].type = PT_PSTS;
-            if(t==PT_PSTS && pv[y/CELL][x/CELL]<0.5f)
+			if(t==PT_PSTS && pv[y/CELL][x/CELL]<0.5f)
                 t = parts[i].type = PT_PSTE;
-            if(t==PT_SHLD1 && pv[y/CELL][x/CELL]>7.0f)
+			if(t==PT_SHLD1 && pv[y/CELL][x/CELL]>7.0f)
                 t = parts[i].type = PT_NONE;
-            if(t==PT_SHLD2 && pv[y/CELL][x/CELL]>15.0f)
+			if(t==PT_SHLD2 && pv[y/CELL][x/CELL]>15.0f)
                 t = parts[i].type = PT_NONE;
-            if(t==PT_SHLD3 && pv[y/CELL][x/CELL]>25.0f)
+			if(t==PT_SHLD3 && pv[y/CELL][x/CELL]>25.0f)
                 t = parts[i].type = PT_NONE;
-            if(t==PT_SHLD4 && pv[y/CELL][x/CELL]>40.0f)
+			if(t==PT_SHLD4 && pv[y/CELL][x/CELL]>40.0f)
                 t = parts[i].type = PT_NONE;
-            if(t==PT_WIFI && pv[y/CELL][x/CELL]>15.0f)
+			if(t==PT_WIFI && pv[y/CELL][x/CELL]>15.0f)
                 t = parts[i].type = PT_BRMT;
             //if(t==PT_GLAS && pv[y/CELL][x/CELL]>4.0f)
             //	t = parts[i].type = PT_BGLA;
@@ -1729,7 +1798,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                     parts[i].type = PT_BGLA;
                 }
             }
-            if(t==PT_QRTZ)
+			if(t==PT_QRTZ)
             {
                 parts[i].pavg[0] = parts[i].pavg[1];
                 parts[i].pavg[1] = pv[y/CELL][x/CELL];
@@ -1745,20 +1814,20 @@ void update_particles_i(pixel *vid, int start, int inc)
                 t = PT_NEUT;
                 create_part(i, x, y, t);
             }
-            if((t==PT_ISOZ||t==PT_ISZS) && 1>rand()%200 && ((int)(-4.0f*(pv[y/CELL][x/CELL])))>(rand()%1000))
+			if((t==PT_ISOZ||t==PT_ISZS) && 1>rand()%200 && ((int)(-4.0f*(pv[y/CELL][x/CELL])))>(rand()%1000))
             {
                 t = PT_PHOT;
-                rr = (rand()%228+128)/127.0f;
-                rrr = (rand()%360)*3.14159f/180.0f;
-                parts[i].life = 680;
-                parts[i].ctype = 0x3FFFFFFF;
-                parts[i].vx = rr*cosf(rrr);
-                parts[i].vy = rr*sinf(rrr);
+				rr = (rand()%228+128)/127.0f;
+				rrr = (rand()%360)*3.14159f/180.0f;
+				parts[i].life = 680;
+				parts[i].ctype = 0x3FFFFFFF;
+				parts[i].vx = rr*cosf(rrr);
+				parts[i].vy = rr*sinf(rrr);
                 create_part(i, x, y, t);
             }
-            if(t==PT_PSTE)
-                if(parts[i].temp>747.0f)
-                    t = parts[i].type = PT_BRCK;
+			if(t==PT_PSTE)
+				if(parts[i].temp>747.0f)
+					t = parts[i].type = PT_BRCK;
             if(t==PT_SPRK&&parts[i].ctype==PT_ETRD&&parts[i].life==1)
             {
                 nearp = nearest_part(i, PT_ETRD);
@@ -1817,111 +1886,122 @@ void update_particles_i(pixel *vid, int start, int inc)
                             }
                         }
                     }
-                    if(pt>=pstates[t].btemp&&pstates[t].burn)
-                    {
-                        t = parts[i].type = pstates[t].burn;
-                        if(t==PT_FIRE||t==PT_PLSM)
-                            parts[i].life = rand()%50+120;
-                    }
-                    else if((pt<=pstates[t].stemp||(t==PT_LAVA&&(pt<=pstates[parts[i].ctype].ltemp)))&&pstates[t].solid)
-                    {
-                        if(t==PT_LAVA&&parts[i].ctype)
-                        {
-                            parts[i].life = 0;
-                            if(parts[i].ctype==PT_THRM)
-                            {
-                                parts[i].tmp = 0;
-                                parts[i].ctype = PT_BMTL;
-                            }
-                            if(parts[i].ctype==PT_PLUT)
-                            {
-                                parts[i].tmp = 0;
-                                parts[i].ctype = PT_LAVA;
-                            }
-                            t = parts[i].type = parts[i].ctype;
-                            parts[i].ctype = PT_NONE;
-                        }
-                        else if(pstates[t].solid==PT_ICEI&&pt<=pstates[t].stemp)
-                        {
-                            parts[i].ctype = parts[i].type;
-                            t = parts[i].type = PT_ICEI;
-                        }
-                        else
-                        {
-                            parts[i].life = 0;
-                            t = parts[i].type = pstates[t].solid;
-                        }
-                    }
-                    else if((pt>=pstates[t].ltemp&&(pt<=pstates[t].gtemp||!pstates[t].gas)&&pstates[t].state==ST_SOLID&&pstates[t].liquid)||(t==PT_ICEI&&pt>pstates[parts[i].ctype].stemp))
-                    {
-                        if(pstates[t].liquid==PT_LAVA)
-                        {
-                            parts[i].life = rand()%120+240;
-                            parts[i].ctype = (parts[i].type==PT_BRMT)?PT_BMTL:parts[i].type;
-                            parts[i].ctype = (parts[i].ctype==PT_SAND)?PT_GLAS:parts[i].ctype;
-                            parts[i].ctype = (parts[i].ctype==PT_BGLA)?PT_GLAS:parts[i].ctype;
-                            parts[i].ctype = (parts[i].ctype==PT_PQRT)?PT_QRTZ:parts[i].ctype;
-                            t = parts[i].type = pstates[t].liquid;
-                        }
-                        else if(t==PT_ICEI&&parts[i].ctype)
-                        {
-                            t = parts[i].type = parts[i].ctype;
-                            parts[i].ctype = PT_NONE;
-                        }
-                        else
-                        {
-                            t = parts[i].type = pstates[t].liquid;
-                        }
-                    }
-                    else if(pt-ctemp<=pstates[t].ltemp&&pstates[t].liquid&&pstates[t].state==ST_GAS)
-                    {
-                        t = parts[i].type = pstates[t].liquid;
-                    }
-                    else if(pt-ctemp>=pstates[t].gtemp&&(pstates[t].gas||parts[i].type==PT_LNTG)&&(pstates[t].state==ST_LIQUID||pstates[t].state==ST_SOLID))
-                    {
-                        if(t==PT_SLTW&&1>rand()%6)
-                        {
-                            t = parts[i].type = PT_SALT;
-                        }
-                        else
-                        {
-                            if((t==PT_BIZR||t==PT_BIZRG||t==PT_BIZRS)&&pt>=pstates[t].gtemp)
-                            {
-                                t = parts[i].type = pstates[t].gas;
-                            }
-                            else
-                            {
-                                t = parts[i].type = pstates[t].gas;
-                                pv[y/CELL][x/CELL] += 0.50f;
-                            }
+					if(y-2 >= 0 && y-2 < YRES && ptypes[t].properties&TYPE_LIQUID){
+						float swappage;
+						r = pmap[y-2][x];
+						if(!((r>>8)>=NPART || !r || parts[i].type != (r&0xFF))){
+							if(parts[i].temp>parts[r>>8].temp){
+								swappage = parts[i].temp;
+								parts[i].temp = parts[r>>8].temp;
+								parts[r>>8].temp = swappage;
+							}
+						}
+					}
 
-                            if(t==PT_FIRE)
-                                parts[i].life = rand()%50+120;
-                            if(t==PT_HFLM)
-                                parts[i].life = rand()%50+120;
-                        }
-                    }
-                    if(t==PT_URAN && pv[y/CELL][x/CELL]>0.0f)
-                    {
-                        float atemp =  parts[i].temp + (-MIN_TEMP);
-                        pt = parts[i].temp = (atemp*(1+(pv[y/CELL][x/CELL]/2000)))+MIN_TEMP;
-                    }
-                    if(t==PT_LAVA)
-                    {
-                        parts[i].life = restrict_flt((pt-700)/7, 0.0f, 400.0f);
-                        if(parts[i].ctype==PT_THRM&&parts[i].tmp>0)
-                        {
-                            parts[i].tmp--;
-                            parts[i].temp = 3500;
-                        }
-                        if(parts[i].ctype==PT_PLUT&&parts[i].tmp>0)
-                        {
-                            parts[i].tmp--;
-                            parts[i].temp = MAX_TEMP;
-                        }
-                    }
-                    pt = parts[i].temp = restrict_flt(parts[i].temp, MIN_TEMP, MAX_TEMP);
-                }
+					if(pt>=pstates[t].btemp&&pstates[t].burn)
+					{
+						t = parts[i].type = pstates[t].burn;
+						if(t==PT_FIRE||t==PT_PLSM)
+							parts[i].life = rand()%50+120;
+					}
+					else if((pt<=pstates[t].stemp||(t==PT_LAVA&&(pt<=pstates[parts[i].ctype].ltemp)))&&pstates[t].solid)
+					{
+						if(t==PT_LAVA&&parts[i].ctype)
+						{
+							parts[i].life = 0;
+							if(parts[i].ctype==PT_THRM)
+							{
+								parts[i].tmp = 0;
+								parts[i].ctype = PT_BMTL;
+							}
+							if(parts[i].ctype==PT_PLUT)
+							{
+								parts[i].tmp = 0;
+								parts[i].ctype = PT_LAVA;
+							}
+							t = parts[i].type = parts[i].ctype;
+							parts[i].ctype = PT_NONE;
+						}
+						else if(pstates[t].solid==PT_ICEI&&pt<=pstates[t].stemp)
+						{
+							parts[i].ctype = parts[i].type;
+							t = parts[i].type = PT_ICEI;
+						}
+						else
+						{
+							parts[i].life = 0;
+							t = parts[i].type = pstates[t].solid;
+						}
+					}
+					else if((pt>=pstates[t].ltemp&&(pt<=pstates[t].gtemp||!pstates[t].gas)&&pstates[t].state==ST_SOLID&&pstates[t].liquid)||(t==PT_ICEI&&pt>pstates[parts[i].ctype].stemp))
+					{
+						if(pstates[t].liquid==PT_LAVA)
+						{
+							parts[i].life = rand()%120+240;
+							parts[i].ctype = (parts[i].type==PT_BRMT)?PT_BMTL:parts[i].type;
+							parts[i].ctype = (parts[i].ctype==PT_SAND)?PT_GLAS:parts[i].ctype;
+							parts[i].ctype = (parts[i].ctype==PT_BGLA)?PT_GLAS:parts[i].ctype;
+							parts[i].ctype = (parts[i].ctype==PT_PQRT)?PT_QRTZ:parts[i].ctype;
+							t = parts[i].type = pstates[t].liquid;
+						}
+						else if(t==PT_ICEI&&parts[i].ctype)
+						{
+							t = parts[i].type = parts[i].ctype;
+							parts[i].ctype = PT_NONE;
+						}
+						else
+						{
+							t = parts[i].type = pstates[t].liquid;
+						}
+					}
+					else if(pt-ctemp<=pstates[t].ltemp&&pstates[t].liquid&&pstates[t].state==ST_GAS)
+					{
+						t = parts[i].type = pstates[t].liquid;
+					}
+					else if(pt-ctemp>=pstates[t].gtemp&&(pstates[t].gas||parts[i].type==PT_LNTG)&&(pstates[t].state==ST_LIQUID||pstates[t].state==ST_SOLID))
+					{
+						if(t==PT_SLTW&&1>rand()%6)
+						{
+							t = parts[i].type = PT_SALT;
+						}
+						else
+						{
+							if((t==PT_BIZR||t==PT_BIZRG||t==PT_BIZRS)&&pt>=pstates[t].gtemp)
+							{
+								t = parts[i].type = pstates[t].gas;
+							}
+							else{
+								t = parts[i].type = pstates[t].gas;
+								pv[y/CELL][x/CELL] += 0.50f;
+							}
+
+							if(t==PT_FIRE)
+								parts[i].life = rand()%50+120;
+							if(t==PT_HFLM)
+								parts[i].life = rand()%50+120;
+						}
+					}
+					if(t==PT_URAN && pv[y/CELL][x/CELL]>0.0f)
+					{
+						float atemp =  parts[i].temp + (-MIN_TEMP);
+						pt = parts[i].temp = (atemp*(1+(pv[y/CELL][x/CELL]/2000)))+MIN_TEMP;
+					}
+					if(t==PT_LAVA)
+					{
+						parts[i].life = restrict_flt((pt-700)/7, 0.0f, 400.0f);
+						if(parts[i].ctype==PT_THRM&&parts[i].tmp>0)
+						{
+							parts[i].tmp--;
+							parts[i].temp = 3500;
+						}
+						if(parts[i].ctype==PT_PLUT&&parts[i].tmp>0)
+						{
+							parts[i].tmp--;
+							parts[i].temp = MAX_TEMP;
+						}
+					}
+					pt = parts[i].temp = restrict_flt(parts[i].temp, MIN_TEMP, MAX_TEMP);
+				}
             }
             if(t==PT_PTCT&&parts[i].temp>295.0f)
             {
@@ -2226,7 +2306,7 @@ void update_particles_i(pixel *vid, int start, int inc)
 											}
 											else if(parts[r>>8].type==PT_FILT){
 												colored = parts[r>>8].ctype;
-											}else if(parts[r>>8].type!=PT_INWR && parts[r>>8].type!=PT_ARAY && parts[r>>8].type!=PT_WIFI) {
+											}else if(parts[r>>8].type!=PT_INWR && parts[r>>8].type!=PT_ARAY && parts[r>>8].type!=PT_WIFI && !(parts[r>>8].type==PT_SWCH && parts[r>>8].life>=10)) {
 												if(nyy!=0 || nxx!=0){
 													create_part(-1, x+nxi+nxx, y+nyi+nyy, PT_SPRK);
 												}
@@ -2240,7 +2320,7 @@ void update_particles_i(pixel *vid, int start, int inc)
 											if(parts[r>>8].type==PT_BRAY){
 												parts[r>>8].life = 1;
 												docontinue = 1;
-											} else if(parts[r>>8].type==PT_INWR || parts[r>>8].type==PT_ARAY || parts[r>>8].type==PT_WIFI) {
+											} else if(parts[r>>8].type==PT_INWR || parts[r>>8].type==PT_ARAY || parts[r>>8].type==PT_WIFI || parts[r>>8].type==PT_FILT || (parts[r>>8].type==PT_SWCH && parts[r>>8].life>=10)) {
 												docontinue = 1;
 											} else {
 												docontinue = 0;
@@ -2674,12 +2754,8 @@ void update_particles_i(pixel *vid, int start, int inc)
                                 parts[r>>8].type = PT_DUST;
                             if((r&0xFF)==PT_DYST && 15>(rand()%1000))
                                 parts[r>>8].type = PT_YEST;
-                            if((r&0xFF)==PT_YEST)
-                            {
-                                if(15>(rand()%100000)&&isplayer==0)
-                                    parts[r>>8].type = PT_STKM;
-                                else
-                                    parts[r>>8].type = PT_DYST;
+                            if((r&0xFF)==PT_YEST) {
+								parts[r>>8].type = PT_DYST;
                             }
 
                             if((r&0xFF)==PT_WATR && 15>(rand()%100))
@@ -3411,28 +3487,29 @@ void update_particles_i(pixel *vid, int start, int inc)
                             r = pmap[y+ny][x+nx];
                             if((r>>8)>=NPART || !r)
                                 continue;
-                            if(parts[r>>8].type==PT_SPRK || (parts[r>>8].type!=PT_PRTI && parts[r>>8].type!=PT_PRTO && (ptypes[parts[r>>8].type].falldown!= 0 || pstates[parts[r>>8].type].state == ST_GAS)))
-                                for( nnx=0; nnx<80; nnx++)
-                                    if(!portal[parts[i].tmp][count-1][nnx])
-                                    {
-                                        portal[parts[i].tmp][count-1][nnx] = parts[r>>8].type;
-                                        portaltemp[parts[i].tmp][count-1][nnx] = parts[r>>8].temp;
-                                        if(parts[r>>8].type==PT_SPRK)
-                                            parts[r>>8].type = parts[r>>8].ctype;
-                                        else
-                                            parts[r>>8].type = PT_NONE;
-                                        break;
-                                    }
-                        }
-            }
-            else if(t==PT_PRTO)
-            {
-                int temprange = 100;
-                int count = 0;
-                for( temp = 0; temp < MAX_TEMP; temp += temprange)
-                    if(parts[i].temp-73.15>temp&&parts[i].temp-73.15 <temp+temprange)
-                        parts[i].tmp = temp/100;
-                for(ny=1; ny>-2; ny--)
+			    if(parts[r>>8].type==PT_SPRK || (parts[r>>8].type!=PT_PRTI && parts[r>>8].type!=PT_PRTO && (ptypes[parts[r>>8].type].falldown!= 0 || pstates[parts[r>>8].type].state == ST_GAS)))
+				    for( nnx=0;nnx<80;nnx++)
+					    if(!portal[parts[i].tmp][count-1][nnx])
+					    {
+						    portal[parts[i].tmp][count-1][nnx] = parts[r>>8].type;
+						    portaltemp[parts[i].tmp][count-1][nnx] = parts[r>>8].temp;
+						    portalctype[parts[i].tmp][count-1][nnx] = parts[r>>8].ctype;
+						    if(parts[r>>8].type==PT_SPRK)
+							parts[r>>8].type = parts[r>>8].ctype;
+						    else
+							parts[r>>8].type = PT_NONE;
+						    break;
+					    }
+			}
+	    }
+	    else if(t==PT_PRTO)
+	    {
+		int temprange = 100;
+		int count = 0;
+		for( temp = 0; temp < MAX_TEMP; temp += temprange)
+			if(parts[i].temp-73.15>temp&&parts[i].temp-73.15 <temp+temprange)
+				parts[i].tmp = temp/100;
+		    for(ny=1; ny>-2; ny--)
                     for(nx=1; nx>-2; nx--)
                         if(x+nx>=0 && y+ny>0 &&
                                 x+nx<XRES && y+ny<YRES && (nx || ny))
@@ -3441,48 +3518,50 @@ void update_particles_i(pixel *vid, int start, int inc)
                             r = pmap[y+ny][x+nx];
                             if((r>>8)>=NPART || r)
                                 continue;
-                            if(!r)
-                            {
-                                for( nnx =0 ; nnx<80; nnx++)
-                                {
-                                    int randomness = count + rand()%3-1;
-                                    if(randomness<1)
-                                        randomness=1;
-                                    if(randomness>8)
-                                        randomness=8;
-                                    if(portal[parts[i].tmp][randomness-1][nnx]==PT_SPRK)//todo. make it look better
-                                    {
-                                        create_part(-1,x+1,y,portal[parts[i].tmp][randomness-1][nnx]);
-                                        create_part(-1,x+1,y+1,portal[parts[i].tmp][randomness-1][nnx]);
-                                        create_part(-1,x+1,y-1,portal[parts[i].tmp][randomness-1][nnx]);
-                                        create_part(-1,x,y-1,portal[parts[i].tmp][randomness-1][nnx]);
-                                        create_part(-1,x,y+1,portal[parts[i].tmp][randomness-1][nnx]);
-                                        create_part(-1,x-1,y+1,portal[parts[i].tmp][randomness-1][nnx]);
-                                        create_part(-1,x-1,y,portal[parts[i].tmp][randomness-1][nnx]);
-                                        create_part(-1,x-1,y-1,portal[parts[i].tmp][randomness-1][nnx]);
-                                        portal[parts[i].tmp][randomness-1][nnx] = 0;
-                                        portaltemp[parts[i].tmp][randomness-1][nnx] = 0;
-                                        break;
-                                    }
-                                    else if(portal[parts[i].tmp][randomness-1][nnx])
-                                    {
-                                        create_part(-1,x+nx,y+ny,portal[parts[i].tmp][randomness-1][nnx]);
-                                        parts[pmap[y+ny][x+nx]>>8].temp = portaltemp[parts[i].tmp][randomness-1][nnx];
-                                        portal[parts[i].tmp][randomness-1][nnx] = 0;
-                                        portaltemp[parts[i].tmp][randomness-1][nnx] = 0;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-            }
-            else if(t==PT_WIFI)
-            {
-                int temprange = 100;
-                for( temp = 0; temp < MAX_TEMP; temp += temprange)
-                    if(parts[i].temp-73.15>temp&&parts[i].temp-73.15 <temp+temprange)
-                        parts[i].tmp = temp/100;
-                for(ny=-1; ny<2; ny++)
+			    if(!r)
+			    {
+				for( nnx =0 ;nnx<80;nnx++)
+				{
+					int randomness = count + rand()%3-1;
+					if(randomness<1)
+						randomness=1;
+					if(randomness>8)
+						randomness=8;
+					if(portal[parts[i].tmp][randomness-1][nnx]==PT_SPRK)//todo. make it look better
+					{
+						create_part(-1,x+1,y,portal[parts[i].tmp][randomness-1][nnx]);
+						create_part(-1,x+1,y+1,portal[parts[i].tmp][randomness-1][nnx]);
+						create_part(-1,x+1,y-1,portal[parts[i].tmp][randomness-1][nnx]);
+						create_part(-1,x,y-1,portal[parts[i].tmp][randomness-1][nnx]);
+						create_part(-1,x,y+1,portal[parts[i].tmp][randomness-1][nnx]);
+						create_part(-1,x-1,y+1,portal[parts[i].tmp][randomness-1][nnx]);
+						create_part(-1,x-1,y,portal[parts[i].tmp][randomness-1][nnx]);
+						create_part(-1,x-1,y-1,portal[parts[i].tmp][randomness-1][nnx]);
+						portal[parts[i].tmp][randomness-1][nnx] = 0;
+						portaltemp[parts[i].tmp][randomness-1][nnx] = 0;
+						break;
+					}
+					else if(portal[parts[i].tmp][randomness-1][nnx])
+					{
+						create_part(-1,x+nx,y+ny,portal[parts[i].tmp][randomness-1][nnx]);
+						parts[pmap[y+ny][x+nx]>>8].temp = portaltemp[parts[i].tmp][randomness-1][nnx];
+						parts[pmap[y+ny][x+nx]>>8].ctype = portalctype[parts[i].tmp][randomness-1][nnx];
+						portal[parts[i].tmp][randomness-1][nnx] = 0;
+						portaltemp[parts[i].tmp][randomness-1][nnx] = 0;
+						portalctype[parts[i].tmp][randomness-1][nnx] = 0;
+						break;
+					}
+				}
+			    }
+			}
+	    }
+	    else if(t==PT_WIFI)
+	    {
+		int temprange = 100;
+		for( temp = 0; temp < MAX_TEMP; temp += temprange)
+			if(parts[i].temp-73.15>temp&&parts[i].temp-73.15 <temp+temprange)
+				parts[i].tmp = temp/100;
+		for(ny=-1; ny<2; ny++)
                     for(nx=-1; nx<2; nx++)
                         if(x+nx>=0 && y+ny>0 &&
                                 x+nx<XRES && y+ny<YRES && (nx || ny))
@@ -3813,36 +3892,56 @@ void update_particles_i(pixel *vid, int start, int inc)
                             r = pmap[y+ny][x+nx];
                             if((r>>8)>=NPART || !r)
                                 continue;
-                            if(parts[r>>8].type!=PT_DMND&&33>=rand()/(RAND_MAX/100)+1)
-                            {
-                                if(parts[r>>8].type==PT_SING && parts[r>>8].life >10)
-                                {
-                                    if(parts[i].life+parts[r>>8].life > 255)
-                                        continue;
-                                    parts[i].life += parts[r>>8].life;
-                                }
-                                else
-                                {
-                                    if(parts[i].life+3 > 255)
-                                    {
-                                        if(parts[r>>8].type!=PT_SING && 1>rand()%100)
-                                        {
-                                            parts[r>>8].type = PT_SING;
-                                            parts[r>>8].life = rand()%50+60;
-                                        }
-                                        continue;
-                                    }
-                                    parts[i].life += 3;
-                                }
-                                parts[i].temp = restrict_flt(parts[r>>8].temp+parts[i].temp, MIN_TEMP, MAX_TEMP);
-                                parts[r>>8].type=PT_NONE;
-                            }
-                        }
-            }
-            else if(t==PT_FIRW)
+			    if(parts[r>>8].type!=PT_DMND&&33>=rand()/(RAND_MAX/100)+1)
+			    {
+				if(parts[r>>8].type==PT_SING && parts[r>>8].life >10)
+				{
+					if(parts[i].life+parts[r>>8].life > 255)
+						continue;
+					parts[i].life += parts[r>>8].life;
+				}
+				else
+				{
+					if(parts[i].life+3 > 255)
+					{
+						if(parts[r>>8].type!=PT_SING && 1>rand()%100)
+						{
+							parts[r>>8].type = PT_SING;
+							parts[r>>8].life = rand()%50+60;
+						}
+						continue;
+					}
+					parts[i].life += 3;
+				}
+				parts[i].temp = restrict_flt(parts[r>>8].temp+parts[i].temp, MIN_TEMP, MAX_TEMP);
+                        	parts[r>>8].type=PT_NONE;
+                    	    }
+			}
+	    }
+	    else if(t==PT_BOYL)
             {
-                if(parts[i].tmp==0)
-                {
+                for(nx=-1; nx<2; nx++)
+                    for(ny=-1; ny<2; ny++)
+                        if(x+nx>=0 && y+ny>0 &&
+                                x+nx<XRES && y+ny<YRES && (nx || ny))
+                        {
+                            r = pmap[y+ny][x+nx];
+                            if((r>>8)>=NPART || !r)
+                                continue;
+			    if(parts[r>>8].type==PT_WATR && 1>rand()%30)
+			    {
+				parts[r>>8].type = PT_FOG;
+			    }
+			    if(parts[r>>8].type==PT_O2 && 1>rand()%9)
+			    {
+				parts[r>>8].type = PT_NONE;
+				t = parts[i].type = PT_WATR;
+				pv[y/CELL][x/CELL] += 4.0;
+			    }
+			}
+	    }
+            else if(t==PT_FIRW) {
+                if(parts[i].tmp==0) {
                     for(nx=-1; nx<2; nx++)
                         for(ny=-1; ny<2; ny++)
                             if(x+nx>=0 && y+ny>0 &&
@@ -3954,6 +4053,7 @@ void update_particles_i(pixel *vid, int start, int inc)
                             if((r>>8)>=NPART || !r)
                                 continue;
                             rt = parts[r>>8].type;
+
                             if(parts[r>>8].type == PT_SWCH&&parts_avg(i,r>>8,PT_INSL)!=PT_INSL)
                             {
                                 if(parts[i].life==10&&parts[r>>8].life<10&&parts[r>>8].life>0)
@@ -3971,6 +4071,14 @@ void update_particles_i(pixel *vid, int start, int inc)
                                 parts[r>>8].life = 9;
                             }
                         }
+		if(parts[i].life==10 && (!(pmap[y-1][x-1]&0xFF) && ((pmap[y-1][x]&0xFF)==PT_BRAY&&parts[pmap[y-1][x]>>8].tmp==2) && !(pmap[y-1][x+1]&0xFF) && ((pmap[y][x+1]&0xFF)==PT_BRAY&&parts[pmap[y][x+1]>>8].tmp==2)))
+		{
+			parts[i].life = 9;
+		}
+		else if(parts[i].life<=5 && (!(pmap[y-1][x-1]&0xFF) && (((pmap[y-1][x]&0xFF)==PT_BRAY&&parts[pmap[y-1][x]>>8].tmp==2) || ((pmap[y+1][x]&0xFF)==PT_BRAY&&parts[pmap[y+1][x]>>8].tmp==2)) && !(pmap[y-1][x+1]&0xFF) && (((pmap[y][x+1]&0xFF)==PT_BRAY&&parts[pmap[y][x+1]>>8].tmp==2) || ((pmap[y][x-1]&0xFF)==PT_BRAY&&parts[pmap[y][x-1]>>8].tmp==2))))
+		{
+			parts[i].life = 14;
+		}
             }
             if(t==PT_SWCH)
                 if((parts[i].life>0&&parts[i].life<10)|| parts[i].life > 10)
@@ -4212,6 +4320,11 @@ killed:
                     parts[i].life -= 1;
                 if((parts[i].temp<309.6f) && (parts[i].temp>=243))
                     parts[i].temp += 1;
+
+				if (isplayer) { //Already a stickman in the simulation
+					death = 1;
+					parts[i].type = PT_NONE;
+				}
 
                 //Death
                 if(parts[i].life<1 || death == 1 || (pv[y/CELL][x/CELL]>=4.5f && player[2] != SPC_AIR) )  //If his HP is less that 0 or there is very big wind...
@@ -4603,6 +4716,11 @@ killed:
                 if((parts[i].temp<309.6f) && (parts[i].temp>=243))
                     parts[i].temp += 1;
 
+				if (isplayer2) { //Already a stickman2 in the simulation
+					death2 = 1;
+					parts[i].type = PT_NONE;
+				}
+
                 //Death
                 if(parts[i].life<1 || death2 == 1 || (pv[y/CELL][x/CELL]>=4.5f && player2[2] != SPC_AIR) )  //If his HP is less that 0 or there is very big wind...
                 {
@@ -4614,7 +4732,7 @@ killed:
                         create_part(-1, x+2, y+r, player2[2]);
                     }
                     kill_part(i);  //Kill him
-                    goto killed;
+                    continue;
                 }
 
                 parts[i].vy += -0.7*dt;  //Head up!

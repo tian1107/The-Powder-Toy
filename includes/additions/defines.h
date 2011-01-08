@@ -1,4 +1,4 @@
-#define OFFCOUNT 140 //Official Count - 1
+#define OFFCOUNT 141 //Official Count - 1
 //Unofficial additions
 #define PT_FPLT     OFFCOUNT + 1
 #define PT_SOAP     OFFCOUNT + 2
