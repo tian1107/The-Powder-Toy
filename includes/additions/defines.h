@@ -22,8 +22,7 @@
 #define PT_VTNN		OFFCOUNT + 20
 #define PT_EXPL     OFFCOUNT + 21
 #define PT_PRSN     OFFCOUNT + 22
-#define PT_CLNT     OFFCOUNT + 23
-#define PT_CSTR     OFFCOUNT + 24
+#define PT_CSTR     OFFCOUNT + 23
 //Unofficial Count
-#define PT_NUM		OFFCOUNT + 25
+#define PT_NUM		OFFCOUNT + 24
 

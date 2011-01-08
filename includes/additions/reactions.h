@@ -543,11 +543,6 @@ if(t==PT_PRSN)
                 }
             }
 }
-//Coolant
-if(t==PT_CLNT)
-{
-    parts[i].temp = 0.0f;
-}
 //C string
 if (t == PT_CSTR)
 {
@@ -585,14 +580,14 @@ if (t == PT_CSTR)
                         dist = rand()%2;
                         switch(dist)
                         {
-                            case 0:
-                                parts[i].any = (charge+1)/2;
-                                parts[r>>8].any = (charge-1)/2;
-                                break;
-                            case 1:
-                                parts[i].any = (charge-1)/2;
-                                parts[r>>8].any = (charge+1)/2;
-                                break;
+                        case 0:
+                            parts[i].any = (charge+1)/2;
+                            parts[r>>8].any = (charge-1)/2;
+                            break;
+                        case 1:
+                            parts[i].any = (charge-1)/2;
+                            parts[r>>8].any = (charge+1)/2;
+                            break;
                         }
                     }
                 }

@@ -29,6 +29,9 @@
 #define YRES	384
 #define NPART XRES*YRES
 
+#define XCNTR   306
+#define YCNTR   192
+
 #define MAX_DISTANCE sqrt(pow(XRES, 2)+pow(YRES, 2))
 
 #define MAXSIGNS 16
@@ -99,6 +102,8 @@ int GRAV_G2;
 int GRAV_B2;
 
 extern int legacy_enable;
+
+extern int kiosk_enable;
 
 extern int sys_pause;
 extern int framerender;

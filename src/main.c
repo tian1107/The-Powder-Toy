@@ -135,6 +135,7 @@ int core_count()
 }
 
 int mousex = 0, mousey = 0;  //They contain mouse position
+int kiosk_enable = 0;
 
 void sdl_seticon(void)
 {
@@ -489,6 +490,7 @@ int parse_save(void *save, int size, int replace, int x0, int y0)
 
     if(replace)
     {
+		gravityMode = 1;
         memset(bmap, 0, sizeof(bmap));
         memset(emap, 0, sizeof(emap));
         memset(signs, 0, sizeof(signs));
@@ -1187,6 +1189,12 @@ int main(int argc, char *argv[])
         {
             hud_enable = 0;
         }
+		else if(!strncmp(argv[i], "kiosk", 5))
+        {
+            kiosk_enable = 1;
+			sdl_scale = 2;
+			hud_enable = 0;
+        }
     }
 
     save_presets(0);
@@ -1550,6 +1558,40 @@ int main(int argc, char *argv[])
 	    else
 		GRID_MODE = (GRID_MODE+1)%10;
 	}
+	if(sdl_key=='=')
+	{
+	    int nx, ny;
+		for(nx = 0;nx<XRES/CELL;nx++)
+			for(ny = 0;ny<YRES/CELL;ny++)
+			{
+				pv[ny][nx] = 0;
+				vx[ny][nx] = 0;
+				vy[ny][nx] = 0;
+			}
+	}
+
+		if(sdl_key=='w' && (!isplayer2 || (sdl_mod & (KMOD_SHIFT)))) //Gravity, by Moach
+		{
+			++gravityMode; // cycle gravity mode
+			itc = 51;
+
+			switch (gravityMode)
+			{
+				default:
+					gravityMode = 0;
+				case 0:
+					strcpy(itc_msg, "Gravity: Off");
+					break;
+				case 1:
+					strcpy(itc_msg, "Gravity: Vertical");
+					break;
+				case 2:
+					strcpy(itc_msg, "Gravity: Radial");
+					break;
+
+			}
+		}
+
 	if(sdl_key=='t')
             VINE_MODE = !VINE_MODE;
         if(sdl_key==SDLK_SPACE)
@@ -1625,6 +1667,7 @@ int main(int argc, char *argv[])
                 }
         }
 #ifdef INTERNAL
+<<<<<<< HEAD
 	int counterthing;
         if(sdl_key=='v')
 	{
@@ -1639,18 +1682,35 @@ int main(int argc, char *argv[])
 				vs = 0;
 			else
 				vs = 1;
+=======
+		int counterthing;
+        if(sdl_key=='v'&&!(sdl_mod & (KMOD_LCTRL|KMOD_RCTRL)))
+		{
+			if(sdl_mod & (KMOD_SHIFT)){
+				if(vs>=1)
+					vs = 0;
+				else
+					vs = 3;//every other frame
+			}
+			else
+			{
+				if(vs>=1)
+					vs = 0;
+				else
+					vs = 1;
+			}
+			counterthing = 0;
+>>>>>>> 6eafb157de0e317a17bb74b2c60b5d759d891666
 		}
-		counterthing = 0;
-	}
         if(vs)
-	{
-	    if(counterthing+1>=vs)
-	    {
-		dump_frame(vid_buf, XRES, YRES, XRES+BARSIZE);
-		counterthing = 0;
-	    }
-	    counterthing = (counterthing+1)%3;
-	}
+		{
+			if(counterthing+1>=vs)
+			{
+				dump_frame(vid_buf, XRES, YRES, XRES+BARSIZE);
+				counterthing = 0;
+			}
+			counterthing = (counterthing+1)%3;
+		}
 #endif
 
         if(sdl_wheel)
@@ -2081,6 +2141,12 @@ int main(int argc, char *argv[])
                         svf_id[0] = 0;
                         svf_name[0] = 0;
                         svf_tags[0] = 0;
+						svf_description[0] = 0;
+						gravityMode = 1;
+						isplayer2 = 0;
+						isplayer = 0;
+						ISSPAWN1 = 0;
+						ISSPAWN2 = 0;
 
                         memset(fire_bg, 0, XRES*YRES*PIXELSIZE);
                         memset(fire_r, 0, sizeof(fire_r));
@@ -2429,12 +2495,16 @@ int main(int argc, char *argv[])
 			else
 				sprintf(uitext, "Version %d.%d (tian1107's additions v%.1f) FPS:%d", SAVE_VERSION, MINOR_VERSION, MODVERSION, FPSB);
 #endif
-            if(REPLACE_MODE)
-                strappend(uitext, " [REPLACE MODE]");
-            if(sdl_mod&(KMOD_CAPS))
-                strappend(uitext, " [CAP LOCKS]");
-            if(GRID_MODE)
-                sprintf(uitext, "%s [GRID: %d]", uitext, GRID_MODE);
+			if(REPLACE_MODE)
+				strappend(uitext, " [REPLACE MODE]");
+			if(sdl_mod&(KMOD_CAPS))
+				strappend(uitext, " [CAP LOCKS]");
+			if(GRID_MODE)
+				sprintf(uitext, "%s [GRID: %d]", uitext, GRID_MODE);
+#ifdef INTERNAL
+			if(vs)
+				strappend(uitext, " [FRAME CAPTURE]");
+#endif
 
             if(sdl_zoom_trig||zoom_en)
             {

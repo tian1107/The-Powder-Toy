@@ -20,5 +20,5 @@
 /* VTNN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_NONE, 0.0f},
 /* EXPL */ {ST_LIQUID,	PT_PLSM, 295.14f,   PT_NONE, 0.0f,		PT_NONE, 0.0f,		PT_PLSM, 295.16f},
 /* PRSN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,      PT_NONE, 0.0f,		PT_NONE, 0.0f},
-/* PRSN */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,      PT_NONE, 0.0f,		PT_NONE, 0.0f},
+/* CSTR */ {ST_SOLID,	PT_NONE, 0.0f,		PT_NONE, 0.0f,      PT_NONE, 0.0f,		PT_NONE, 0.0f},
 // Name		Original	Solid	 Frzp		Liquid   Mpnt		Gas	   Bpoint		Burn	Burning point
