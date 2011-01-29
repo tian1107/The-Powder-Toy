@@ -55,9 +55,9 @@ static menu_wall mwalls[] =
 #define SC_NONWAV   10
 #define SC_LIFE 11
 #define SC_LIFE2 12
-#define SC_CRACKER 13
-#define SC_CRACKER2 14
-#define SC_TOTAL 15
+#define SC_CRACKER2 13
+#define SC_CRACKER 14
+#define SC_TOTAL 14
 
 static menu_section msections[] =
 {

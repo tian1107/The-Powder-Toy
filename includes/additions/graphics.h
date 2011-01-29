@@ -69,8 +69,10 @@ if(t == PT_RREC)
 }
 if(t==PT_PRSN)
 {
-    /*if(mousex>(nx-3) && mousex<(nx+3) && mousey<(ny+3) && mousey>(ny-3))  //If mous is in the head
+    /*
+    if(mousex>(nx-3) && mousex<(nx+3) && mousey<(ny+3) && mousey>(ny-3))  //If mous is in the head
     {
+        char hp[10];
         itoa(parts[i].life, hp, 10);
         drawtext(vid, mousex, mousey-12, hp, 255, 255, 255, 255);
         //drawtext(vid, mousex-8-2*(parts[i].life<100)-2*(parts[i].life<10), mousey-12, ptypes[parts[i].any].name, 255, 255, 255, 255);

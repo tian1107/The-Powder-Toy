@@ -53,7 +53,7 @@ if(t==PT_VTNN)
 if(t==PT_PRSN)
 {
     do
-        parts[i].any = (rand()%PT_NUM); //Random type
+        parts[i].any = (rand()%(PT_NUM-1)); //Random type
     while((ptypes[parts[i].any].falldown==0 || parts[i].any == PT_PRSN || parts[i].any == PT_EWAVE || parts[i].any == PT_STKM || parts[i].any == PT_STKM2 || parts[i].any == PT_NONE) && parts[i].any != PT_PHOT && parts[i].any != PT_NEUT);
     parts[i].life = 100;
 }
