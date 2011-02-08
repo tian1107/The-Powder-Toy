@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <regex.h>
+#include <sys/types.h>
 #include "misc.h"
 #include "defines.h"
 #include "interface.h"
 #include "graphics.h"
+#include "powder.h"
 
 //Signum function
 #if defined(WIN32) && !defined(__GNUC__)
@@ -89,13 +92,15 @@ void strlist_free(struct strlist **list)
 void save_presets(int do_update)
 {
 	FILE *f=fopen("powder.def", "wb");
-	unsigned char sig[4] = {0x50, 0x44, 0x65, 0x66};
+	unsigned char sig[4] = {0x50, 0x44, 0x65, 0x67};
 	unsigned char tmp = sdl_scale;
 	if (!f)
 		return;
 	fwrite(sig, 1, 4, f);
 	save_string(f, svf_user);
-	save_string(f, svf_pass);
+	//save_string(f, svf_pass);
+	save_string(f, svf_user_id);
+	save_string(f, svf_session_id);
 	fwrite(&tmp, 1, 1, f);
 	tmp = cmode;
 	fwrite(&tmp, 1, 1, f);
@@ -113,6 +118,17 @@ void save_presets(int do_update)
 	fclose(f);
 }
 
+int sregexp(const char *str, char *pattern)
+{
+	int result;
+	regex_t patternc;
+	if(regcomp(&patternc, pattern,  0)!=0)
+		return 1;
+	result = regexec(&patternc, str, 0, NULL, 0);
+	regfree(&patternc);
+	return result;
+}
+
 void load_presets(void)
 {
 	FILE *f=fopen("powder.def", "rb");
@@ -120,7 +136,7 @@ void load_presets(void)
 	if (!f)
 		return;
 	fread(sig, 1, 4, f);
-	if (sig[0]!=0x50 || sig[1]!=0x44 || sig[2]!=0x65 || sig[3]!=0x66)
+	if (sig[0]!=0x50 || sig[1]!=0x44 || sig[2]!=0x65)
 	{
 		if (sig[0]==0x4D && sig[1]==0x6F && sig[2]==0x46 && sig[3]==0x6F)
 		{
@@ -142,17 +158,26 @@ void load_presets(void)
 		remove("powder.def");
 		return;
 	}
-	if (load_string(f, svf_user, 63))
-		goto fail;
-	if (load_string(f, svf_pass, 63))
-		goto fail;
-	svf_login = !!svf_user[0];
+	if(sig[3]==0x66){
+		if (load_string(f, svf_user, 63))
+			goto fail;
+		if (load_string(f, svf_pass, 63))
+			goto fail;
+	} else {
+		if (load_string(f, svf_user, 63))
+			goto fail;
+		if (load_string(f, svf_user_id, 63))
+			goto fail;
+		if (load_string(f, svf_session_id, 63))
+			goto fail;
+	}
+	svf_login = !!svf_session_id[0];
 	if (fread(&tmp, 1, 1, f) != 1)
 		goto fail;
 	sdl_scale = (tmp == 2) ? 2 : 1;
 	if (fread(&tmp, 1, 1, f) != 1)
 		goto fail;
-	cmode = tmp%7;
+	cmode = tmp%CM_COUNT;
 	if (fread(&tmp, 1, 1, f) != 1)
 		goto fail;
 	svf_admin = tmp;

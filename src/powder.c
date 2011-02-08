@@ -450,7 +450,7 @@ void kill_part(int i)
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
-_inline void part_change_type(int n, int x, int y, int t)
+_inline void part_change_type(int i, int x, int y, int t)
 #else
 inline void part_change_type(int i, int x, int y, int t)
 #endif
@@ -465,7 +465,7 @@ inline void part_change_type(int i, int x, int y, int t)
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
-_inline int create_n_parts(int n, int x, int y, int t)
+_inline int create_n_parts(int n, int x, int y, float vx, float vy, int t)
 #else
 inline int create_n_parts(int n, int x, int y, float vx, float vy, int t)
 #endif
@@ -577,8 +577,7 @@ inline int create_part(int p, int x, int y, int t)
 
 	if (t==PT_SPRK)
 	{
-		if (!((pmap[y][x]&0xFF)==PT_INST||(ptypes[pmap[y][x]&0xFF].properties&PROP_CONDUCTS))
-			|| (pmap[y][x]&0xFF)==PT_QRTZ)
+		if ((pmap[y][x]>>8)>=NPART || !((pmap[y][x]&0xFF)==PT_INST||(ptypes[pmap[y][x]&0xFF].properties&PROP_CONDUCTS)))
 			return -1;
 		if (parts[pmap[y][x]>>8].life!=0)
 			return -1;
@@ -604,8 +603,6 @@ inline int create_part(int p, int x, int y, int t)
 				}
 			}
 		}
-		if (photons[y][x] && t==PT_PHOT)
-			return -1;
 		if (pfree == -1)
 			return -1;
 		i = pfree;
@@ -667,6 +664,12 @@ inline int create_part(int p, int x, int y, int t)
 		parts[i].life = 50;
 		parts[i].tmp = 50;
 	}
+	if (ptypes[t].properties&PROP_LIFE) {
+		int r;
+		for(r = 0; r<NGOL; r++)
+			if(t==goltype[r])
+				parts[i].tmp = grule[r+1][9] - 1;
+	}
 	if (t==PT_DEUT)
 		parts[i].life = 10;
 	if (t==PT_BRAY)
@@ -725,6 +728,7 @@ inline int create_part(int p, int x, int y, int t)
 	}
 	if (t==PT_PHOT)
 		photons[y][x] = t|(i<<8);
+    #include "additions/life.h"
 	if (t==PT_STKM)
 	{
 		if (isplayer==0)
@@ -967,7 +971,6 @@ inline void delete_part(int x, int y)
 	}
 	else
 		return;
-	
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -1078,7 +1081,7 @@ inline int parts_avg(int ci, int ni,int t)
 {
 	if (t==PT_INSL)//to keep electronics working
 	{
-		int pmr = pmap[(int)((parts[ci].y + parts[ni].y)/2)][(int)((parts[ci].x + parts[ni].x)/2)];
+		int pmr = pmap[((int)(parts[ci].y+0.5f) + (int)(parts[ni].y+0.5f))/2][((int)(parts[ci].x+0.5f) + (int)(parts[ni].x+0.5f))/2];
 		if ((pmr>>8) < NPART && pmr)
 			return parts[pmr>>8].type;
 		else
@@ -1111,7 +1114,7 @@ int nearest_part(int ci, int t)
 	{
 		if (parts[i].type==t&&!parts[i].life&&i!=ci)
 		{
-			ndistance = abs((cx-parts[i].x)+(cy-parts[i].y));// Faster but less accurate  Older: sqrt(pow(cx-parts[i].x, 2)+pow(cy-parts[i].y, 2));
+			ndistance = abs(cx-parts[i].x)+abs(cy-parts[i].y);// Faster but less accurate  Older: sqrt(pow(cx-parts[i].x, 2)+pow(cy-parts[i].y, 2));
 			if (ndistance<distance)
 			{
 				distance = ndistance;
@@ -1124,11 +1127,11 @@ int nearest_part(int ci, int t)
 
 void update_particles_i(pixel *vid, int start, int inc)
 {
-	int i, j, x, y, t, nx, ny, r, surround_space, s, lt, rt, nt, nnx, nny, q, golnum, goldelete, z;
-	float mv, dx, dy, ix, iy, lx, ly, nrx, nry, dp;
+	int i, j, x, y, t, nx, ny, r, surround_space, s, lt, rt, nt, nnx, nny, q, golnum, goldelete, z, neighbors;
+	float mv, dx, dy, ix, iy, lx, ly, nrx, nry, dp, ctemph, ctempl;
 	int fin_x, fin_y, clear_x, clear_y;
 	float fin_xf, fin_yf, clear_xf, clear_yf;
-	float nn, ct1, ct2;
+	float nn, ct1, ct2, swappage;
 	float pt = R_TEMP;
 	float c_heat = 0.0f;
 	int h_count = 0;
@@ -1288,9 +1291,9 @@ void update_particles_i(pixel *vid, int start, int inc)
 	}
 	if (ISGOL==1&&++CGOL>=GSPEED)//GSPEED is frames per generation
 	{
+		int createdsomething = 0;
 		CGOL=0;
 		ISGOL=0;
-		int createdsomething = 0;
 		for (nx=CELL; nx<XRES-CELL; nx++)
 			for (ny=CELL; ny<YRES-CELL; ny++)
 			{
@@ -1301,25 +1304,32 @@ void update_particles_i(pixel *vid, int start, int inc)
 					continue;
 				}
 				else
-					for ( golnum=1; golnum<NGOL; golnum++)
+					for ( golnum=1; golnum<=NGOL; golnum++)
 						if (parts[r>>8].type==goltype[golnum-1])
 						{
-							gol[nx][ny] = golnum;
-							for ( nnx=-1; nnx<2; nnx++)
-								for ( nny=-1; nny<2; nny++)//it will count itself as its own neighbor, which is needed, but will have 1 extra for delete check
-								{
-									gol2[((nx+nnx+XRES-3*CELL)%(XRES-2*CELL))+CELL][((ny+nny+YRES-3*CELL)%(YRES-2*CELL))+CELL][golnum] ++;
-									gol2[((nx+nnx+XRES-3*CELL)%(XRES-2*CELL))+CELL][((ny+nny+YRES-3*CELL)%(YRES-2*CELL))+CELL][0] ++;
-								}
+							if(parts[r>>8].tmp == grule[golnum][9]-1) {
+								gol[nx][ny] = golnum;
+								for ( nnx=-1; nnx<2; nnx++)
+									for ( nny=-1; nny<2; nny++)//it will count itself as its own neighbor, which is needed, but will have 1 extra for delete check
+									{
+										gol2[((nx+nnx+XRES-3*CELL)%(XRES-2*CELL))+CELL][((ny+nny+YRES-3*CELL)%(YRES-2*CELL))+CELL][golnum] ++;
+										gol2[((nx+nnx+XRES-3*CELL)%(XRES-2*CELL))+CELL][((ny+nny+YRES-3*CELL)%(YRES-2*CELL))+CELL][0] ++;
+									}
+							} else {
+								parts[r>>8].tmp --;
+								if(parts[r>>8].tmp<=0)
+									parts[r>>8].type = PT_NONE;//using kill_part makes it not work
+							}
 						}
 			}
 		for (nx=CELL; nx<XRES-CELL; nx++)
 			for (ny=CELL; ny<YRES-CELL; ny++)
 			{
-				int neighbors = gol2[nx][ny][0];
-				if (neighbors==0)
+				r = pmap[ny][nx];
+				neighbors = gol2[nx][ny][0];
+				if(neighbors==0 || !(ptypes[r&0xFF].properties&PROP_LIFE || !r&0xFF) || (r>>8)>=NPART)
 					continue;
-				for ( golnum = 1; golnum<NGOL; golnum++)
+				for ( golnum = 1; golnum<=NGOL; golnum++)
 					for ( goldelete = 0; goldelete<9; goldelete++)
 					{
 						if (neighbors==goldelete&&gol[nx][ny]==0&&grule[golnum][goldelete]>=2&&gol2[nx][ny][golnum]>=(goldelete%2)+goldelete/2)
@@ -1328,10 +1338,15 @@ void update_particles_i(pixel *vid, int start, int inc)
 								createdsomething = 1;
 						}
 						else if (neighbors-1==goldelete&&gol[nx][ny]==golnum&&(grule[golnum][goldelete]==0||grule[golnum][goldelete]==2))//subtract 1 because it counted itself
-							kill_part(pmap[ny][nx]>>8);
+						{
+							if(parts[r>>8].tmp==grule[golnum][9]-1)
+								parts[r>>8].tmp --;
+						}
+						if(parts[r>>8].tmp<=0)
+							parts[r>>8].type = PT_NONE;//using kill_part makes it not work
 					}
 				gol2[nx][ny][0] = 0;
-				for ( z = 1; z<NGOL; z++)
+				for ( z = 1; z<=NGOL; z++)
 					gol2[nx][ny][z] = 0;
 			}
 		if (createdsomething)
@@ -1471,7 +1486,6 @@ void update_particles_i(pixel *vid, int start, int inc)
 			if (!legacy_enable)
 			{
 				if (y-2 >= 0 && y-2 < YRES && (ptypes[t].properties&TYPE_LIQUID)) {
-					float swappage;
 					r = pmap[y-2][x];
 					if (!((r>>8)>=NPART || !r || parts[i].type != (r&0xFF))) {
 						if (parts[i].temp>parts[r>>8].temp) {
@@ -1509,8 +1523,16 @@ void update_particles_i(pixel *vid, int start, int inc)
 						parts[surround_hconduct[j]].temp = pt;
 					}
 
+					ctemph = ctempl = pt;
+					// change boiling point with pressure
+					if ((ptypes[t].state==ST_LIQUID && ptransitions[t].tht>-1 && ptransitions[t].tht<PT_NUM && ptypes[ptransitions[t].tht].state==ST_GAS)
+						|| t==PT_LNTG || t==PT_SLTW)
+						ctemph -= 2.0f*pv[y/CELL][x/CELL];
+					else if ((ptypes[t].state==ST_GAS && ptransitions[t].tlt>-1 && ptransitions[t].tlt<PT_NUM && ptypes[ptransitions[t].tlt].state==ST_LIQUID)
+						|| t==PT_WTRV)
+						ctempl -= 2.0f*pv[y/CELL][x/CELL];
 					s = 1;
-					if (pt>ptransitions[t].thv&&ptransitions[t].tht>-1) {
+					if (ctemph>ptransitions[t].thv&&ptransitions[t].tht>-1) {
 						// particle type change due to high temperature
 						if (ptransitions[t].tht!=PT_NUM)
 							t = ptransitions[t].tht;
@@ -1531,7 +1553,7 @@ void update_particles_i(pixel *vid, int start, int inc)
 							else t = PT_WTRV;
 						}
 						else s = 0;
-					} else if (pt<ptransitions[t].tlv&&ptransitions[t].tlt>-1) {
+					} else if (ctempl<ptransitions[t].tlv&&ptransitions[t].tlt>-1) {
 						// particle type change due to low temperature
 						if (ptransitions[t].tlt!=PT_NUM)
 							t = ptransitions[t].tlt;
@@ -1540,9 +1562,10 @@ void update_particles_i(pixel *vid, int start, int inc)
 							else t = PT_DSTW;
 						}
 						else if (t==PT_LAVA) {
-							if (parts[i].ctype&&parts[i].ctype!=PT_LAVA) {
+							if (parts[i].ctype && parts[i].ctype<PT_NUM && parts[i].ctype!=PT_LAVA) {
 								if (ptransitions[parts[i].ctype].tht==PT_LAVA&&pt>=ptransitions[parts[i].ctype].thv) s = 0;
 								else if (parts[i].ctype==PT_THRM&&pt>=ptransitions[PT_BMTL].thv) s = 0;
+								else if (pt>=973.0f) s = 0; // freezing point for lava with any other (not listed in ptransitions as turning into lava) ctype
 								else {
 									t = parts[i].ctype;
 									parts[i].ctype = PT_NONE;
@@ -1949,15 +1972,15 @@ killed:
 								{
 									parts[i].x = clear_xf+(j-clear_x);
 									parts[i].y = fin_yf;
-									x = j;
-									y = fin_y;
+									nx = j;
+									ny = fin_y;
 									s = 1;
 									break;
 								}
 								if (try_move(i, x, y, j, clear_y))
 								{
 									parts[i].x = clear_xf+(j-clear_x);
-									x = j;
+									nx = j;
 									s = 1;
 									break;
 								}
@@ -1971,12 +1994,12 @@ killed:
 							if (s)
 								for (j=clear_y+r; j>=0 && j<YRES && j>=clear_y-rt && j<clear_y+rt; j+=r)
 								{
-									if (try_move(i, x, y, clear_x, j))
+									if (try_move(i, x, y, nx, j))
 									{
 										parts[i].y = clear_yf+(j-clear_y);
 										break;
 									}
-									if ((pmap[j][x]&255)!=t || (bmap[j/CELL][x/CELL] && bmap[j/CELL][x/CELL]!=WL_STREAM))
+									if ((pmap[j][nx]&255)!=t || (bmap[j/CELL][nx/CELL] && bmap[j/CELL][nx/CELL]!=WL_STREAM))
 									{
 										s = 0;
 										break;

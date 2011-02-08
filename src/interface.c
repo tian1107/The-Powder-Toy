@@ -25,7 +25,9 @@ int svf_login = 0;
 int svf_admin = 0;
 int svf_mod = 0;
 char svf_user[64] = "";
+char svf_user_id[64] = "";
 char svf_pass[64] = "";
+char svf_session_id[64] = "";
 
 int svf_open = 0;
 int svf_own = 0;
@@ -87,8 +89,25 @@ void get_sign_pos(int i, int *x0, int *y0, int *w, int *h)
 	if (strcmp(signs[i].text, "{t}")==0)
 		*w = textwidth("Temp: 0000.00");
 
+	if(sregexp(signs[i].text, "^{c:[0-9]*|.*}$")==0)
+	{
+		int sldr, startm;
+		char buff[256];
+		memset(buff, 0, sizeof(buff));
+		for(sldr=3; signs[i].text[sldr-1] != '|'; sldr++)
+			startm = sldr + 1;
+		
+		sldr = startm;
+		while(signs[i].text[sldr] != '}')
+		{
+			buff[sldr - startm] = signs[i].text[sldr];
+			sldr++;
+		}
+		*w = textwidth(buff) + 5;
+	}
+	
 	//Ususal width
-	if (strcmp(signs[i].text, "{p}") && strcmp(signs[i].text, "{t}"))
+	if (strcmp(signs[i].text, "{p}") && strcmp(signs[i].text, "{t}") && sregexp(signs[i].text, "^{c:[0-9]*|.*}$"))
 		*w = textwidth(signs[i].text) + 5;
 	*h = 14;
 	*x0 = (signs[i].ju == 2) ? signs[i].x - *w :
@@ -836,7 +855,7 @@ void login_ui(pixel *vid_buf)
 	res = http_multipart_post(
 	          "http://" SERVER "/Login.api",
 	          NULL, NULL, NULL,
-	          svf_user, svf_pass,
+	          svf_user, svf_pass, NULL,
 	          &err, NULL);
 	if (err != 200)
 	{
@@ -845,14 +864,35 @@ void login_ui(pixel *vid_buf)
 			free(res);
 		goto fail;
 	}
-	if (res && !strncmp(res, "OK", 2))
+	if (res && !strncmp(res, "OK ", 3))
 	{
-		if (!strcmp(res, "OK ADMIN"))
+		char *s_id,*u_e,*nres;
+		printf("{%s}\n", res);
+		s_id = strchr(res+3, ' ');
+		if (!s_id)
+			goto fail;
+		*(s_id++) = 0;
+
+		u_e = strchr(s_id, ' ');
+		if (!u_e){
+			u_e = malloc(1);
+			memset(u_e, 0, 1);
+		}
+		else
+			*(u_e++) = 0;
+		
+		strcpy(svf_user_id, res+3);
+		strcpy(svf_session_id, s_id);
+		nres = mystrdup(u_e);
+
+		printf("{%s} {%s} {%s}\n", svf_user_id, svf_session_id, nres);
+
+		if (!strncmp(nres, "ADMIN", 5))
 		{
 			svf_admin = 1;
 			svf_mod = 0;
 		}
-		else if (!strcmp(res, "OK MOD"))
+		else if (!strncmp(nres, "MOD", 3))
 		{
 			svf_admin = 0;
 			svf_mod = 1;
@@ -874,6 +914,8 @@ void login_ui(pixel *vid_buf)
 fail:
 	strcpy(svf_user, "");
 	strcpy(svf_pass, "");
+	strcpy(svf_user_id, "");
+	strcpy(svf_session_id, "");
 	svf_login = 0;
 	svf_own = 0;
 	svf_admin = 0;
@@ -2489,7 +2531,8 @@ int search_ui(pixel *vid_buf)
 			http = http_async_req_start(http, uri, NULL, 0, 1);
 			if (svf_login)
 			{
-				http_auth_headers(http, svf_user, svf_pass);
+				//http_auth_headers(http, svf_user, svf_pass);
+				http_auth_headers(http, svf_user_id, NULL, svf_session_id);
 			}
 			http_last_use = time(NULL);
 			free(uri);
@@ -2757,8 +2800,10 @@ int open_ui(pixel *vid_buf, char *save_id, char *save_date)
 	http_2 = http_async_req_start(http_2, uri_2, NULL, 0, 1);
 	if (svf_login)
 	{
-		http_auth_headers(http, svf_user, svf_pass);
-		http_auth_headers(http_2, svf_user, svf_pass);
+		//http_auth_headers(http, svf_user, svf_pass);
+		//http_auth_headers(http_2, svf_user, svf_pass);
+		http_auth_headers(http, svf_user_id, NULL, svf_session_id);
+		http_auth_headers(http_2, svf_user_id, NULL, svf_session_id);
 	}
 	http_last_use = time(NULL);
 	http_last_use_2 = time(NULL);
@@ -3483,7 +3528,7 @@ int execute_tagop(pixel *vid_buf, char *op, char *tag)
 	result = http_multipart_post(
 	             uri,
 	             names, parts, NULL,
-	             svf_user, svf_pass,
+	             svf_user_id, /*svf_pass*/NULL, svf_session_id,
 	             &status, NULL);
 
 	free(uri);
@@ -3543,7 +3588,7 @@ void execute_save(pixel *vid_buf)
 	result = http_multipart_post(
 	             "http://" SERVER "/Save.api",
 	             names, parts, plens,
-	             svf_user, svf_pass,
+	             svf_user_id, /*svf_pass*/NULL, svf_session_id,
 	             &status, NULL);
 
 	if (svf_last)
@@ -3600,7 +3645,7 @@ int execute_delete(pixel *vid_buf, char *id)
 	result = http_multipart_post(
 	             "http://" SERVER "/Delete.api",
 	             names, parts, NULL,
-	             svf_user, svf_pass,
+	             svf_user_id, /*svf_pass*/NULL, svf_session_id,
 	             &status, NULL);
 
 	if (status!=200)
@@ -3636,7 +3681,7 @@ void execute_submit(pixel *vid_buf, char *id, char *message)
 	result = http_multipart_post(
 	             "http://" SERVER "/Comment.api",
 	             names, parts, NULL,
-	             svf_user, svf_pass,
+	             svf_user_id, /*svf_pass*/NULL, svf_session_id,
 	             &status, NULL);
 
 	if (status!=200)
@@ -3671,7 +3716,7 @@ int execute_report(pixel *vid_buf, char *id, char *reason)
 	result = http_multipart_post(
 	             "http://" SERVER "/Report.api",
 	             names, parts, NULL,
-	             svf_user, svf_pass,
+	             svf_user_id, /*svf_pass*/NULL, svf_session_id,
 	             &status, NULL);
 
 	if (status!=200)
@@ -3706,7 +3751,7 @@ void execute_fav(pixel *vid_buf, char *id)
 	result = http_multipart_post(
 	             "http://" SERVER "/Favourite.api",
 	             names, parts, NULL,
-	             svf_user, svf_pass,
+	             svf_user_id, /*svf_pass*/NULL, svf_session_id,
 	             &status, NULL);
 
 	if (status!=200)
@@ -3741,7 +3786,7 @@ int execute_vote(pixel *vid_buf, char *id, char *action)
 	result = http_multipart_post(
 	             "http://" SERVER "/Vote.api",
 	             names, parts, NULL,
-	             svf_user, svf_pass,
+	             svf_user_id, /*svf_pass*/NULL, svf_session_id,
 	             &status, NULL);
 
 	if (status!=200)
@@ -3788,4 +3833,211 @@ void open_link(char *uri) {
 #else
 	printf("Cannot open browser\n");
 #endif
+}
+struct command_history {
+	void *prev_command;
+	char *command;
+};
+typedef struct command_history command_history;
+command_history *last_command = NULL;
+char *console_ui(pixel *vid_buf,char error[255]) { //TODO: error messages, show previous commands
+	int mx,my,b,bq,cc,ci = -1;
+	command_history *currentcommand;
+	ui_edit ed;
+	ed.x = 15;
+	ed.y = 210;
+	ed.w = XRES;
+	ed.nx = 1;
+	ed.def = "";
+	strcpy(ed.str, "");
+	ed.focus = 1;
+	ed.hide = 0;
+	ed.multiline = 0;
+	ed.cursor = 0;
+	//fillrect(vid_buf, -1, -1, XRES, 220, 0, 0, 0, 190);
+	while (!sdl_poll())
+	{
+		bq = b;
+		b = SDL_GetMouseState(&mx, &my);
+		mx /= sdl_scale;
+		my /= sdl_scale;
+		ed.focus = 1;
+
+		clearrect(vid_buf, 0, 0, XRES+BARSIZE, 220);//anyway to make it transparent?
+		draw_line(vid_buf, 1, 219, XRES, 219, 228, 228, 228, XRES+BARSIZE);
+		drawtext(vid_buf, 100, 15, "Welcome to The Powder Toy console v.2 (by cracker64)\n"
+					  "Current commands are quit, set, reset, load, create, file, kill, sound\n"
+					  "You can set type, temp, ctype, life, x, y, vx, vy using this format ('set life particle# 9001')\n"
+					  "You can also use 'all' instead of a particle number to do it to everything.\n"
+					  "You can now use particle names (ex. set type all deut)\n"
+					  "Reset works with pressure, velocity, sparks, temp (ex. 'reset pressure')\n"
+					  "To load a save use load saveID (ex. load 1337)\n"
+					  "Create particles with 'create deut x,y' where x and y are the coords\n"
+					  "Run scripts from file 'file filename'\n"
+					  "You can delete/kill a particle with 'kill x,y'"
+					  "Play a sound with (sound blah.wav)"
+					  ,255, 187, 187, 255);
+		
+		cc = 0;
+		currentcommand = last_command;
+		while(cc < 10)
+		{
+			if(currentcommand==NULL)
+				break;
+			drawtext(vid_buf, 15, 175-(cc*12), currentcommand->command, 255, 255, 255, 255);
+			if(currentcommand->prev_command!=NULL)
+			{
+				if(cc<9) {
+					currentcommand = currentcommand->prev_command;
+				} else if(currentcommand->prev_command!=NULL) {
+					free(currentcommand->prev_command);
+					currentcommand->prev_command = NULL;
+				}
+				cc++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if(error)
+			drawtext(vid_buf, 15, 190, error,255, 187, 187, 255);
+		ui_edit_draw(vid_buf, &ed);
+		ui_edit_process(mx, my, b, &ed);
+		sdl_blit(0, 0, (XRES+BARSIZE), YRES+MENUSIZE, vid_buf, (XRES+BARSIZE));
+		if (sdl_key==SDLK_RETURN)
+		{
+			currentcommand = malloc(sizeof(command_history));
+			memset(currentcommand, 0, sizeof(command_history));
+			currentcommand->prev_command = last_command;
+			currentcommand->command = mystrdup(ed.str);
+			last_command = currentcommand;
+			return currentcommand->command;
+		}
+		if (sdl_key==SDLK_ESCAPE || sdl_key==SDLK_BACKQUOTE)
+		{
+			console_mode = 0;
+			return NULL;
+		}
+		if(sdl_key==SDLK_UP || sdl_key==SDLK_DOWN)
+		{
+			ci += sdl_key==SDLK_UP?1:-1;
+			if(ci<-1)
+				ci = -1;
+			if(ci==-1)
+			{
+				strcpy(ed.str, "");
+				ed.cursor = strlen(ed.str);
+			}
+			else
+			{
+				if(last_command!=NULL) {
+					currentcommand = last_command;
+					for (cc = 0; cc<ci; cc++) {
+						if(currentcommand->prev_command==NULL)
+							ci = cc;
+						else
+							currentcommand = currentcommand->prev_command;
+					}
+					strcpy(ed.str, currentcommand->command);
+					ed.cursor = strlen(ed.str);
+				}
+				else
+				{
+					ci = -1;
+					strcpy(ed.str, "");
+					ed.cursor = strlen(ed.str);
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+int console_parse_type(char *txt, int *element, char *err)
+{
+	int i = atoi(txt);
+	char num[4];
+	if (i>=0 && i<PT_NUM)
+	{
+		sprintf(num,"%d",i);
+		if (strcmp(txt,num)==0)
+		{
+			*element = i;
+			strcpy(err,"");
+			return 1;
+		}
+	}
+	i = -1;
+	// alternative names for some elements
+	if (strcasecmp(txt,"C4")==0) i = PT_PLEX;
+	else if (strcasecmp(txt,"C5")==0) i = PT_C5;
+	else if (strcasecmp(txt,"NONE")==0) i = PT_NONE;
+	if (i>=0)
+	{
+		*element = i;
+		strcpy(err,"");
+		return 1;
+	}
+	for (i=1; i<PT_NUM; i++) {
+		if (strcasecmp(txt,ptypes[i].name)==0)
+		{
+			*element = i;
+			strcpy(err,"");
+			return 1;
+		}
+	}
+	strcpy(err, "Particle type not recognised");
+	return 0;
+}
+int console_parse_coords(char *txt, int *x, int *y, char *err)
+{
+	// TODO: use regex?
+	int nx = -1, ny = -1;
+	sscanf(txt,"%d,%d",&nx,&ny);
+	if (nx<0 && nx>=XRES)
+	{
+		strcpy(err,"Invalid coordinates");
+		return 0;
+	}
+	if (ny<0 && ny>=YRES)
+	{
+		strcpy(err,"Invalid coordinates");
+		return 0;
+	}
+	*x = nx;
+	*y = ny;
+	return 1;
+}
+int console_parse_partref(char *txt, int *which, char *err)
+{
+	// TODO: use regex?
+	int i = -1, nx, ny;
+	if (console_parse_coords(txt, &nx, &ny, err))
+	{
+		i = pmap[ny][nx];
+		if (!i || (i>>8)>=NPART)
+			i = -1;
+		else
+			i = i>>8;
+	}
+	else if (txt)
+	{
+		char *num = (char*)malloc(strlen(txt)+3);
+		strcpy(err,""); // suppress error message from failed coordinate parsing
+		i = atoi(txt);
+		sprintf(num,"%d",i);
+		if (!txt || strcmp(txt,num)!=0)
+			i = -1;
+		free(num);
+	}
+	if (i>=0 && i<NPART && parts[i].type)
+	{
+		*which = i;
+		strcpy(err,"");
+		return 1;
+	}
+	strcpy(err,"Particle does not exist");
+	return 0;
 }

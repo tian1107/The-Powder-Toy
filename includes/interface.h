@@ -53,9 +53,11 @@ static menu_wall mwalls[] =
 #define SC_NUCLEAR 7
 #define SC_LIFE 9
 #define SC_LIFE2 10
-#define SC_CRACKER 12
-#define SC_CRACKER2 13
-#define SC_TOTAL 11
+#define SC_WAV 11
+#define SC_NONWAV 12
+#define SC_CRACKER 13
+#define SC_CRACKER2 14
+#define SC_TOTAL 13
 
 static menu_section msections[] =
 {
@@ -69,6 +71,9 @@ static menu_section msections[] =
 	{"\xC6", "Radioactive", 0, 1},
 	{"\xCC", "Special", 0, 1},
 	{"\xD2", "Life", 0, 1},
+	{"\xD2", "More Life", 0, 1},
+	{"\xC8", "Waves", 0, 0},
+	{"\xC8", "Non Waves", 0, 0},
 	{"\xC8", "Cracker", 0, 0},
 	{"\xC8", "Cracker!", 0, 0},
 };
@@ -118,6 +123,8 @@ extern int svf_admin;
 extern int svf_mod;
 extern char svf_user[64];
 extern char svf_pass[64];
+extern char svf_user_id[64];
+extern char svf_session_id[64];
 
 extern int svf_open;
 extern int svf_own;
@@ -223,6 +230,11 @@ int execute_vote(pixel *vid_buf, char *id, char *action);
 void open_link(char *uri);
 
 int report_ui(pixel *vid_buf, char *save_id);
+
+char *console_ui(pixel *vid_buf, char error[255]);
+int console_parse_coords(char *txt, int *x, int *y, char *err);
+int console_parse_type(char *txt, int *element, char *err);
+int console_parse_partref(char *txt, int *which, char *err);
 
 #endif
 

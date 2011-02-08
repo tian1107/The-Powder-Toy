@@ -7,14 +7,12 @@
 #define PATH_SEP "/"
 #endif
 
-#define SAVE_VERSION 45
-#define MINOR_VERSION 2
+#define SAVE_VERSION 46
+#define MINOR_VERSION 1
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
-//#define BETA
+#define BETA
 
 #define SERVER "powdertoy.co.uk"
-
-#undef PLOSS
 
 #define THUMB_CACHE_SIZE 256
 
@@ -45,11 +43,11 @@ extern unsigned char ZSIZE;
 #define ISTP    (CELL/2)
 #define CFDS	(4.0f/CELL)
 
-#define TSTEPP 0.3f
-#define TSTEPV 0.4f
-#define VADV 0.3f
-#define VLOSS 0.999f
-#define PLOSS 0.9999f
+#define AIR_TSTEPP 0.3f
+#define AIR_TSTEPV 0.4f
+#define AIR_VADV 0.3f
+#define AIR_VLOSS 0.999f
+#define AIR_PLOSS 0.9999f
 
 #define GRID_X 5
 #define GRID_Y 4
@@ -136,9 +134,10 @@ int GSPEED;
 int love[XRES/9][YRES/9];
 int lolz[XRES/9][YRES/9];
 int gol[XRES][YRES];
-int gol2[XRES][YRES][NGOL];
+int gol2[XRES][YRES][NGOL+1];
 int SEC;
 int SEC2;
+int console_mode;
 int REPLACE_MODE;
 int CURRENT_BRUSH;
 int GRID_MODE;
