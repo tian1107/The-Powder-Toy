@@ -28,7 +28,7 @@
 #ifdef WIN32
 #include <windows.h>
 #else
-#include <sys/unistd.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #endif
 #ifdef MACOSX
