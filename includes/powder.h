@@ -298,6 +298,7 @@ int update_WTRV(UPDATE_FUNC_ARGS);
 int update_YEST(UPDATE_FUNC_ARGS);
 //Additions
 int update_FPLT(UPDATE_FUNC_ARGS);
+int update_SOAP(UPDATE_FUNC_ARGS);
 
 int update_MISC(UPDATE_FUNC_ARGS);
 int update_legacy_PYRO(UPDATE_FUNC_ARGS);
