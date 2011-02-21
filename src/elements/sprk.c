@@ -68,6 +68,28 @@ int update_SPRK(UPDATE_FUNC_ARGS) {
 					}
 				}
 	}
+	else if(ct==PT_REMT&&parts[i].life==1)
+    {
+        /*int intf = 0;
+        nearp = next_part(-1, PT_RREC);
+        while(nearp != -1){
+        intf = inbetween(i, nearp, PT_INTF);
+        if(intf == -1){
+        create_line(parts[i].x, parts[i].y, parts[nearp].x, parts[nearp].y, 1,1, PT_EWAVE);
+        parts[i].type = PT_REMT;
+        parts[i].ctype = PT_NONE;
+        parts[i].life = 20;
+        parts[nearp].type = PT_SPRK;
+        parts[nearp].life = 9;
+        parts[nearp].ctype = PT_RREC;
+        }
+        else{
+        create_line(parts[i].x, parts[i].y, parts[intf].x, parts[intf].y, 1,1, PT_EWAVE);
+        }
+        nearp = next_part(nearp,PT_RREC);
+        }*/
+        circle(x, y, 50,PT_EWAVE);
+    }
 	for (rx=-2; rx<3; rx++)
 		for (ry=-2; ry<3; ry++)
 			if (x+rx>=0 && y+ry>0 && x+rx<XRES && y+ry<YRES && (rx || ry))

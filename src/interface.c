@@ -584,6 +584,9 @@ void draw_svf_ui(pixel *vid_buf)
 	case CM_LIFE:
 		drawtext(vid_buf, XRES-29+BARSIZE/*481*/, YRES+(MENUSIZE-13), "\x00", 255, 50, 255, 255);
 		break;
+    case CM_WAVE:
+        drawtext(vid_buf, XRES-29+BARSIZE/*481*/, YRES+(MENUSIZE-13), "\xC6", 255, 0, 0, 255);
+		break;
 	}
 	drawrect(vid_buf, XRES-32+BARSIZE/*478*/, YRES+(MENUSIZE-16), 14, 14, 255, 255, 255, 255);
 
@@ -1921,6 +1924,10 @@ void set_cmode(int cm)
 		{
 			set_cmode(CM_CRACK);
 		}
+	}
+	else if (cmode==CM_WAVE)
+	{
+		strcpy(itc_msg, "Wave Display");
 	}
 	else
 	{

@@ -1550,6 +1550,10 @@ int main(int argc, char *argv[])
 		{
 			set_cmode(CM_LIFE);
 		}
+		if (sdl_key=='2'&& (sdl_mod & (KMOD_SHIFT)))
+		{
+			set_cmode(CM_WAVE);
+		}
 		if (sdl_key==SDLK_TAB)
 		{
 			CURRENT_BRUSH =(CURRENT_BRUSH + 1)%BRUSH_NUM ;

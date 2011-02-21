@@ -2874,6 +2874,7 @@ void draw_parts(pixel *vid)
 					//blendpixel(vid, nx+1, ny, R, G, B, 255);
 				}
 			}
+			#include "additions/graphics.h"
 			if (cmode == CM_BLOB&&t!=PT_FIRE&&t!=PT_PLSM&&t!=PT_HFLM&&t!=PT_NONE&&t!=PT_ACID&&t!=PT_LCRY&&t!=PT_GLOW&&t!=PT_SWCH&&t!=PT_SMKE&&t!=PT_WTRV&&!(t==PT_FIRW&&parts[i].tmp==3))
 			{
 				if (t==PT_PHOT) {
@@ -2947,7 +2948,7 @@ void render_signs(pixel *vid_buf)
 					sprintf(buff, "Temp: 0.00");  //...tempirature
 				drawtext(vid_buf, x+3, y+3, buff, 255, 255, 255, 255);
 			}
-			
+
 			if(sregexp(signs[i].text, "^{c:[0-9]*|.*}$")==0)
 			{
 				int sldr, startm;
