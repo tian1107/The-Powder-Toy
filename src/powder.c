@@ -253,6 +253,7 @@ int try_move(int i, int x, int y, int nx, int ny)
 		if (parts[e].type == PT_PHOT)
 			return 1;
 
+		if ((pmap[ny][nx]>>8)==e) pmap[ny][nx] = 0;
 		parts[e].x += x-nx;
 		parts[e].y += y-ny;
 		pmap[(int)(parts[e].y+0.5f)][(int)(parts[e].x+0.5f)] = (e<<8)|parts[e].type;
@@ -453,7 +454,7 @@ _inline void part_change_type(int i, int x, int y, int t)
 inline void part_change_type(int i, int x, int y, int t)
 #endif
 {
-	if (x<0 || y<0 || x>=XRES || y>=YRES || i>=NPART)
+	if (x<0 || y<0 || x>=XRES || y>=YRES || i>=NPART || t<0 || t>=PT_NUM)
 		return;
 	parts[i].type = t;
 	if (t==PT_PHOT)// || t==PT_NEUT)
@@ -484,7 +485,7 @@ inline int create_n_parts(int n, int x, int y, float vx, float vy, int t)
 	if (n>680) {
 		n = 680;
 	}
-	if (x<0 || y<0 || x>=XRES || y>=YRES)
+	if (x<0 || y<0 || x>=XRES || y>=YRES || t<0 || t>=PT_NUM)
 		return -1;
 
 	for (c; c<n; c++) {
@@ -522,7 +523,7 @@ inline int create_part(int p, int x, int y, int t)
 {
 	int i;
 
-	if (x<0 || y<0 || x>=XRES || y>=YRES)
+	if (x<0 || y<0 || x>=XRES || y>=YRES || ((t<0 || t>=PT_NUM)&&t!=SPC_HEAT&&t!=SPC_COOL&&t!=SPC_AIR&&t!=SPC_VACUUM))
 		return -1;
 
 	if (t==SPC_HEAT||t==SPC_COOL)
@@ -1780,6 +1781,9 @@ killed:
 				}
 			}
 
+			rt = parts[i].flags & FLAG_STAGNANT;
+			parts[i].flags &= ~FLAG_STAGNANT;
+
 			if ((t==PT_PHOT||t==PT_NEUT)) {
 				if (t == PT_PHOT) {
 					rt = pmap[fin_y][fin_x] & 0xFF;
@@ -2008,24 +2012,25 @@ killed:
 										break;
 									}
 								}
-							else if (clear_x!=x&&clear_y!=y && try_move(i, x, y, clear_x, clear_y)) {
+							else if ((clear_x!=x||clear_y!=y) && try_move(i, x, y, clear_x, clear_y)) {
 								// if interpolation was done and haven't yet moved, try moving to last clear position
 								parts[i].x = clear_xf;
 								parts[i].y = clear_yf;
 							}
+							else
+								parts[i].flags |= FLAG_STAGNANT;
 							parts[i].vx *= ptypes[t].collision;
 							parts[i].vy *= ptypes[t].collision;
-							if (!s)
-								parts[i].flags |= FLAG_STAGNANT;
 						}
 						else
 						{
-							if (clear_x!=x&&clear_y!=y && try_move(i, x, y, clear_x, clear_y)) {
+							if ((clear_x!=x||clear_y!=y) && try_move(i, x, y, clear_x, clear_y)) {
 								// if interpolation was done, try moving to last clear position
 								parts[i].x = clear_xf;
 								parts[i].y = clear_yf;
 							}
-							parts[i].flags |= FLAG_STAGNANT;
+							else
+								parts[i].flags |= FLAG_STAGNANT;
 							parts[i].vx *= ptypes[t].collision;
 							parts[i].vy *= ptypes[t].collision;
 						}
@@ -2708,7 +2713,7 @@ void create_box(int x1, int y1, int x2, int y2, int c)
 	}
 	for (j=y1; j<=y2; j++)
 		for (i=x1; i<=x2; i++)
-			create_parts(i, j, 1, 1, c);
+			create_parts(i, j, 0, 0, c);
 }
 
 int flood_parts(int x, int y, int c, int cm, int bm)
