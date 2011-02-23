@@ -1,4 +1,4 @@
-/*Moved to powder.c
+/*//Moved to powder.c
 if(t == PT_CHAN){
     int emt = pmap[y][x];
     if(parts[emt>>8].life != 0)

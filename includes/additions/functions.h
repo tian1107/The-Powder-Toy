@@ -104,17 +104,6 @@ int inbetween(int i, int j, int t)
         hy = parts[j].y;
         ly = parts[i].y;
     }
-    while(intf!=-1)
-    {
-        if (parts[intf].x <= hx && parts[intf].x >= lx && parts[intf].y <= hy && parts[intf].y >= ly)
-        {
-            if(isbetween(i, j, intf) == 1)
-            {
-                return intf;
-            }
-        }
-        intf = next_part(intf, t);
-    }
     return -1;
 }
 

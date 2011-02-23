@@ -6,7 +6,8 @@
 #include "defines.h"
 #include "interface.h"
 
-#define CM_COUNT 11
+#define CM_COUNT 12
+#define CM_WAVE 11
 #define CM_CRACK 10
 #define CM_LIFE 9
 #define CM_GRAD 8
@@ -299,6 +300,8 @@ int update_YEST(UPDATE_FUNC_ARGS);
 //Additions
 int update_FPLT(UPDATE_FUNC_ARGS);
 int update_SOAP(UPDATE_FUNC_ARGS);
+int update_RREC(UPDATE_FUNC_ARGS);
+int update_PROT(UPDATE_FUNC_ARGS);
 
 int update_MISC(UPDATE_FUNC_ARGS);
 int update_legacy_PYRO(UPDATE_FUNC_ARGS);
