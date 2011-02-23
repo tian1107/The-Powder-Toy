@@ -627,12 +627,16 @@ inline int create_part(int p, int x, int y, int t)
     }
     if (t==PT_SPRK)
     {
-        if ((pmap[y][x]>>8)>=NPART || !((pmap[y][x]&0xFF)==PT_INST||(ptypes[pmap[y][x]&0xFF].properties&PROP_CONDUCTS)))
+        if ((pmap[y][x]>>8)>=NPART || !((pmap[y][x]&0xFF)==PT_INST||(ptypes[pmap[y][x]&0xFF].properties&PROP_CONDUCTS)) || (pmap[y][x]&0xFF) == PT_WREC)
             return -1;
         if (parts[pmap[y][x]>>8].life!=0)
             return -1;
         parts[pmap[y][x]>>8].type = PT_SPRK;
         parts[pmap[y][x]>>8].life = 4;
+        if(parts[pmap[y][x]>>8].type == PT_WEMT)
+            parts[pmap[y][x]>>8].any = -1;
+        else
+            parts[pmap[y][x]>>8].any = 0;
         parts[pmap[y][x]>>8].ctype = pmap[y][x]&0xFF;
         pmap[y][x] = (pmap[y][x]&~0xFF) | PT_SPRK;
         return pmap[y][x]>>8;

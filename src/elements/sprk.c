@@ -90,6 +90,13 @@ int update_SPRK(UPDATE_FUNC_ARGS) {
         }*/
         circle(x, y, 50,PT_EWAVE);
     }
+    else if(ct==PT_IEMT && parts[i].life == 1)
+    {
+        create_line(x, 0, x, YRES, 1,1, PT_IWAVE);
+        create_line(0, y, XRES, y, 1,1, PT_IWAVE);
+        create_line(x - y, 0, YRES + x - y, YRES, 1,1, PT_IWAVE);
+        create_line(x+y, 0, -YRES+x+y, YRES, 1,1, PT_IWAVE);
+    }
 	for (rx=-2; rx<3; rx++)
 		for (ry=-2; ry<3; ry++)
 			if (x+rx>=0 && y+ry>0 && x+rx<XRES && y+ry<YRES && (rx || ry))
@@ -127,12 +134,19 @@ int update_SPRK(UPDATE_FUNC_ARGS) {
 				if (abs(rx)+abs(ry)>=4 &&ct!=PT_SWCH&&rt!=PT_SWCH)
 					conduct_sprk = 0;
 
-
 				if (ct==PT_METL && (rt==PT_NTCT||rt==PT_PTCT||rt==PT_INWR||(rt==PT_SPRK&&(parts[r>>8].ctype==PT_NTCT||parts[r>>8].ctype==PT_PTCT))) && pavg!=PT_INSL)
 				{
 					parts[r>>8].temp = 473.0f;
 					if (rt==PT_NTCT||rt==PT_PTCT)
 						conduct_sprk = 0;
+				}
+				if (ct==PT_WEMT)
+				{
+				    parts[r>>8].any = -1;
+				}
+				if (rt==PT_WREC && parts[i].any != -1)
+				{
+				    conduct_sprk = 0;
 				}
 				if (ct==PT_NTCT && !(rt==PT_PSCN || rt==PT_NTCT || (rt==PT_NSCN&&parts[i].temp>373.0f)))
 					conduct_sprk = 0;
@@ -159,6 +173,7 @@ int update_SPRK(UPDATE_FUNC_ARGS) {
 					conduct_sprk = 0;
 
 				if (conduct_sprk) {
+				    parts[r>>8].any = parts[i].any;
 					if (ct==PT_ETRD) {
 						part_change_type(i,x,y,PT_ETRD);
 						parts[i].ctype = PT_NONE;

@@ -216,7 +216,7 @@ if(t==PT_PROT)
 }
 //More waves
 if(t == PT_URAN || t == PT_PLUT)
-{
+{''
     if(rand() % 10 < 1)
         create_part(-1, x+rand()%10-5, y+rand()%10-5, PT_WAVE);
 }

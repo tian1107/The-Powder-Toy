@@ -52,12 +52,11 @@ static menu_wall mwalls[] =
 #define SC_LIQUID 4
 #define SC_NUCLEAR 7
 #define SC_LIFE 9
-#define SC_LIFE2 10
-#define SC_WAV 11
-#define SC_NONWAV 12
-#define SC_CRACKER 13
-#define SC_CRACKER2 14
-#define SC_TOTAL 13
+#define SC_WAV 10
+#define SC_NONWAV 11
+#define SC_CRACKER 12
+#define SC_CRACKER2 13
+#define SC_TOTAL 12
 
 static menu_section msections[] =
 {
@@ -71,7 +70,6 @@ static menu_section msections[] =
 	{"\xC6", "Radioactive", 0, 1},
 	{"\xCC", "Special", 0, 1},
 	{"\xD2", "Life", 0, 1},
-	{"\xD2", "More Life", 0, 1},
 	{"\xC8", "Waves", 0, 0},
 	{"\xC8", "Non Waves", 0, 0},
 	{"\xC8", "Cracker", 0, 0},
@@ -156,8 +154,6 @@ extern char search_expr[256];
 
 extern char *tag_names[TAG_MAX];
 extern int tag_votes[TAG_MAX];
-
-extern int Z_keysym;
 
 extern int zoom_en;
 extern int zoom_x, zoom_y;
