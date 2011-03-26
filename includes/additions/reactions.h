@@ -319,14 +319,15 @@ if(t==PT_CHLN)
                     if(((r&0xFF)==PT_WATR || (r&0xFF)==PT_DSTW) && rand()%10<1)
                     {
                         delete_part(x, y);
-                        parts[r>>8].type = PT_ACID;
+                        parts[r>>8].type = PT_ACID; //H2O + CL2 -> 2HCl + 1/2 O2
                         parts[r>>8].life = 500; //Acidic Acid!
                     }
                     else if(((r&0xFF)==PT_RBDM || (r&0xFF)==PT_LRBD) && rand()%10<1)
                     {
-                        parts[r>>8].type = PT_SALT;
+                        parts[r>>8].type = PT_SALT; //CL2 + Rb -> RbCL2
                         delete_part(x, y);
                     }
+
 
                 }
             }

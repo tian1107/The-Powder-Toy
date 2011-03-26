@@ -406,6 +406,8 @@ int update_STKM(UPDATE_FUNC_ARGS) {
 
 	if ((r&0xFF)==PT_PLUT)  //If on plut
 		parts[i].life -= 1;
+    if ((r&0xFF)==PT_CHLN)
+        parts[i].life -= 2;
 
 	isplayer = 1;
 	return 0;

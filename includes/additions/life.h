@@ -42,13 +42,9 @@ if(t==PT_HWAV)
 {
     parts[i].life = 50;
 }
-if(t==PT_TUNN)
+if(t==PT_RTNN)
 {
     parts[i].vx = 1;
-}
-if(t==PT_VTNN)
-{
-    parts[i].vy = 1;
 }
 if(t==PT_PRSN)
 {
@@ -61,4 +57,8 @@ if(t==PT_CSTR)
 {
     parts[i].any = 0;
     parts[i].any2 = 0;
+}
+if(t==PT_VTNN)
+{
+    parts[i].vy = 1;
 }

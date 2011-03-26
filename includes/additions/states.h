@@ -23,5 +23,7 @@
 /* EXPL */ {-.5f,	PT_PLSM,	0.5f,	PT_PLSM,	295.14f,    PT_PLSM,	295.16f,	PT_PLSM},
 /* PRSN */ {IPL,	NT,			IPH,	NT,			ITL,	    NT,			ITH,	    NT},
 /* CSTR */ {IPL,	NT,			IPH,	NT,			ITL,	    NT,			ITH,	    NT},
+/* LTNN */ {IPL,	NT,			IPH,	NT,			ITL,	    NT,			ITH,	    NT},
+
 // Name		plv		plt	 		phv		pht			tlv		    tlt	 		thv		    tht
 //			if low pressure		if high pressure	if low temperature	if high temperature
