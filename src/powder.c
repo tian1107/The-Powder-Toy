@@ -30,33 +30,32 @@ unsigned photons[YRES][XRES];
 
 static int pn_junction_sprk(int x, int y, int pt)
 {
-    unsigned r = pmap[y][x];
-    if ((r & 0xFF) != pt)
-        return 0;
-    r >>= 8;
-    if (parts[r].type != pt)
-        return 0;
-    if (parts[r].life != 0)
-        return 0;
+	unsigned r = pmap[y][x];
+	if ((r & 0xFF) != pt)
+		return 0;
+	r >>= 8;
+	if (parts[r].type != pt)
+		return 0;
+	if (parts[r].life != 0)
+		return 0;
 
-    parts[r].ctype = pt;
-    part_change_type(r,x,y,PT_SPRK);
-    parts[r].life = 4;
-    return 1;
+	parts[r].ctype = pt;
+	part_change_type(r,x,y,PT_SPRK);
+	parts[r].life = 4;
+	return 1;
 }
 
 static void photoelectric_effect(int nx, int ny)
 {
-    unsigned r = pmap[ny][nx];
+	unsigned r = pmap[ny][nx];
 
-    if ((r&0xFF) == PT_PSCN)
-    {
-        if ((pmap[ny][nx-1] & 0xFF) == PT_NSCN ||
-                (pmap[ny][nx+1] & 0xFF) == PT_NSCN ||
-                (pmap[ny-1][nx] & 0xFF) == PT_NSCN ||
-                (pmap[ny+1][nx] & 0xFF) == PT_NSCN)
-            pn_junction_sprk(nx, ny, PT_PSCN);
-    }
+	if ((r&0xFF) == PT_PSCN) {
+		if ((pmap[ny][nx-1] & 0xFF) == PT_NSCN ||
+		        (pmap[ny][nx+1] & 0xFF) == PT_NSCN ||
+		        (pmap[ny-1][nx] & 0xFF) == PT_NSCN ||
+		        (pmap[ny+1][nx] & 0xFF) == PT_NSCN)
+			pn_junction_sprk(nx, ny, PT_PSCN);
+	}
 }
 /*
    RETURN-value explenation
@@ -66,398 +65,406 @@ static void photoelectric_effect(int nx, int ny)
  */
 int eval_move(int pt, int nx, int ny, unsigned *rr)
 {
-    unsigned r;
+	unsigned r;
 
-    if (nx<0 || ny<0 || nx>=XRES || ny>=YRES)
-        return 0;
+	if (nx<0 || ny<0 || nx>=XRES || ny>=YRES)
+		return 0;
 
-    r = pmap[ny][nx];
-    if (r && (r>>8)<NPART)
-        r = (r&~0xFF) | parts[r>>8].type;
-    if (rr)
-        *rr = r;
+	r = pmap[ny][nx];
+	if (r && (r>>8)<NPART)
+		r = (r&~0xFF) | parts[r>>8].type;
+	if (rr)
+		*rr = r;
 
-    if ((r&0xFF)==PT_VOID || (r&0xFF)==PT_BHOL)
-        return 1;
+	if ((r&0xFF)==PT_VOID || (r&0xFF)==PT_BHOL)
+		return 1;
 
-    if (pt==PT_PHOT&&(
-                (r&0xFF)==PT_GLAS || (r&0xFF)==PT_PHOT ||
-                (r&0xFF)==PT_CLNE || (r&0xFF)==PT_PCLN ||
-                (r&0xFF)==PT_GLOW || (r&0xFF)==PT_WATR ||
-                (r&0xFF)==PT_DSTW || (r&0xFF)==PT_SLTW ||
-                (r&0xFF)==PT_ISOZ || (r&0xFF)==PT_ISZS ||
-                (r&0xFF)==PT_FILT || (r&0xFF)==PT_INVIS ||
-                (r&0xFF)==PT_QRTZ || (r&0xFF)==PT_PQRT ||
-                ((r&0xFF)==PT_LCRY&&parts[r>>8].life > 5)))
-        return 2;
+	if(pt==PT_SPRK)//spark shouldn't move
+		return 0;
 
-    if (pt==PT_STKM) //Stick man's head shouldn't collide
-        return 2;
-    if (pt==PT_STKM2) //Stick man's head shouldn't collide
-        return 2;
-    if ((pt==PT_BIZR||pt==PT_BIZRG)&&(r&0xFF)==PT_FILT)
-        return 2;
-    if (bmap[ny/CELL][nx/CELL]==WL_ALLOWGAS && ptypes[pt].falldown!=0 && pt!=PT_FIRE && pt!=PT_SMKE)
-        return 0;
-    if (ptypes[pt].falldown!=2 && bmap[ny/CELL][nx/CELL]==WL_ALLOWLIQUID)
-        return 0;
-    if ((pt==PT_NEUT ||pt==PT_PHOT) && bmap[ny/CELL][nx/CELL]==WL_EWALL && !emap[ny/CELL][nx/CELL])
-        return 0;
-    if (bmap[ny/CELL][nx/CELL]==WL_EHOLE && !emap[ny/CELL][nx/CELL])
-        return 2;
-    if (bmap[ny/CELL][nx/CELL]==WL_ALLOWAIR)
-        return 0;
+	if (pt==PT_PHOT&&(
+	            (r&0xFF)==PT_GLAS || (r&0xFF)==PT_PHOT ||
+	            (r&0xFF)==PT_CLNE || (r&0xFF)==PT_PCLN ||
+	            (r&0xFF)==PT_GLOW || (r&0xFF)==PT_WATR ||
+	            (r&0xFF)==PT_DSTW || (r&0xFF)==PT_SLTW ||
+	            (r&0xFF)==PT_ISOZ || (r&0xFF)==PT_ISZS ||
+	            (r&0xFF)==PT_FILT || (r&0xFF)==PT_INVIS ||
+	            (r&0xFF)==PT_QRTZ || (r&0xFF)==PT_PQRT ||
+	            ((r&0xFF)==PT_LCRY&&parts[r>>8].life > 5)))
+		return 2;
 
-    if (ptypes[pt].falldown!=1 && bmap[ny/CELL][nx/CELL]==WL_ALLOWSOLID)
-        return 0;
-    if (r && (r&0xFF) < PT_NUM)
-    {
-        if (ptypes[pt].properties&TYPE_ENERGY && ptypes[(r&0xFF)].properties&TYPE_ENERGY)
-            return 2;
+	if (pt==PT_STKM) //Stick man's head shouldn't collide
+		return 2;
+	if (pt==PT_STKM2) //Stick man's head shouldn't collide
+		return 2;
+	if ((pt==PT_BIZR||pt==PT_BIZRG)&&(r&0xFF)==PT_FILT)
+		return 2;
+	if (bmap[ny/CELL][nx/CELL]==WL_ALLOWGAS && ptypes[pt].falldown!=0 && pt!=PT_FIRE && pt!=PT_SMKE)
+		return 0;
+	if (ptypes[pt].falldown!=2 && bmap[ny/CELL][nx/CELL]==WL_ALLOWLIQUID)
+		return 0;
+	if ((pt==PT_NEUT ||pt==PT_PHOT) && bmap[ny/CELL][nx/CELL]==WL_EWALL && !emap[ny/CELL][nx/CELL])
+		return 0;
+	if (bmap[ny/CELL][nx/CELL]==WL_EHOLE && !emap[ny/CELL][nx/CELL])
+		return 2;
+	if (bmap[ny/CELL][nx/CELL]==WL_ALLOWAIR)
+		return 0;
 
-        if (pt==PT_NEUT && ptypes[(r&0xFF)].properties&PROP_NEUTPASS)
-            return 2;
-        if (pt==PT_NEUT && ptypes[(r&0xFF)].properties&PROP_NEUTPENETRATE)
-            return 1;
-        if ((r&0xFF)==PT_NEUT && ptypes[pt].properties&PROP_NEUTPENETRATE)
-            return 0;
-    }
+	if (ptypes[pt].falldown!=1 && bmap[ny/CELL][nx/CELL]==WL_ALLOWSOLID)
+		return 0;
+	if (r && (r&0xFF) < PT_NUM) {
+		if (ptypes[pt].properties&TYPE_ENERGY && ptypes[(r&0xFF)].properties&TYPE_ENERGY)
+			return 2;
 
-    if (r && ((r&0xFF) >= PT_NUM || (ptypes[pt].weight <= ptypes[(r&0xFF)].weight)))
-        return 0;
+		if (pt==PT_NEUT && ptypes[(r&0xFF)].properties&PROP_NEUTPASS)
+			return 2;
+		if (pt==PT_NEUT && ptypes[(r&0xFF)].properties&PROP_NEUTPENETRATE)
+			return 1;
+		if ((r&0xFF)==PT_NEUT && ptypes[pt].properties&PROP_NEUTPENETRATE)
+			return 0;
+	}
 
-    if (pt == PT_PHOT)
-        return 2;
+	if (r && ((r&0xFF) >= PT_NUM || (ptypes[pt].weight <= ptypes[(r&0xFF)].weight)))
+		return 0;
 
-    return 1;
+	if (pt == PT_PHOT)
+		return 2;
+
+	return 1;
 }
 
 int try_move(int i, int x, int y, int nx, int ny)
 {
-    unsigned r, e;
+	unsigned r, e;
 
-    if (x==nx && y==ny)
-        return 1;
+	if (x==nx && y==ny)
+		return 1;
+	if (nx<0 || ny<0 || nx>=XRES || ny>=YRES)
+		return 1;
 
-    e = eval_move(parts[i].type, nx, ny, &r);
+	e = eval_move(parts[i].type, nx, ny, &r);
 
-    if ((pmap[ny][nx]&0xFF)==PT_BOMB && parts[i].type==PT_BOMB && parts[i].tmp == 1)
-        e = 2;
+	if ((pmap[ny][nx]&0xFF)==PT_BOMB && parts[i].type==PT_BOMB && parts[i].tmp == 1)
+		e = 2;
 
-    if ((pmap[ny][nx]&0xFF)==PT_INVIS && (pv[ny/CELL][nx/CELL]>4.0f ||pv[ny/CELL][nx/CELL]<-4.0f))
-        return 1;
-    /* half-silvered mirror */
-    if (!e && parts[i].type==PT_PHOT &&
-            (((r&0xFF)==PT_BMTL && rand()<RAND_MAX/2) ||
-             (pmap[y][x]&0xFF)==PT_BMTL))
-        e = 2;
+	if ((pmap[ny][nx]&0xFF)==PT_INVIS && (pv[ny/CELL][nx/CELL]>4.0f ||pv[ny/CELL][nx/CELL]<-4.0f))
+		return 1;
+	/* half-silvered mirror */
+	if (!e && parts[i].type==PT_PHOT &&
+	        (((r&0xFF)==PT_BMTL && rand()<RAND_MAX/2) ||
+	         (pmap[y][x]&0xFF)==PT_BMTL))
+		e = 2;
 
-    if (!e)
-    {
-        if (!legacy_enable && parts[i].type==PT_PHOT && r)
-        {
-            if ((r & 0xFF) == PT_COAL || (r & 0xFF) == PT_BCOL)
-                parts[r>>8].temp = parts[i].temp;
+	if (!e)
+	{
+		if (!legacy_enable && parts[i].type==PT_PHOT && r)
+		{
+			if ((r & 0xFF) == PT_COAL || (r & 0xFF) == PT_BCOL)
+				parts[r>>8].temp = parts[i].temp;
 
-            if ((r & 0xFF) < PT_NUM && ptypes[r&0xFF].hconduct)
-                parts[i].temp = parts[r>>8].temp = restrict_flt((parts[r>>8].temp+parts[i].temp)/2, MIN_TEMP, MAX_TEMP);
-        }
-        return 0;
-    }
+			if ((r & 0xFF) < PT_NUM && ptypes[r&0xFF].hconduct)
+				parts[i].temp = parts[r>>8].temp = restrict_flt((parts[r>>8].temp+parts[i].temp)/2, MIN_TEMP, MAX_TEMP);
+		}
+		return 0;
+	}
 
-    if (e == 2)
-    {
-        if (parts[i].type == PT_PHOT && (r&0xFF)==PT_GLOW && !parts[r>>8].life)
-            if (rand() < RAND_MAX/30)
-            {
-                parts[r>>8].life = 120;
-                create_gain_photon(i);
-            }
-        if (parts[i].type == PT_PHOT && (r&0xFF)==PT_FILT)
-        {
-            int temp_bin = (int)((parts[r>>8].temp-273.0f)*0.025f);
-            if (temp_bin < 0) temp_bin = 0;
-            if (temp_bin > 25) temp_bin = 25;
-            parts[i].ctype = 0x1F << temp_bin;
-        }
-        if (parts[i].type == PT_NEUT && (r&0xFF)==PT_GLAS)
-        {
-            if (rand() < RAND_MAX/10)
-                create_cherenkov_photon(i);
-        }
-        if (parts[i].type == PT_PHOT && (r&0xFF)==PT_INVIS)
-        {
-            part_change_type(i,x,y,PT_NEUT);
-            parts[i].ctype = 0;
-        }
-        if ((parts[i].type==PT_BIZR||parts[i].type==PT_BIZRG) && (r&0xFF)==PT_FILT)
-        {
-            int temp_bin = (int)((parts[r>>8].temp-273.0f)*0.025f);
-            if (temp_bin < 0) temp_bin = 0;
-            if (temp_bin > 25) temp_bin = 25;
-            parts[i].ctype = 0x1F << temp_bin;
-        }
-        return 1;
-    }
+	if (e == 2)
+	{
+		if (parts[i].type == PT_PHOT && (r&0xFF)==PT_GLOW && !parts[r>>8].life)
+			if (rand() < RAND_MAX/30)
+			{
+				parts[r>>8].life = 120;
+				create_gain_photon(i);
+			}
+		if (parts[i].type == PT_PHOT && (r&0xFF)==PT_FILT)
+		{
+			int temp_bin = (int)((parts[r>>8].temp-273.0f)*0.025f);
+			if (temp_bin < 0) temp_bin = 0;
+			if (temp_bin > 25) temp_bin = 25;
+			parts[i].ctype = 0x1F << temp_bin;
+		}
+		if (parts[i].type == PT_NEUT && (r&0xFF)==PT_GLAS) {
+			if (rand() < RAND_MAX/10)
+				create_cherenkov_photon(i);
+		}
+		if (parts[i].type == PT_PHOT && (r&0xFF)==PT_INVIS) {
+			part_change_type(i,x,y,PT_NEUT);
+			parts[i].ctype = 0;
+		}
+		if ((parts[i].type==PT_BIZR||parts[i].type==PT_BIZRG) && (r&0xFF)==PT_FILT)
+		{
+			int temp_bin = (int)((parts[r>>8].temp-273.0f)*0.025f);
+			if (temp_bin < 0) temp_bin = 0;
+			if (temp_bin > 25) temp_bin = 25;
+			parts[i].ctype = 0x1F << temp_bin;
+		}
+		return 1;
+	}
 
-    if ((r&0xFF)==PT_VOID)
-    {
-        if (parts[i].type == PT_STKM)
-        {
-            death = 1;
-            isplayer = 0;
-        }
-        if (parts[i].type == PT_STKM2)
-        {
-            death2 = 1;
-            isplayer2 = 0;
-        }
-        parts[i].type=PT_NONE;
-        return 0;
-    }
-    if ((r&0xFF)==PT_BHOL)
-    {
-        if (parts[i].type == PT_STKM)
-        {
-            death = 1;
-            isplayer = 0;
-        }
-        if (parts[i].type == PT_STKM2)
-        {
-            death2 = 1;
-            isplayer2 = 0;
-        }
-        parts[i].type=PT_NONE;
-        if (!legacy_enable)
-        {
-            parts[r>>8].temp = restrict_flt(parts[r>>8].temp+parts[i].temp/2, MIN_TEMP, MAX_TEMP);//3.0f;
-        }
+	if ((r&0xFF)==PT_VOID)
+	{
+		if (parts[i].type == PT_STKM)
+		{
+			death = 1;
+			isplayer = 0;
+		}
+		if (parts[i].type == PT_STKM2)
+		{
+			death2 = 1;
+			isplayer2 = 0;
+		}
+		parts[i].type=PT_NONE;
+		return 0;
+	}
+	if ((r&0xFF)==PT_BHOL)
+	{
+		if (parts[i].type == PT_STKM)
+		{
+			death = 1;
+			isplayer = 0;
+		}
+		if (parts[i].type == PT_STKM2)
+		{
+			death2 = 1;
+			isplayer2 = 0;
+		}
+		parts[i].type=PT_NONE;
+		if (!legacy_enable)
+		{
+			parts[r>>8].temp = restrict_flt(parts[r>>8].temp+parts[i].temp/2, MIN_TEMP, MAX_TEMP);//3.0f;
+		}
 
-        return 0;
-    }
-    if ((pmap[ny][nx]&0xFF)==PT_CNCT)
-        return 0;
-    if (parts[i].type==PT_CNCT && y<ny && (pmap[y+1][x]&0xFF)==PT_CNCT)
-        return 0;
+		return 0;
+	}
+	if ((pmap[ny][nx]&0xFF)==PT_CNCT)
+		return 0;
+	if (parts[i].type==PT_CNCT && y<ny && (pmap[y+1][x]&0xFF)==PT_CNCT)
+		return 0;
 
-    if (bmap[ny/CELL][nx/CELL]==WL_EHOLE && !emap[y/CELL][x/CELL])
-        return 1;
-    if ((bmap[y/CELL][x/CELL]==WL_EHOLE && !emap[y/CELL][x/CELL]) && (bmap[ny/CELL][nx/CELL]!=WL_EHOLE && !emap[ny/CELL][nx/CELL]))
-        return 0;
+	if (bmap[ny/CELL][nx/CELL]==WL_EHOLE && !emap[y/CELL][x/CELL])
+		return 1;
+	if ((bmap[y/CELL][x/CELL]==WL_EHOLE && !emap[y/CELL][x/CELL]) && (bmap[ny/CELL][nx/CELL]!=WL_EHOLE && !emap[ny/CELL][nx/CELL]))
+		return 0;
 
-    if (r && (r>>8)<NPART && ptypes[r&0xFF].falldown!=2 && bmap[y/CELL][x/CELL]==WL_ALLOWLIQUID)
-        return 0;
+	if (r && (r>>8)<NPART && ptypes[r&0xFF].falldown!=2 && bmap[y/CELL][x/CELL]==WL_ALLOWLIQUID)
+		return 0;
 
-    if (parts[i].type == PT_PHOT)
-        return 1;
+	if (parts[i].type == PT_PHOT)
+		return 1;
 
-    e = r >> 8;
-    if (r && e<NPART)
-    {
-        if (parts[e].type == PT_PHOT)
-            return 1;
+	e = r >> 8;
+	if (r && e<NPART)
+	{
+		if (parts[e].type == PT_PHOT||parts[e].type == PT_NEUT)
+			return 1;
 
-        if ((pmap[ny][nx]>>8)==e) pmap[ny][nx] = 0;
-        parts[e].x += x-nx;
-        parts[e].y += y-ny;
-        pmap[(int)(parts[e].y+0.5f)][(int)(parts[e].x+0.5f)] = (e<<8)|parts[e].type;
-    }
+		if (parts[i].type==PT_NEUT) {
+			// target material is NEUTPENETRATE, meaning it gets moved around when neutron passes
+			unsigned s = pmap[y][x];
+			if ((s&0xFF) && (s&0xFF)<PT_NUM && !(ptypes[s&0xFF].properties&PROP_NEUTPENETRATE))
+				return 1; // if the element currently underneath neutron isn't NEUTPENETRATE, don't move it around
+			if ((pmap[ny][nx]>>8)==e) pmap[ny][nx] = (s&~(0xFF))|parts[s>>8].type;
+			parts[e].x = x;
+			parts[e].y = y;
+			pmap[y][x] = (e<<8)|parts[e].type;
+			parts[s>>8].x = nx;
+			parts[s>>8].y = ny;
+			return 1;
+		}
 
-    return 1;
+		if ((pmap[ny][nx]>>8)==e) pmap[ny][nx] = 0;
+		parts[e].x += x-nx;
+		parts[e].y += y-ny;
+		pmap[(int)(parts[e].y+0.5f)][(int)(parts[e].x+0.5f)] = (e<<8)|parts[e].type;
+	}
+
+	return 1;
 }
 
 static unsigned direction_to_map(float dx, float dy, int t)
 {
-    // TODO:
-    // Adding extra directions causes some inaccuracies.
-    // Not adding them causes problems with some diagonal surfaces (photons absorbed instead of reflected).
-    // For now, don't add them.
-    // Solution may involve more intelligent setting of initial i0 value in find_next_boundary?
-    // or rewriting normal/boundary finding code
+	// TODO:
+	// Adding extra directions causes some inaccuracies.
+	// Not adding them causes problems with some diagonal surfaces (photons absorbed instead of reflected).
+	// For now, don't add them.
+	// Solution may involve more intelligent setting of initial i0 value in find_next_boundary?
+	// or rewriting normal/boundary finding code
 
-    return (dx >= 0) |
-           (((dx + dy) >= 0) << 1) |     /*  567  */
-           ((dy >= 0) << 2) |            /*  4+0  */
-           (((dy - dx) >= 0) << 3) |     /*  321  */
-           ((dx <= 0) << 4) |
-           (((dx + dy) <= 0) << 5) |
-           ((dy <= 0) << 6) |
-           (((dy - dx) <= 0) << 7);
-    /*
-    return (dx >= -0.001) |
-           (((dx + dy) >= -0.001) << 1) |     //  567
-           ((dy >= -0.001) << 2) |            //  4+0
-           (((dy - dx) >= -0.001) << 3) |     //  321
-           ((dx <= 0.001) << 4) |
-           (((dx + dy) <= 0.001) << 5) |
-           ((dy <= 0.001) << 6) |
-           (((dy - dx) <= 0.001) << 7);
-    }*/
+	return (dx >= 0) |
+	       (((dx + dy) >= 0) << 1) |     /*  567  */
+	       ((dy >= 0) << 2) |            /*  4+0  */
+	       (((dy - dx) >= 0) << 3) |     /*  321  */
+	       ((dx <= 0) << 4) |
+	       (((dx + dy) <= 0) << 5) |
+	       ((dy <= 0) << 6) |
+	       (((dy - dx) <= 0) << 7);
+	/*
+	return (dx >= -0.001) |
+	       (((dx + dy) >= -0.001) << 1) |     //  567
+	       ((dy >= -0.001) << 2) |            //  4+0
+	       (((dy - dx) >= -0.001) << 3) |     //  321
+	       ((dx <= 0.001) << 4) |
+	       (((dx + dy) <= 0.001) << 5) |
+	       ((dy <= 0.001) << 6) |
+	       (((dy - dx) <= 0.001) << 7);
+	}*/
 }
 
 static int is_blocking(int t, int x, int y)
 {
-    if (t & REFRACT)
-    {
-        if (x<0 || y<0 || x>=XRES || y>=YRES)
-            return 0;
-        if ((pmap[y][x] & 0xFF) == PT_GLAS)
-            return 1;
-        return 0;
-    }
+	if (t & REFRACT) {
+		if (x<0 || y<0 || x>=XRES || y>=YRES)
+			return 0;
+		if ((pmap[y][x] & 0xFF) == PT_GLAS)
+			return 1;
+		return 0;
+	}
 
-    return !eval_move(t, x, y, NULL);
+	return !eval_move(t, x, y, NULL);
 }
 
 static int is_boundary(int pt, int x, int y)
 {
-    if (!is_blocking(pt,x,y))
-        return 0;
-    if (is_blocking(pt,x,y-1) && is_blocking(pt,x,y+1) && is_blocking(pt,x-1,y) && is_blocking(pt,x+1,y))
-        return 0;
-    return 1;
+	if (!is_blocking(pt,x,y))
+		return 0;
+	if (is_blocking(pt,x,y-1) && is_blocking(pt,x,y+1) && is_blocking(pt,x-1,y) && is_blocking(pt,x+1,y))
+		return 0;
+	return 1;
 }
 
 static int find_next_boundary(int pt, int *x, int *y, int dm, int *em)
 {
-    static int dx[8] = {1,1,0,-1,-1,-1,0,1};
-    static int dy[8] = {0,1,1,1,0,-1,-1,-1};
-    static int de[8] = {0x83,0x07,0x0E,0x1C,0x38,0x70,0xE0,0xC1};
-    int i, ii, i0;
+	static int dx[8] = {1,1,0,-1,-1,-1,0,1};
+	static int dy[8] = {0,1,1,1,0,-1,-1,-1};
+	static int de[8] = {0x83,0x07,0x0E,0x1C,0x38,0x70,0xE0,0xC1};
+	int i, ii, i0;
 
-    if (*x <= 0 || *x >= XRES-1 || *y <= 0 || *y >= YRES-1)
-        return 0;
+	if (*x <= 0 || *x >= XRES-1 || *y <= 0 || *y >= YRES-1)
+		return 0;
 
-    if (*em != -1)
-    {
-        i0 = *em;
-        dm &= de[i0];
-    }
-    else
-        i0 = 0;
+	if (*em != -1) {
+		i0 = *em;
+		dm &= de[i0];
+	} else
+		i0 = 0;
 
-    for (ii=0; ii<8; ii++)
-    {
-        i = (ii + i0) & 7;
-        if ((dm & (1 << i)) && is_boundary(pt, *x+dx[i], *y+dy[i]))
-        {
-            *x += dx[i];
-            *y += dy[i];
-            *em = i;
-            return 1;
-        }
-    }
+	for (ii=0; ii<8; ii++) {
+		i = (ii + i0) & 7;
+		if ((dm & (1 << i)) && is_boundary(pt, *x+dx[i], *y+dy[i])) {
+			*x += dx[i];
+			*y += dy[i];
+			*em = i;
+			return 1;
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 int get_normal(int pt, int x, int y, float dx, float dy, float *nx, float *ny)
 {
-    int ldm, rdm, lm, rm;
-    int lx, ly, lv, rx, ry, rv;
-    int i, j;
-    float r, ex, ey;
+	int ldm, rdm, lm, rm;
+	int lx, ly, lv, rx, ry, rv;
+	int i, j;
+	float r, ex, ey;
 
-    if (!dx && !dy)
-        return 0;
+	if (!dx && !dy)
+		return 0;
 
-    if (!is_boundary(pt, x, y))
-        return 0;
+	if (!is_boundary(pt, x, y))
+		return 0;
 
-    ldm = direction_to_map(-dy, dx, pt);
-    rdm = direction_to_map(dy, -dx, pt);
-    lx = rx = x;
-    ly = ry = y;
-    lv = rv = 1;
-    lm = rm = -1;
+	ldm = direction_to_map(-dy, dx, pt);
+	rdm = direction_to_map(dy, -dx, pt);
+	lx = rx = x;
+	ly = ry = y;
+	lv = rv = 1;
+	lm = rm = -1;
 
-    j = 0;
-    for (i=0; i<SURF_RANGE; i++)
-    {
-        if (lv)
-            lv = find_next_boundary(pt, &lx, &ly, ldm, &lm);
-        if (rv)
-            rv = find_next_boundary(pt, &rx, &ry, rdm, &rm);
-        j += lv + rv;
-        if (!lv && !rv)
-            break;
-    }
+	j = 0;
+	for (i=0; i<SURF_RANGE; i++) {
+		if (lv)
+			lv = find_next_boundary(pt, &lx, &ly, ldm, &lm);
+		if (rv)
+			rv = find_next_boundary(pt, &rx, &ry, rdm, &rm);
+		j += lv + rv;
+		if (!lv && !rv)
+			break;
+	}
 
-    if (j < NORMAL_MIN_EST)
-        return 0;
+	if (j < NORMAL_MIN_EST)
+		return 0;
 
-    if ((lx == rx) && (ly == ry))
-        return 0;
+	if ((lx == rx) && (ly == ry))
+		return 0;
 
-    ex = rx - lx;
-    ey = ry - ly;
-    r = 1.0f/hypot(ex, ey);
-    *nx =  ey * r;
-    *ny = -ex * r;
+	ex = rx - lx;
+	ey = ry - ly;
+	r = 1.0f/hypot(ex, ey);
+	*nx =  ey * r;
+	*ny = -ex * r;
 
-    return 1;
+	return 1;
 }
 
 int get_normal_interp(int pt, float x0, float y0, float dx, float dy, float *nx, float *ny)
 {
-    int x, y, i;
+	int x, y, i;
 
-    dx /= NORMAL_FRAC;
-    dy /= NORMAL_FRAC;
+	dx /= NORMAL_FRAC;
+	dy /= NORMAL_FRAC;
 
-    for (i=0; i<NORMAL_INTERP; i++)
-    {
-        x = (int)(x0 + 0.5f);
-        y = (int)(y0 + 0.5f);
-        if (is_boundary(pt, x, y))
-            break;
-        x0 += dx;
-        y0 += dy;
-    }
-    if (i >= NORMAL_INTERP)
-        return 0;
+	for (i=0; i<NORMAL_INTERP; i++) {
+		x = (int)(x0 + 0.5f);
+		y = (int)(y0 + 0.5f);
+		if (is_boundary(pt, x, y))
+			break;
+		x0 += dx;
+		y0 += dy;
+	}
+	if (i >= NORMAL_INTERP)
+		return 0;
 
-    if (pt == PT_PHOT)
-        photoelectric_effect(x, y);
+	if (pt == PT_PHOT)
+		photoelectric_effect(x, y);
 
-    return get_normal(pt, x, y, dx, dy, nx, ny);
+	return get_normal(pt, x, y, dx, dy, nx, ny);
 }
 
 void kill_part(int i)
 {
-    int x, y;
+	int x, y;
 
-    x = (int)(parts[i].x+0.5f);
-    y = (int)(parts[i].y+0.5f);
-    if (parts[i].type == PT_STKM)
-    {
-        death = 1;
-        isplayer = 0;
-    }
-    if (parts[i].type == PT_STKM2)
-    {
-        death2 = 1;
-        isplayer2 = 0;
-    }
-    if (parts[i].type == PT_SPAWN)
-    {
-        ISSPAWN1 = 0;
-    }
-    if (parts[i].type == PT_SPAWN2)
-    {
-        ISSPAWN2 = 0;
-    }
-    if (x>=0 && y>=0 && x<XRES && y<YRES)
-    {
-        if ((pmap[y][x]>>8)==i)
-            pmap[y][x] = 0;
-        else if ((photons[y][x]>>8)==i)
-            photons[y][x] = 0;
-    }
+	x = (int)(parts[i].x+0.5f);
+	y = (int)(parts[i].y+0.5f);
+	if (parts[i].type == PT_STKM)
+	{
+		death = 1;
+		isplayer = 0;
+	}
+	if (parts[i].type == PT_STKM2)
+	{
+		death2 = 1;
+		isplayer2 = 0;
+	}
+	if (parts[i].type == PT_SPAWN)
+	{
+		ISSPAWN1 = 0;
+	}
+	if (parts[i].type == PT_SPAWN2)
+	{
+		ISSPAWN2 = 0;
+	}
+	if (x>=0 && y>=0 && x<XRES && y<YRES) {
+		if ((pmap[y][x]>>8)==i)
+			pmap[y][x] = 0;
+		else if ((photons[y][x]>>8)==i)
+			photons[y][x] = 0;
+	}
 
-    parts[i].type = PT_NONE;
-    parts[i].life = pfree;
-    pfree = i;
+	parts[i].type = PT_NONE;
+	parts[i].life = pfree;
+	pfree = i;
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -466,21 +473,21 @@ _inline void part_change_type(int i, int x, int y, int t)
 inline void part_change_type(int i, int x, int y, int t)
 #endif
 {
-    if (x<0 || y<0 || x>=XRES || y>=YRES || i>=NPART || t<0 || t>=PT_NUM)
-        return;
-    parts[i].type = t;
-    if (t==PT_PHOT)// || t==PT_NEUT)
-    {
-        photons[y][x] = t|(i<<8);
-        if ((pmap[y][x]>>8)==i)
-            pmap[y][x] = 0;
-    }
-    else
-    {
-        pmap[y][x] = t|(i<<8);
-        if ((photons[y][x]>>8)==i)
-            photons[y][x] = 0;
-    }
+	if (x<0 || y<0 || x>=XRES || y>=YRES || i>=NPART || t<0 || t>=PT_NUM)
+		return;
+	parts[i].type = t;
+	if (t==PT_PHOT || t==PT_NEUT)
+	{
+		photons[y][x] = t|(i<<8);
+		if ((pmap[y][x]>>8)==i)
+			pmap[y][x] = 0;
+	}
+	else
+	{
+		pmap[y][x] = t|(i<<8);
+		if ((photons[y][x]>>8)==i)
+			photons[y][x] = 0;
+	}
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -489,45 +496,42 @@ _inline int create_n_parts(int n, int x, int y, float vx, float vy, int t)
 inline int create_n_parts(int n, int x, int y, float vx, float vy, int t)
 #endif
 {
-    int i, c;
-    n = (n/10);
-    if (n<1)
-    {
-        n = 1;
-    }
-    if (n>680)
-    {
-        n = 680;
-    }
-    if (x<0 || y<0 || x>=XRES || y>=YRES || t<0 || t>=PT_NUM)
-        return -1;
+	int i, c;
+	n = (n/10);
+	if (n<1) {
+		n = 1;
+	}
+	if (n>680) {
+		n = 680;
+	}
+	if (x<0 || y<0 || x>=XRES || y>=YRES || t<0 || t>=PT_NUM)
+		return -1;
 
-    for (c; c<n; c++)
-    {
-        float r = (rand()%128+128)/127.0f;
-        float a = (rand()%360)*3.14159f/180.0f;
-        if (pfree == -1)
-            return -1;
-        i = pfree;
-        pfree = parts[i].life;
+	for (c=0; c<n; c++) {
+		float r = (rand()%128+128)/127.0f;
+		float a = (rand()%360)*3.14159f/180.0f;
+		if (pfree == -1)
+			return -1;
+		i = pfree;
+		pfree = parts[i].life;
 
-        parts[i].x = (float)x;
-        parts[i].y = (float)y;
-        parts[i].type = t;
-        parts[i].life = rand()%480+480;
-        parts[i].vx = r*cosf(a);
-        parts[i].vy = r*sinf(a);
-        parts[i].ctype = 0;
-        parts[i].temp += (n*17);
-        parts[i].tmp = 0;
-        if (t!=PT_STKM&&t!=PT_STKM2 && t!=PT_PHOT && !pmap[y][x])// && t!=PT_NEUT)
-            pmap[y][x] = t|(i<<8);
-        else if (t==PT_PHOT && !photons[y][x])
-            photons[y][x] = t|(i<<8);
+		parts[i].x = (float)x;
+		parts[i].y = (float)y;
+		parts[i].type = t;
+		parts[i].life = rand()%480+480;
+		parts[i].vx = r*cosf(a);
+		parts[i].vy = r*sinf(a);
+		parts[i].ctype = 0;
+		parts[i].temp += (n*17);
+		parts[i].tmp = 0;
+		if (t!=PT_STKM&&t!=PT_STKM2 && t!=PT_PHOT && t!=PT_NEUT && !pmap[y][x])
+			pmap[y][x] = t|(i<<8);
+		else if ((t==PT_PHOT||t==PT_NEUT) && !photons[y][x])
+			photons[y][x] = t|(i<<8);
 
-        pv[y/CELL][x/CELL] += 6.0f * CFDS;
-    }
-    return 0;
+		pv[y/CELL][x/CELL] += 6.0f * CFDS;
+	}
+	return 0;
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -536,475 +540,402 @@ _inline int create_part(int p, int x, int y, int t)
 inline int create_part(int p, int x, int y, int t)
 #endif
 {
-    int i;
+	int i;
 
-    if (x<0 || y<0 || x>=XRES || y>=YRES || ((t<0 || t>=PT_NUM)&&t!=SPC_HEAT&&t!=SPC_COOL&&t!=SPC_AIR&&t!=SPC_VACUUM))
-        return -1;
+	if (x<0 || y<0 || x>=XRES || y>=YRES || ((t<0 || t>=PT_NUM)&&t!=SPC_HEAT&&t!=SPC_COOL&&t!=SPC_AIR&&t!=SPC_VACUUM))
+		return -1;
 
-    if (t==SPC_HEAT||t==SPC_COOL)
-    {
-        if ((pmap[y][x]&0xFF)!=PT_NONE&&(pmap[y][x]&0xFF)<PT_NUM)
-        {
-            if (t==SPC_HEAT&&parts[pmap[y][x]>>8].temp<MAX_TEMP)
-            {
-                if ((pmap[y][x]&0xFF)==PT_PUMP)
-                {
-                    parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp + 0.1f, MIN_TEMP, MAX_TEMP);
-                }
-                else if ((sdl_mod & (KMOD_SHIFT)) && (sdl_mod & (KMOD_CTRL)))
-                {
-                    parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp + 50.0f, MIN_TEMP, MAX_TEMP);
-                }
-                else
-                {
-                    parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp + 4.0f, MIN_TEMP, MAX_TEMP);
-                }
-            }
-            if (t==SPC_COOL&&parts[pmap[y][x]>>8].temp>MIN_TEMP)
-            {
-                if ((pmap[y][x]&0xFF)==PT_PUMP)
-                {
-                    parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp - 0.1f, MIN_TEMP, MAX_TEMP);
-                }
-                else if ((sdl_mod & (KMOD_SHIFT)) && (sdl_mod & (KMOD_CTRL)))
-                {
-                    parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp - 50.0f, MIN_TEMP, MAX_TEMP);
-                }
-                else
-                {
-                    parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp - 4.0f, MIN_TEMP, MAX_TEMP);
-                }
-            }
-            return pmap[y][x]>>8;
-        }
-        else
-        {
-            return -1;
-        }
-    }
-    if (t==SPC_AIR)
-    {
-        pv[y/CELL][x/CELL] += 0.03f;
-        if (y+CELL<YRES)
-            pv[y/CELL+1][x/CELL] += 0.03f;
-        if (x+CELL<XRES)
-        {
-            pv[y/CELL][x/CELL+1] += 0.03f;
-            if (y+CELL<YRES)
-                pv[y/CELL+1][x/CELL+1] += 0.03f;
-        }
-        return -1;
-    }
-    if (t==SPC_VACUUM)
-    {
-        pv[y/CELL][x/CELL] -= 0.03f;
-        if (y+CELL<YRES)
-            pv[y/CELL+1][x/CELL] -= 0.03f;
-        if (x+CELL<XRES)
-        {
-            pv[y/CELL][x/CELL+1] -= 0.03f;
-            if (y+CELL<YRES)
-                pv[y/CELL+1][x/CELL+1] -= 0.03f;
-        }
-        return -1;
-    }
-    if(t == PT_CHAN)
-    {
-        int emt = pmap[y][x];
-        if(parts[emt>>8].life != 0)
-            return -1;
-        if((emt&0xFF)==PT_REMT || (emt&0xFF)==PT_RREC)
-        {
-            parts[emt>>8].any++;
-            if(parts[emt>>8].any % 2 == 0)
-            {
-                parts[emt>>8].any = 0;
-                parts[emt>>8].tmp++;
-                parts[emt>>8].tmp %= 4;
-            }
-        }
-        return emt>>8;
-    }
-    if (t==PT_SPRK)
-    {
-        if ((pmap[y][x]>>8)>=NPART || !((pmap[y][x]&0xFF)==PT_INST||(ptypes[pmap[y][x]&0xFF].properties&PROP_CONDUCTS)) || (pmap[y][x]&0xFF) == PT_WREC)
-            return -1;
-        if (parts[pmap[y][x]>>8].life!=0)
-            return -1;
-        parts[pmap[y][x]>>8].type = PT_SPRK;
-        parts[pmap[y][x]>>8].life = 4;
-        if(parts[pmap[y][x]>>8].type == PT_WEMT)
-            parts[pmap[y][x]>>8].any = -1;
-        else
-            parts[pmap[y][x]>>8].any = 0;
-        parts[pmap[y][x]>>8].ctype = pmap[y][x]&0xFF;
-        pmap[y][x] = (pmap[y][x]&~0xFF) | PT_SPRK;
-        return pmap[y][x]>>8;
-    }
-    if (t==PT_SPAWN&&ISSPAWN1)
-        return -1;
-    if (t==PT_SPAWN2&&ISSPAWN2)
-        return -1;
-    if (p==-1)//creating from anything but brush
-    {
-        if (pmap[y][x])
-        {
-            if ((pmap[y][x]&0xFF)!=PT_SPAWN&&(pmap[y][x]&0xFF)!=PT_SPAWN2)
-            {
-                if (t!=PT_STKM&&t!=PT_STKM2)
-                {
-                    return -1;
-                }
-            }
-        }
-        if (pfree == -1)
-            return -1;
-        i = pfree;
-        pfree = parts[i].life;
-    }
-    else if (p==-2)//creating from brush
-    {
-        if (pmap[y][x])
-        {
-            if (((pmap[y][x]&0xFF)==PT_CLNE||(pmap[y][x]&0xFF)==PT_BCLN||((pmap[y][x]&0xFF)==PT_PCLN&&t!=PT_PSCN&&t!=PT_NSCN))&&(t!=PT_CLNE&&t!=PT_PCLN&&t!=PT_BCLN&&t!=PT_STKM&&t!=PT_STKM2))
-            {
-                parts[pmap[y][x]>>8].ctype = t;
-            }
-            return -1;
-        }
-        if (photons[y][x] && t==PT_PHOT)
-            return -1;
-        if (pfree == -1)
-            return -1;
-        i = pfree;
-        pfree = parts[i].life;
-    }
-    else
-        i = p;
+	if (t==SPC_HEAT||t==SPC_COOL)
+	{
+		if ((pmap[y][x]&0xFF)!=PT_NONE&&(pmap[y][x]&0xFF)<PT_NUM)
+		{
+			if (t==SPC_HEAT&&parts[pmap[y][x]>>8].temp<MAX_TEMP)
+			{
+				if ((pmap[y][x]&0xFF)==PT_PUMP) {
+					parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp + 0.1f, MIN_TEMP, MAX_TEMP);
+				} else if ((sdl_mod & (KMOD_SHIFT)) && (sdl_mod & (KMOD_CTRL))) {
+					parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp + 50.0f, MIN_TEMP, MAX_TEMP);
+				} else {
+					parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp + 4.0f, MIN_TEMP, MAX_TEMP);
+				}
+			}
+			if (t==SPC_COOL&&parts[pmap[y][x]>>8].temp>MIN_TEMP)
+			{
+				if ((pmap[y][x]&0xFF)==PT_PUMP) {
+					parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp - 0.1f, MIN_TEMP, MAX_TEMP);
+				} else if ((sdl_mod & (KMOD_SHIFT)) && (sdl_mod & (KMOD_CTRL))) {
+					parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp - 50.0f, MIN_TEMP, MAX_TEMP);
+				} else {
+					parts[pmap[y][x]>>8].temp = restrict_flt(parts[pmap[y][x]>>8].temp - 4.0f, MIN_TEMP, MAX_TEMP);
+				}
+			}
+			return pmap[y][x]>>8;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	if (t==SPC_AIR)
+	{
+		pv[y/CELL][x/CELL] += 0.03f;
+		if (y+CELL<YRES)
+			pv[y/CELL+1][x/CELL] += 0.03f;
+		if (x+CELL<XRES)
+		{
+			pv[y/CELL][x/CELL+1] += 0.03f;
+			if (y+CELL<YRES)
+				pv[y/CELL+1][x/CELL+1] += 0.03f;
+		}
+		return -1;
+	}
+	if (t==SPC_VACUUM)
+	{
+		pv[y/CELL][x/CELL] -= 0.03f;
+		if (y+CELL<YRES)
+			pv[y/CELL+1][x/CELL] -= 0.03f;
+		if (x+CELL<XRES)
+		{
+			pv[y/CELL][x/CELL+1] -= 0.03f;
+			if (y+CELL<YRES)
+				pv[y/CELL+1][x/CELL+1] -= 0.03f;
+		}
+		return -1;
+	}
 
-    if (t==PT_GLAS)
-    {
-        parts[i].pavg[1] = pv[y/CELL][x/CELL];
-    }
-    if (t==PT_QRTZ)
-    {
-        parts[i].pavg[1] = pv[y/CELL][x/CELL];
-    }
-    if (t!=PT_STKM&&t!=PT_STKM2)
-    {
-        parts[i].x = (float)x;
-        parts[i].y = (float)y;
-        parts[i].type = t;
-        parts[i].vx = 0;
-        parts[i].vy = 0;
-        parts[i].life = 0;
-        parts[i].ctype = 0;
-        parts[i].temp = ptypes[t].heat;
-        parts[i].tmp = 0;
-    }
-    if (t==PT_ACID)
-    {
-        parts[i].life = 75;
-    }
-    /*Testing
-    if(t==PT_WOOD){
-    	parts[i].life = 150;
-    }
-    End Testing*/
-    if (t==PT_WARP)
-    {
-        parts[i].life = rand()%95+70;
-    }
-    if (t==PT_FUSE)
-    {
-        parts[i].life = 50;
-        parts[i].tmp = 50;
-    }
-    if (ptypes[t].properties&PROP_LIFE)
-    {
-        int r;
-        for(r = 0; r<NGOL; r++)
-            if(t==goltype[r])
-                parts[i].tmp = grule[r+1][9] - 1;
-    }
-    if (t==PT_DEUT)
-        parts[i].life = 10;
-    if (t==PT_BRAY)
-        parts[i].life = 30;
-    if (t==PT_PUMP)
-        parts[i].life= 10;
-    if (t==PT_SING)
-        parts[i].life = rand()%50+60;
-    if (t==PT_QRTZ)
-        parts[i].tmp = (rand()%11);
-    if (t==PT_PQRT)
-        parts[i].tmp = (rand()%11);
-    if (t==PT_FSEP)
-        parts[i].life = 50;
-    if (t==PT_COAL)
-    {
-        parts[i].life = 110;
-        parts[i].tmp = 50;
-    }
-    if (t==PT_FRZW)
-        parts[i].life = 100;
-    if (t==PT_PIPE)
-        parts[i].life = 60;
-    if (t==PT_BCOL)
-        parts[i].life = 110;
-    if (t==PT_FIRE)
-        parts[i].life = rand()%50+120;
-    if (t==PT_PLSM)
-        parts[i].life = rand()%150+50;
-    if (t==PT_HFLM)
-        parts[i].life = rand()%150+50;
-    if (t==PT_LAVA)
-        parts[i].life = rand()%120+240;
-    if (t==PT_NBLE)
-        parts[i].life = 0;
-    if (t==PT_ICEI)
-        parts[i].ctype = PT_WATR;
-    if (t==PT_NEUT)
-    {
-        float r = (rand()%128+128)/127.0f;
-        float a = (rand()%360)*3.14159f/180.0f;
-        parts[i].life = rand()%480+480;
-        parts[i].vx = r*cosf(a);
-        parts[i].vy = r*sinf(a);
-    }
-    if (t==PT_MORT)
-    {
-        parts[i].vx = 2;
-    }
-    if (t==PT_PHOT)
-    {
-        float a = (rand()%8) * 0.78540f;
-        parts[i].life = 680;
-        parts[i].ctype = 0x3FFFFFFF;
-        parts[i].vx = 3.0f*cosf(a);
-        parts[i].vy = 3.0f*sinf(a);
-    }
-    if (t==PT_PHOT)
-        photons[y][x] = t|(i<<8);
-#include "additions/life.h"
-    if (t==PT_STKM)
-    {
-        if (isplayer==0)
-        {
-            if (pmap[y][x]&0xFF==PT_SPAWN)
-            {
-                parts[pmap[y][x]>>8].type = PT_STKM;
-                parts[pmap[y][x]>>8].vx = 0;
-                parts[pmap[y][x]>>8].vy = 0;
-                parts[pmap[y][x]>>8].life = 100;
-                parts[pmap[y][x]>>8].ctype = 0;
-                parts[pmap[y][x]>>8].temp = ptypes[t].heat;
+	if (t==PT_SPRK)
+	{
+		if ((pmap[y][x]>>8)>=NPART || !((pmap[y][x]&0xFF)==PT_INST||(ptypes[pmap[y][x]&0xFF].properties&PROP_CONDUCTS)))
+			return -1;
+		if (parts[pmap[y][x]>>8].life!=0)
+			return -1;
+		parts[pmap[y][x]>>8].type = PT_SPRK;
+		parts[pmap[y][x]>>8].life = 4;
+		parts[pmap[y][x]>>8].ctype = pmap[y][x]&0xFF;
+		pmap[y][x] = (pmap[y][x]&~0xFF) | PT_SPRK;
+		return pmap[y][x]>>8;
+	}
+	if (t==PT_SPAWN&&ISSPAWN1)
+		return -1;
+	if (t==PT_SPAWN2&&ISSPAWN2)
+		return -1;
+	if (p==-1)//creating from anything but brush
+	{
+		if (pmap[y][x])
+		{
+			if ((pmap[y][x]&0xFF)!=PT_SPAWN&&(pmap[y][x]&0xFF)!=PT_SPAWN2)
+			{
+				if (t!=PT_STKM&&t!=PT_STKM2)
+				{
+					return -1;
+				}
+			}
+		}
+		if (pfree == -1)
+			return -1;
+		i = pfree;
+		pfree = parts[i].life;
+	}
+	else if (p==-2)//creating from brush
+	{
+		if (pmap[y][x])
+		{
+			if (((pmap[y][x]&0xFF)==PT_CLNE||(pmap[y][x]&0xFF)==PT_BCLN||((pmap[y][x]&0xFF)==PT_PCLN&&t!=PT_PSCN&&t!=PT_NSCN))&&(t!=PT_CLNE&&t!=PT_PCLN&&t!=PT_BCLN&&t!=PT_STKM&&t!=PT_STKM2))
+			{
+				parts[pmap[y][x]>>8].ctype = t;
+			}
+			return -1;
+		}
+		if (photons[y][x] && (t==PT_PHOT||t==PT_NEUT))
+			return -1;
+		if (pfree == -1)
+			return -1;
+		i = pfree;
+		pfree = parts[i].life;
+	}
+	else
+		i = p;
 
-            }
-            else
-            {
-                parts[i].x = (float)x;
-                parts[i].y = (float)y;
-                parts[i].type = PT_STKM;
-                parts[i].vx = 0;
-                parts[i].vy = 0;
-                parts[i].life = 100;
-                parts[i].ctype = 0;
-                parts[i].temp = ptypes[t].heat;
-            }
+	if (t==PT_GLAS)
+	{
+		parts[i].pavg[1] = pv[y/CELL][x/CELL];
+	}
+	if (t==PT_QRTZ)
+	{
+		parts[i].pavg[1] = pv[y/CELL][x/CELL];
+	}
+	if (t!=PT_STKM&&t!=PT_STKM2)
+	{
+		parts[i].x = (float)x;
+		parts[i].y = (float)y;
+		parts[i].type = t;
+		parts[i].vx = 0;
+		parts[i].vy = 0;
+		parts[i].life = 0;
+		parts[i].ctype = 0;
+		parts[i].temp = ptypes[t].heat;
+		parts[i].tmp = 0;
+	}
+	if (t==PT_ACID)
+	{
+		parts[i].life = 75;
+	}
+	/*Testing
+	if(t==PT_WOOD){
+		parts[i].life = 150;
+	}
+	End Testing*/
+	if (t==PT_WARP) {
+		parts[i].life = rand()%95+70;
+	}
+	if (t==PT_FUSE) {
+		parts[i].life = 50;
+		parts[i].tmp = 50;
+	}
+	if (ptypes[t].properties&PROP_LIFE) {
+		int r;
+		for(r = 0; r<NGOL; r++)
+			if(t==goltype[r])
+				parts[i].tmp = grule[r+1][9] - 1;
+	}
+	if (t==PT_DEUT)
+		parts[i].life = 10;
+	if (t==PT_BRAY)
+		parts[i].life = 30;
+	if (t==PT_PUMP)
+		parts[i].life= 10;
+	if (t==PT_SING)
+		parts[i].life = rand()%50+60;
+	if (t==PT_QRTZ)
+		parts[i].tmp = (rand()%11);
+	if (t==PT_PQRT)
+		parts[i].tmp = (rand()%11);
+	if (t==PT_FSEP)
+		parts[i].life = 50;
+	if (t==PT_COAL) {
+		parts[i].life = 110;
+		parts[i].tmp = 50;
+	}
+	if (t==PT_FRZW)
+		parts[i].life = 100;
+	if (t==PT_PIPE)
+		parts[i].life = 60;
+	if (t==PT_BCOL)
+		parts[i].life = 110;
+	if (t==PT_FIRE)
+		parts[i].life = rand()%50+120;
+	if (t==PT_PLSM)
+		parts[i].life = rand()%150+50;
+	if (t==PT_HFLM)
+		parts[i].life = rand()%150+50;
+	if (t==PT_LAVA)
+		parts[i].life = rand()%120+240;
+	if (t==PT_NBLE)
+		parts[i].life = 0;
+	if (t==PT_ICEI)
+		parts[i].ctype = PT_WATR;
+	if (t==PT_NEUT)
+	{
+		float r = (rand()%128+128)/127.0f;
+		float a = (rand()%360)*3.14159f/180.0f;
+		parts[i].life = rand()%480+480;
+		parts[i].vx = r*cosf(a);
+		parts[i].vy = r*sinf(a);
+	}
+	if (t==PT_MORT)
+	{
+		parts[i].vx = 2;
+	}
+	if (t==PT_PHOT)
+	{
+		float a = (rand()%8) * 0.78540f;
+		parts[i].life = 680;
+		parts[i].ctype = 0x3FFFFFFF;
+		parts[i].vx = 3.0f*cosf(a);
+		parts[i].vy = 3.0f*sinf(a);
+	}
+	if (t==PT_STKM)
+	{
+		if (isplayer==0)
+		{
+			parts[i].x = (float)x;
+			parts[i].y = (float)y;
+			parts[i].type = PT_STKM;
+			parts[i].vx = 0;
+			parts[i].vy = 0;
+			parts[i].life = 100;
+			parts[i].ctype = 0;
+			parts[i].temp = ptypes[t].heat;
 
+			player[3] = x-1;  //Setting legs positions
+			player[4] = y+6;
+			player[5] = x-1;
+			player[6] = y+6;
 
+			player[7] = x-3;
+			player[8] = y+12;
+			player[9] = x-3;
+			player[10] = y+12;
 
-            player[3] = x-1;  //Setting legs positions
-            player[4] = y+6;
-            player[5] = x-1;
-            player[6] = y+6;
+			player[11] = x+1;
+			player[12] = y+6;
+			player[13] = x+1;
+			player[14] = y+6;
 
-            player[7] = x-3;
-            player[8] = y+12;
-            player[9] = x-3;
-            player[10] = y+12;
+			player[15] = x+3;
+			player[16] = y+12;
+			player[17] = x+3;
+			player[18] = y+12;
 
-            player[11] = x+1;
-            player[12] = y+6;
-            player[13] = x+1;
-            player[14] = y+6;
+			isplayer = 1;
+		}
+		else
+		{
+			return -1;
+		}
+		create_part(-1,x,y,PT_SPAWN);
+		ISSPAWN1 = 1;
+	}
+	if (t==PT_STKM2)
+	{
+		if (isplayer2==0)
+		{
+			parts[i].x = (float)x;
+			parts[i].y = (float)y;
+			parts[i].type = PT_STKM2;
+			parts[i].vx = 0;
+			parts[i].vy = 0;
+			parts[i].life = 100;
+			parts[i].ctype = 0;
+			parts[i].temp = ptypes[t].heat;
 
-            player[15] = x+3;
-            player[16] = y+12;
-            player[17] = x+3;
-            player[18] = y+12;
+			player2[3] = x-1;  //Setting legs positions
+			player2[4] = y+6;
+			player2[5] = x-1;
+			player2[6] = y+6;
 
-            isplayer = 1;
-        }
-        else
-        {
-            return -1;
-        }
-        //kill_part(playerspawn);
-        create_part(-1,x,y,PT_SPAWN);
-        ISSPAWN1 = 1;
-    }
-    if (t==PT_STKM2)
-    {
-        if (isplayer2==0)
-        {
-            if (pmap[y][x]&0xFF==PT_SPAWN2)
-            {
-                parts[pmap[y][x]>>8].type = PT_STKM2;
-                parts[pmap[y][x]>>8].vx = 0;
-                parts[pmap[y][x]>>8].vy = 0;
-                parts[pmap[y][x]>>8].life = 100;
-                parts[pmap[y][x]>>8].ctype = 0;
-                parts[pmap[y][x]>>8].temp = ptypes[t].heat;
+			player2[7] = x-3;
+			player2[8] = y+12;
+			player2[9] = x-3;
+			player2[10] = y+12;
 
-            }
-            else
-            {
-                parts[i].x = (float)x;
-                parts[i].y = (float)y;
-                parts[i].type = PT_STKM2;
-                parts[i].vx = 0;
-                parts[i].vy = 0;
-                parts[i].life = 100;
-                parts[i].ctype = 0;
-                parts[i].temp = ptypes[t].heat;
-            }
+			player2[11] = x+1;
+			player2[12] = y+6;
+			player2[13] = x+1;
+			player2[14] = y+6;
 
+			player2[15] = x+3;
+			player2[16] = y+12;
+			player2[17] = x+3;
+			player2[18] = y+12;
 
+			isplayer2 = 1;
+		}
+		else
+		{
+			return -1;
+		}
+		create_part(-1,x,y,PT_SPAWN2);
+		ISSPAWN2 = 1;
+	}
+	if (t==PT_BIZR||t==PT_BIZRG)
+		parts[i].ctype = 0x47FFFF;
+	if (t==PT_PHOT||t==PT_NEUT)
+		photons[y][x] = t|(i<<8);
+	if (t!=PT_STKM&&t!=PT_STKM2 && t!=PT_PHOT && t!=PT_NEUT) // is this needed? it breaks floodfill, Yes photons should not be placed in the PMAP
+		pmap[y][x] = t|(i<<8);
 
-            player2[3] = x-1;  //Setting legs positions
-            player2[4] = y+6;
-            player2[5] = x-1;
-            player2[6] = y+6;
-
-            player2[7] = x-3;
-            player2[8] = y+12;
-            player2[9] = x-3;
-            player2[10] = y+12;
-
-            player2[11] = x+1;
-            player2[12] = y+6;
-            player2[13] = x+1;
-            player2[14] = y+6;
-
-            player2[15] = x+3;
-            player2[16] = y+12;
-            player2[17] = x+3;
-            player2[18] = y+12;
-
-            isplayer2 = 1;
-        }
-        else
-        {
-            return -1;
-        }
-        //kill_part(player2spawn);
-        create_part(-1,x,y,PT_SPAWN2);
-        ISSPAWN2 = 1;
-    }
-    if (t==PT_BIZR||t==PT_BIZRG)
-        parts[i].ctype = 0x47FFFF;
-    if (t!=PT_STKM&&t!=PT_STKM2 && t!=PT_PHOT)// && t!=PT_NEUT)  is this needed? it breaks floodfill, Yes photons should not be placed in the PMAP
-        pmap[y][x] = t|(i<<8);
-
-    return i;
+	return i;
 }
 
 static void create_gain_photon(int pp)
 {
-    float xx, yy;
-    int i, lr, temp_bin, nx, ny;
+	float xx, yy;
+	int i, lr, temp_bin, nx, ny;
 
-    if (pfree == -1)
-        return;
-    i = pfree;
+	if (pfree == -1)
+		return;
+	i = pfree;
 
-    lr = rand() % 2;
+	lr = rand() % 2;
 
-    if (lr)
-    {
-        xx = parts[pp].x - 0.3*parts[pp].vy;
-        yy = parts[pp].y + 0.3*parts[pp].vx;
-    }
-    else
-    {
-        xx = parts[pp].x + 0.3*parts[pp].vy;
-        yy = parts[pp].y - 0.3*parts[pp].vx;
-    }
+	if (lr) {
+		xx = parts[pp].x - 0.3*parts[pp].vy;
+		yy = parts[pp].y + 0.3*parts[pp].vx;
+	} else {
+		xx = parts[pp].x + 0.3*parts[pp].vy;
+		yy = parts[pp].y - 0.3*parts[pp].vx;
+	}
 
-    nx = (int)(xx + 0.5f);
-    ny = (int)(yy + 0.5f);
+	nx = (int)(xx + 0.5f);
+	ny = (int)(yy + 0.5f);
 
-    if (nx<0 || ny<0 || nx>=XRES || ny>=YRES)
-        return;
+	if (nx<0 || ny<0 || nx>=XRES || ny>=YRES)
+		return;
 
-    if ((pmap[ny][nx] & 0xFF) != PT_GLOW)
-        return;
+	if ((pmap[ny][nx] & 0xFF) != PT_GLOW)
+		return;
 
-    pfree = parts[i].life;
+	pfree = parts[i].life;
 
-    parts[i].type = PT_PHOT;
-    parts[i].life = 680;
-    parts[i].x = xx;
-    parts[i].y = yy;
-    parts[i].vx = parts[pp].vx;
-    parts[i].vy = parts[pp].vy;
-    parts[i].temp = parts[pmap[ny][nx] >> 8].temp;
-    parts[i].tmp = 0;
-    photons[ny][nx] = PT_PHOT|(i<<8);
+	parts[i].type = PT_PHOT;
+	parts[i].life = 680;
+	parts[i].x = xx;
+	parts[i].y = yy;
+	parts[i].vx = parts[pp].vx;
+	parts[i].vy = parts[pp].vy;
+	parts[i].temp = parts[pmap[ny][nx] >> 8].temp;
+	parts[i].tmp = 0;
+	photons[ny][nx] = PT_PHOT|(i<<8);
 
-    temp_bin = (int)((parts[i].temp-273.0f)*0.25f);
-    if (temp_bin < 0) temp_bin = 0;
-    if (temp_bin > 25) temp_bin = 25;
-    parts[i].ctype = 0x1F << temp_bin;
+	temp_bin = (int)((parts[i].temp-273.0f)*0.25f);
+	if (temp_bin < 0) temp_bin = 0;
+	if (temp_bin > 25) temp_bin = 25;
+	parts[i].ctype = 0x1F << temp_bin;
 }
 
 static void create_cherenkov_photon(int pp)
 {
-    int i, lr, nx, ny;
-    float r, eff_ior;
+	int i, lr, nx, ny;
+	float r, eff_ior;
 
-    if (pfree == -1)
-        return;
-    i = pfree;
+	if (pfree == -1)
+		return;
+	i = pfree;
 
-    nx = (int)(parts[pp].x + 0.5f);
-    ny = (int)(parts[pp].y + 0.5f);
-    if ((pmap[ny][nx] & 0xFF) != PT_GLAS)
-        return;
+	nx = (int)(parts[pp].x + 0.5f);
+	ny = (int)(parts[pp].y + 0.5f);
+	if ((pmap[ny][nx] & 0xFF) != PT_GLAS)
+		return;
 
-    if (hypotf(parts[pp].vx, parts[pp].vy) < 1.44f)
-        return;
+	if (hypotf(parts[pp].vx, parts[pp].vy) < 1.44f)
+		return;
 
-    pfree = parts[i].life;
+	pfree = parts[i].life;
 
-    lr = rand() % 2;
+	lr = rand() % 2;
 
-    parts[i].type = PT_PHOT;
-    parts[i].ctype = 0x00000F80;
-    parts[i].life = 680;
-    parts[i].x = parts[pp].x;
-    parts[i].y = parts[pp].y;
-    parts[i].temp = parts[pmap[ny][nx] >> 8].temp;
-    parts[i].tmp = 0;
-    photons[ny][nx] = PT_PHOT|(i<<8);
+	parts[i].type = PT_PHOT;
+	parts[i].ctype = 0x00000F80;
+	parts[i].life = 680;
+	parts[i].x = parts[pp].x;
+	parts[i].y = parts[pp].y;
+	parts[i].temp = parts[pmap[ny][nx] >> 8].temp;
+	parts[i].tmp = 0;
+	photons[ny][nx] = PT_PHOT|(i<<8);
 
-    if (lr)
-    {
-        parts[i].vx = parts[pp].vx - 2.5f*parts[pp].vy;
-        parts[i].vy = parts[pp].vy + 2.5f*parts[pp].vx;
-    }
-    else
-    {
-        parts[i].vx = parts[pp].vx + 2.5f*parts[pp].vy;
-        parts[i].vy = parts[pp].vy - 2.5f*parts[pp].vx;
-    }
+	if (lr) {
+		parts[i].vx = parts[pp].vx - 2.5f*parts[pp].vy;
+		parts[i].vy = parts[pp].vy + 2.5f*parts[pp].vx;
+	} else {
+		parts[i].vx = parts[pp].vx + 2.5f*parts[pp].vy;
+		parts[i].vy = parts[pp].vy - 2.5f*parts[pp].vx;
+	}
 
-    /* photons have speed of light. no discussion. */
-    r = 1.269 / hypotf(parts[i].vx, parts[i].vy);
-    parts[i].vx *= r;
-    parts[i].vy *= r;
+	/* photons have speed of light. no discussion. */
+	r = 1.269 / hypotf(parts[i].vx, parts[i].vy);
+	parts[i].vx *= r;
+	parts[i].vy *= r;
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -1013,31 +944,28 @@ _inline void delete_part(int x, int y)
 inline void delete_part(int x, int y)
 #endif
 {
-    unsigned i;
+	unsigned i;
 
-    if (x<0 || y<0 || x>=XRES || y>=YRES)
-        return;
-    if (photons[y][x])
-    {
-        i = photons[y][x];
-    }
-    else
-    {
-        i = pmap[y][x];
-    }
+	if (x<0 || y<0 || x>=XRES || y>=YRES)
+		return;
+	if (photons[y][x]) {
+		i = photons[y][x];
+	} else {
+		i = pmap[y][x];
+	}
 
-    if (!i || (i>>8)>=NPART)
-        return;
-    if ((parts[i>>8].type==SLALT)||SLALT==0)
-    {
-        kill_part(i>>8);
-    }
-    else if (ptypes[parts[i>>8].type].menusection==SEC)
-    {
-        kill_part(i>>8);
-    }
-    else
-        return;
+	if (!i || (i>>8)>=NPART)
+		return;
+	if ((parts[i>>8].type==SLALT)||SLALT==0)
+	{
+		kill_part(i>>8);
+	}
+	else if (ptypes[parts[i>>8].type].menusection==SEC)
+	{
+		kill_part(i>>8);
+	}
+	else
+		return;
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -1046,7 +974,7 @@ _inline int is_wire(int x, int y)
 inline int is_wire(int x, int y)
 #endif
 {
-    return bmap[y][x]==WL_DETECT || bmap[y][x]==WL_EWALL || bmap[y][x]==WL_ALLOWLIQUID || bmap[y][x]==WL_WALLELEC || bmap[y][x]==WL_ALLOWALLELEC || bmap[y][x]==WL_EHOLE;
+	return bmap[y][x]==WL_DETECT || bmap[y][x]==WL_EWALL || bmap[y][x]==WL_ALLOWLIQUID || bmap[y][x]==WL_WALLELEC || bmap[y][x]==WL_ALLOWALLELEC || bmap[y][x]==WL_EHOLE;
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -1055,90 +983,89 @@ _inline int is_wire_off(int x, int y)
 inline int is_wire_off(int x, int y)
 #endif
 {
-    return (bmap[y][x]==WL_DETECT || bmap[y][x]==WL_EWALL || bmap[y][x]==WL_ALLOWLIQUID || bmap[y][x]==WL_WALLELEC || bmap[y][x]==WL_ALLOWALLELEC || bmap[y][x]==WL_EHOLE) && emap[y][x]<8;
+	return (bmap[y][x]==WL_DETECT || bmap[y][x]==WL_EWALL || bmap[y][x]==WL_ALLOWLIQUID || bmap[y][x]==WL_WALLELEC || bmap[y][x]==WL_ALLOWALLELEC || bmap[y][x]==WL_EHOLE) && emap[y][x]<8;
 }
 
 int get_wavelength_bin(int *wm)
 {
-    int i, w0=30, wM=0;
+	int i, w0=30, wM=0;
 
-    if (!*wm)
-        return -1;
+	if (!*wm)
+		return -1;
 
-    for (i=0; i<30; i++)
-        if (*wm & (1<<i))
-        {
-            if (i < w0)
-                w0 = i;
-            if (i > wM)
-                wM = i;
-        }
+	for (i=0; i<30; i++)
+		if (*wm & (1<<i)) {
+			if (i < w0)
+				w0 = i;
+			if (i > wM)
+				wM = i;
+		}
 
-    if (wM-w0 < 5)
-        return (wM+w0)/2;
+	if (wM-w0 < 5)
+		return (wM+w0)/2;
 
-    i = rand() % (wM-w0-3);
-    i += w0;
+	i = rand() % (wM-w0-3);
+	i += w0;
 
-    *wm &= 0x1F << i;
-    return i + 2;
+	*wm &= 0x1F << i;
+	return i + 2;
 }
 
 void set_emap(int x, int y)
 {
-    int x1, x2;
+	int x1, x2;
 
-    if (!is_wire_off(x, y))
-        return;
+	if (!is_wire_off(x, y))
+		return;
 
-    // go left as far as possible
-    x1 = x2 = x;
-    while (x1>0)
-    {
-        if (!is_wire_off(x1-1, y))
-            break;
-        x1--;
-    }
-    while (x2<XRES/CELL-1)
-    {
-        if (!is_wire_off(x2+1, y))
-            break;
-        x2++;
-    }
+	// go left as far as possible
+	x1 = x2 = x;
+	while (x1>0)
+	{
+		if (!is_wire_off(x1-1, y))
+			break;
+		x1--;
+	}
+	while (x2<XRES/CELL-1)
+	{
+		if (!is_wire_off(x2+1, y))
+			break;
+		x2++;
+	}
 
-    // fill span
-    for (x=x1; x<=x2; x++)
-        emap[y][x] = 16;
+	// fill span
+	for (x=x1; x<=x2; x++)
+		emap[y][x] = 16;
 
-    // fill children
+	// fill children
 
-    if (y>1 && x1==x2 &&
-            is_wire(x1-1, y-1) && is_wire(x1, y-1) && is_wire(x1+1, y-1) &&
-            !is_wire(x1-1, y-2) && is_wire(x1, y-2) && !is_wire(x1+1, y-2))
-        set_emap(x1, y-2);
-    else if (y>0)
-        for (x=x1; x<=x2; x++)
-            if (is_wire_off(x, y-1))
-            {
-                if (x==x1 || x==x2 || y>=YRES/CELL-1 ||
-                        is_wire(x-1, y-1) || is_wire(x+1, y-1) ||
-                        is_wire(x-1, y+1) || !is_wire(x, y+1) || is_wire(x+1, y+1))
-                    set_emap(x, y-1);
-            }
+	if (y>1 && x1==x2 &&
+	        is_wire(x1-1, y-1) && is_wire(x1, y-1) && is_wire(x1+1, y-1) &&
+	        !is_wire(x1-1, y-2) && is_wire(x1, y-2) && !is_wire(x1+1, y-2))
+		set_emap(x1, y-2);
+	else if (y>0)
+		for (x=x1; x<=x2; x++)
+			if (is_wire_off(x, y-1))
+			{
+				if (x==x1 || x==x2 || y>=YRES/CELL-1 ||
+				        is_wire(x-1, y-1) || is_wire(x+1, y-1) ||
+				        is_wire(x-1, y+1) || !is_wire(x, y+1) || is_wire(x+1, y+1))
+					set_emap(x, y-1);
+			}
 
-    if (y<YRES/CELL-2 && x1==x2 &&
-            is_wire(x1-1, y+1) && is_wire(x1, y+1) && is_wire(x1+1, y+1) &&
-            !is_wire(x1-1, y+2) && is_wire(x1, y+2) && !is_wire(x1+1, y+2))
-        set_emap(x1, y+2);
-    else if (y<YRES/CELL-1)
-        for (x=x1; x<=x2; x++)
-            if (is_wire_off(x, y+1))
-            {
-                if (x==x1 || x==x2 || y<0 ||
-                        is_wire(x-1, y+1) || is_wire(x+1, y+1) ||
-                        is_wire(x-1, y-1) || !is_wire(x, y-1) || is_wire(x+1, y-1))
-                    set_emap(x, y+1);
-            }
+	if (y<YRES/CELL-2 && x1==x2 &&
+	        is_wire(x1-1, y+1) && is_wire(x1, y+1) && is_wire(x1+1, y+1) &&
+	        !is_wire(x1-1, y+2) && is_wire(x1, y+2) && !is_wire(x1+1, y+2))
+		set_emap(x1, y+2);
+	else if (y<YRES/CELL-1)
+		for (x=x1; x<=x2; x++)
+			if (is_wire_off(x, y+1))
+			{
+				if (x==x1 || x==x2 || y<0 ||
+				        is_wire(x-1, y+1) || is_wire(x+1, y+1) ||
+				        is_wire(x-1, y-1) || !is_wire(x, y-1) || is_wire(x+1, y-1))
+					set_emap(x, y+1);
+			}
 }
 
 #if defined(WIN32) && !defined(__GNUC__)
@@ -1147,55 +1074,55 @@ _inline int parts_avg(int ci, int ni,int t)//t is the particle you are looking f
 inline int parts_avg(int ci, int ni,int t)
 #endif
 {
-    if (t==PT_INSL)//to keep electronics working
-    {
-        int pmr = pmap[((int)(parts[ci].y+0.5f) + (int)(parts[ni].y+0.5f))/2][((int)(parts[ci].x+0.5f) + (int)(parts[ni].x+0.5f))/2];
-        if ((pmr>>8) < NPART && pmr)
-            return parts[pmr>>8].type;
-        else
-            return PT_NONE;
-    }
-    else
-    {
-        int pmr2 = pmap[(int)((parts[ci].y + parts[ni].y)/2+0.5f)][(int)((parts[ci].x + parts[ni].x)/2+0.5f)];//seems to be more accurate.
-        if ((pmr2>>8) < NPART && pmr2)
-        {
-            if (parts[pmr2>>8].type==t)
-                return t;
-        }
-        else
-            return PT_NONE;
-    }
-    return PT_NONE;
+	if (t==PT_INSL)//to keep electronics working
+	{
+		int pmr = pmap[((int)(parts[ci].y+0.5f) + (int)(parts[ni].y+0.5f))/2][((int)(parts[ci].x+0.5f) + (int)(parts[ni].x+0.5f))/2];
+		if ((pmr>>8) < NPART && pmr)
+			return parts[pmr>>8].type;
+		else
+			return PT_NONE;
+	}
+	else
+	{
+		int pmr2 = pmap[(int)((parts[ci].y + parts[ni].y)/2+0.5f)][(int)((parts[ci].x + parts[ni].x)/2+0.5f)];//seems to be more accurate.
+		if ((pmr2>>8) < NPART && pmr2)
+		{
+			if (parts[pmr2>>8].type==t)
+				return t;
+		}
+		else
+			return PT_NONE;
+	}
+	return PT_NONE;
 }
 
 
 int nearest_part(int ci, int t)
 {
-    int distance = MAX_DISTANCE;
-    int ndistance = 0;
-    int id = -1;
-    int i = 0;
-    int cx = (int)parts[ci].x;
-    int cy = (int)parts[ci].y;
-    for (i=0; i<NPART; i++)
-    {
-        if (parts[i].type==t&&!parts[i].life&&i!=ci)
-        {
-            ndistance = abs(cx-parts[i].x)+abs(cy-parts[i].y);// Faster but less accurate  Older: sqrt(pow(cx-parts[i].x, 2)+pow(cy-parts[i].y, 2));
-            if (ndistance<distance)
-            {
-                distance = ndistance;
-                id = i;
-            }
-        }
-    }
-    return id;
+	int distance = MAX_DISTANCE;
+	int ndistance = 0;
+	int id = -1;
+	int i = 0;
+	int cx = (int)parts[ci].x;
+	int cy = (int)parts[ci].y;
+	for (i=0; i<NPART; i++)
+	{
+		if (parts[i].type==t&&!parts[i].life&&i!=ci)
+		{
+			ndistance = abs(cx-parts[i].x)+abs(cy-parts[i].y);// Faster but less accurate  Older: sqrt(pow(cx-parts[i].x, 2)+pow(cy-parts[i].y, 2));
+			if (ndistance<distance)
+			{
+				distance = ndistance;
+				id = i;
+			}
+		}
+	}
+	return id;
 }
 
 void update_particles_i(pixel *vid, int start, int inc)
 {
-	int i, j, x, y, t, nx, ny, r, surround_space, s, lt, rt, nt, nnx, nny, q, golnum, goldelete, z, neighbors;
+	int i, j, x, y, t, nx, ny, r, surround_space, s, lt, rt, nt, nnx, nny, q, golnum, goldelete, z, neighbors, createdsomething;
 	float mv, dx, dy, ix, iy, lx, ly, nrx, nry, dp, ctemph, ctempl;
 	int fin_x, fin_y, clear_x, clear_y;
 	float fin_xf, fin_yf, clear_xf, clear_yf;
@@ -1399,17 +1326,17 @@ void update_particles_i(pixel *vid, int start, int inc)
 			{
 				r = pmap[ny][nx];
 				neighbors = gol2[nx][ny][0];
-				if(neighbors==0 || !(ptypes[r&0xFF].properties&PROP_LIFE || !r&0xFF) || (r>>8)>=NPART)
+				if(neighbors==0 || !(ptypes[r&0xFF].properties&PROP_LIFE || !(r&0xFF)) || (r>>8)>=NPART)
 					continue;
 				for ( golnum = 1; golnum<=NGOL; golnum++)
-					for ( goldelete = 0; goldelete<9; goldelete++)
 					{
-						if (neighbors==goldelete&&gol[nx][ny]==0&&grule[golnum][goldelete]>=2&&gol2[nx][ny][golnum]>=(goldelete%2)+goldelete/2)
+						goldelete = neighbors;
+						if (gol[nx][ny]==0&&grule[golnum][goldelete]>=2&&gol2[nx][ny][golnum]>=(goldelete%2)+goldelete/2)
 						{
 							if (create_part(-1,nx,ny,goltype[golnum-1]))
 								createdsomething = 1;
 						}
-						else if (neighbors-1==goldelete&&gol[nx][ny]==golnum&&(grule[golnum][goldelete]==0||grule[golnum][goldelete]==2))//subtract 1 because it counted itself
+						else if (gol[nx][ny]==golnum&&(grule[golnum][goldelete-1]==0||grule[golnum][goldelete-1]==2))//subtract 1 because it counted itself
 						{
 							if(parts[r>>8].tmp==grule[golnum][9]-1)
 								parts[r>>8].tmp --;
@@ -1442,12 +1369,11 @@ void update_particles_i(pixel *vid, int start, int inc)
 			t = parts[i].type;
 			//printf("parts[%d].type: %d\n", i, parts[i].type);
 
-
-			if (parts[i].life && t!=PT_ACID  && t!=PT_COAL && t!=PT_WOOD && t!=PT_STKM && t!=PT_STKM2 && t!=PT_FUSE && t!=PT_FSEP && t!=PT_BCOL && t!=PT_GOL && t!=PT_SPNG && t!=PT_DEUT)
+			if (parts[i].life && t!=PT_ACID  && t!=PT_COAL && t!=PT_WOOD && t!=PT_STKM && t!=PT_STKM2 && t!=PT_FUSE && t!=PT_FSEP && t!=PT_BCOL && t!=PT_GOL && t!=PT_SPNG && t!=PT_QRTZ && t!=PT_DEUT && t!=PT_PRTO && t!=PT_PRTI)
 			{
 				if (!(parts[i].life==10&&(t==PT_SWCH||t==PT_LCRY||t==PT_PCLN||t==PT_HSWC||t==PT_PUMP)))
 					parts[i].life--;
-				if (parts[i].life<=0 && !(ptypes[t].properties&PROP_CONDUCTS) && t!=PT_ARAY && t!=PT_FIRW && t!=PT_SWCH && t!=PT_PCLN && t!=PT_HSWC && t!=PT_PUMP && t!=PT_SPRK && t!=PT_LAVA && t!=PT_LCRY && t!=PT_QRTZ && t!=PT_GLOW && t!= PT_FOG && t!=PT_PIPE && t!=PT_FRZW &&(t!=PT_ICEI&&parts[i].ctype!=PT_FRZW)&&t!=PT_INST && t!=PT_SHLD1&& t!=PT_SHLD2&& t!=PT_SHLD3&& t!=PT_SHLD4)
+				if (parts[i].life<=0 && !(ptypes[t].properties&PROP_CONDUCTS) && t!=PT_ARAY && t!=PT_FIRW && t!=PT_SWCH && t!=PT_PCLN && t!=PT_HSWC && t!=PT_PUMP && t!=PT_SPRK && t!=PT_LAVA && t!=PT_LCRY && t!=PT_QRTZ && t!=PT_GLOW && t!= PT_FOG && t!=PT_PIPE && t!=PT_FRZW &&(t!=PT_ICEI&&parts[i].ctype!=PT_FRZW)&&t!=PT_INST && t!=PT_SHLD1&& t!=PT_SHLD2&& t!=PT_SHLD3&& t!=PT_SHLD4 && t!=PT_SING)
 				{
 					kill_part(i);
 					continue;
@@ -1786,16 +1712,16 @@ void update_particles_i(pixel *vid, int start, int inc)
 				update_legacy_all(i,x,y,surround_space);
 
 killed:
-            if (parts[i].type == PT_NONE)
-                continue;
+			if (parts[i].type == PT_NONE)
+				continue;
 
-            if (!parts[i].vx&&!parts[i].vy)
-                continue;
+			if (!parts[i].vx&&!parts[i].vy)
+				continue;
 
 #if defined(WIN32) && !defined(__GNUC__)
-            mv = max(fabsf(parts[i].vx), fabsf(parts[i].vy));
+			mv = max(fabsf(parts[i].vx), fabsf(parts[i].vy));
 #else
-            mv = fmaxf(fabsf(parts[i].vx), fabsf(parts[i].vy));
+			mv = fmaxf(fabsf(parts[i].vx), fabsf(parts[i].vy));
 #endif
 			if (mv < ISTP)
 			{
@@ -2111,13 +2037,13 @@ killed:
 			if (ny!=y || nx!=x)
 			{
 				if ((pmap[y][x]>>8)==i) pmap[y][x] = 0;
-				else if (t==PT_PHOT&&(photons[y][x]>>8)==i) photons[y][x] = 0;
+				else if ((photons[y][x]>>8)==i) photons[y][x] = 0;
 				if (nx<CELL || nx>=XRES-CELL || ny<CELL || ny>=YRES-CELL)
 				{
 					kill_part(i);
 					continue;
 				}
-				if (t==PT_PHOT)
+				if (t==PT_PHOT||t==PT_NEUT)
 					photons[ny][nx] = t|(i<<8);
 				else
 					pmap[ny][nx] = t|(i<<8);
@@ -2131,779 +2057,692 @@ killed:
 
 void update_particles(pixel *vid)
 {
-    int i, j, x, y, t, nx, ny, r, cr,cg,cb, l = -1;
-    float lx, ly;
+	int i, j, x, y, t, nx, ny, r, cr,cg,cb, l = -1;
+	float lx, ly;
 #ifdef MT
-    int pt = 0, pc = 0;
-    pthread_t *InterThreads;
+	int pt = 0, pc = 0;
+	pthread_t *InterThreads;
 #endif
 
-    isplayer = 0;  //Needed for player spawning
-    isplayer2 = 0;
-    memset(pmap, 0, sizeof(pmap));
-    memset(photons, 0, sizeof(photons));
-    r = rand()%2;
-    NUM_PARTS = 0;
-    for (j=0; j<NPART; j++)
-    {
-        i = r ? (NPART-1-j) : j;
-        if (parts[i].type)
-        {
-            t = parts[i].type;
-            x = (int)(parts[i].x+0.5f);
-            y = (int)(parts[i].y+0.5f);
-            if (x>=0 && y>=0 && x<XRES && y<YRES && t!=PT_PHOT)
-            {
-                if (t!=PT_NEUT || (pmap[y][x]&0xFF)!=PT_GLAS)
-                    pmap[y][x] = t|(i<<8);
-            }
-            if (t==PT_PHOT)
-                photons[y][x] = t|(i<<8);
-            NUM_PARTS ++;
-        }
-        else
-        {
-            parts[i].life = l;
-            l = i;
-        }
-    }
-    pfree=l;
-    if (cmode==CM_BLOB)
-    {
-        for (y=0; y<YRES/CELL; y++)
-        {
-            for (x=0; x<XRES/CELL; x++)
-            {
-                if (bmap[y][x]==WL_WALL)
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                        {
-                            pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                            drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
+	isplayer = 0;  //Needed for player spawning
+	isplayer2 = 0;
+	memset(pmap, 0, sizeof(pmap));
+	memset(photons, 0, sizeof(photons));
+	r = rand()%2;
+	NUM_PARTS = 0;
+	for (j=0; j<NPART; j++)
+	{
+		i = r ? (NPART-1-j) : j;
+		if (parts[i].type)
+		{
+			t = parts[i].type;
+			x = (int)(parts[i].x+0.5f);
+			y = (int)(parts[i].y+0.5f);
+			if (x>=0 && y>=0 && x<XRES && y<YRES)
+			{
+				if (t==PT_PHOT||t==PT_NEUT)
+					photons[y][x] = t|(i<<8);
+				else
+					pmap[y][x] = t|(i<<8);
+			}
+			NUM_PARTS ++;
+		}
+		else
+		{
+			parts[i].life = l;
+			l = i;
+		}
+	}
+	pfree=l;
+	if (cmode==CM_BLOB)
+	{
+		for (y=0; y<YRES/CELL; y++)
+		{
+			for (x=0; x<XRES/CELL; x++)
+			{
+				if (bmap[y][x]==WL_WALL)
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+						{
+							pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+							drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
 
-                        }
-                if (bmap[y][x]==WL_DESTROYALL)
-                    for (j=0; j<CELL; j+=2)
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                            drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
-                        }
-                if (bmap[y][x]==WL_ALLOWLIQUID)
-                {
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                            if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
-                                drawblob(vid, (x*CELL+i), (y*CELL+j), 0xC0, 0xC0, 0xC0);
-                            }
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_FAN)
-                    for (j=0; j<CELL; j+=2)
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x8080FF);
-                            drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0xFF);
-                        }
-                if (bmap[y][x]==WL_DETECT)
-                {
-                    for (j=0; j<CELL; j+=2)
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFF8080);
-                            drawblob(vid, (x*CELL+i), (y*CELL+j), 0xFF, 0x80, 0x80);
-                        }
-                    if (emap[y][x])
-                    {
-                        cr = 255;
-                        cg = 32;
-                        cb = 8;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_EWALL)
-                {
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 128;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                        for (j=0; j<CELL; j++)
-                            for (i=0; i<CELL; i++)
-                                if (i&j&1)
-                                {
-                                    vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                                    drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
-                                }
-                    }
-                    else
-                    {
-                        for (j=0; j<CELL; j++)
-                            for (i=0; i<CELL; i++)
-                                pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                        for (j=0; j<CELL; j++)
-                            for (i=0; i<CELL; i++)
-                                if (!(i&j&1))
-                                {
-                                    vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                                    drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
-                                }
-                    }
-                }
-                if (bmap[y][x]==WL_WALLELEC)
-                {
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                        {
-                            pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                            if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
-                                drawblob(vid, (x*CELL+i), (y*CELL+j), 0xC0, 0xC0, 0xC0);
-                            }
-                            else
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                                drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
-                            }
-                        }
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWALLELEC)
-                {
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                        {
-                            //pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                            if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFFFF22);
-                                drawblob(vid, (x*CELL+i), (y*CELL+j), 0xFF, 0xFF, 0x22);
-                            }
+						}
+				if (bmap[y][x]==WL_DESTROYALL)
+					for (j=0; j<CELL; j+=2)
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+							drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
+						}
+				if (bmap[y][x]==WL_ALLOWLIQUID)
+				{
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+							if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
+								drawblob(vid, (x*CELL+i), (y*CELL+j), 0xC0, 0xC0, 0xC0);
+							}
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_FAN)
+					for (j=0; j<CELL; j+=2)
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x8080FF);
+							drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0xFF);
+						}
+				if (bmap[y][x]==WL_DETECT)
+				{
+					for (j=0; j<CELL; j+=2)
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFF8080);
+							drawblob(vid, (x*CELL+i), (y*CELL+j), 0xFF, 0x80, 0x80);
+						}
+					if (emap[y][x])
+					{
+						cr = 255;
+						cg = 32;
+						cb = 8;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_EWALL)
+				{
+					if (emap[y][x])
+					{
+						cr = cg = cb = 128;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+						for (j=0; j<CELL; j++)
+							for (i=0; i<CELL; i++)
+								if (i&j&1)
+								{
+									vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+									drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
+								}
+					}
+					else
+					{
+						for (j=0; j<CELL; j++)
+							for (i=0; i<CELL; i++)
+								pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+						for (j=0; j<CELL; j++)
+							for (i=0; i<CELL; i++)
+								if (!(i&j&1))
+								{
+									vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+									drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
+								}
+					}
+				}
+				if (bmap[y][x]==WL_WALLELEC)
+				{
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+						{
+							pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+							if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
+								drawblob(vid, (x*CELL+i), (y*CELL+j), 0xC0, 0xC0, 0xC0);
+							}
+							else
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+								drawblob(vid, (x*CELL+i), (y*CELL+j), 0x80, 0x80, 0x80);
+							}
+						}
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWALLELEC)
+				{
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+						{
+							//pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+							if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFFFF22);
+								drawblob(vid, (x*CELL+i), (y*CELL+j), 0xFF, 0xFF, 0x22);
+							}
 
-                        }
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWGAS)
-                {
-                    for (j=0; j<CELL; j+=2)
-                    {
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x579777);
-                            drawblob(vid, (x*CELL+i), (y*CELL+j), 0x57, 0x97, 0x77);
-                        }
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWAIR)
-                {
-                    for (j=0; j<CELL; j+=2)
-                    {
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x3C3C3C);
-                            drawblob(vid, (x*CELL+i), (y*CELL+j), 0x3C, 0x3C, 0x3C);
-                        }
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWSOLID)
-                {
-                    for (j=0; j<CELL; j+=2)
-                    {
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x575757);
-                            drawblob(vid, (x*CELL+i), (y*CELL+j), 0x57, 0x57, 0x57);
-                        }
-                    }
-                }
-                if (bmap[y][x]==WL_EHOLE)
-                {
-                    if (emap[y][x])
-                    {
-                        for (j=0; j<CELL; j++)
-                        {
-                            for (i=(j)&1; i<CELL; i++)
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
-                                drawblob(vid, (x*CELL+i), (y*CELL+j), 0x24, 0x24, 0x24);
-                            }
-                        }
-                        for (j=0; j<CELL; j+=2)
-                        {
-                            for (i=(j)&1; i<CELL; i+=2)
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x000000);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (j=0; j<CELL; j+=2)
-                        {
-                            for (i=(j)&1; i<CELL; i+=2)
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
-                                drawblob(vid, (x*CELL+i), (y*CELL+j), 0x24, 0x24, 0x24);
-                            }
-                        }
-                    }
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (emap[y][x] && (!sys_pause||framerender))
-                    emap[y][x] --;
-            }
-        }
-    }
-    else
-    {
-        for (y=0; y<YRES/CELL; y++)
-        {
-            for (x=0; x<XRES/CELL; x++)
-            {
-                if (bmap[y][x]==WL_WALL)
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                        {
-                            pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                        }
-                if (bmap[y][x]==WL_DESTROYALL)
-                    for (j=0; j<CELL; j+=2)
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                if (bmap[y][x]==WL_ALLOWLIQUID)
-                {
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                            if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_FAN)
-                    for (j=0; j<CELL; j+=2)
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x8080FF);
-                if (bmap[y][x]==WL_DETECT)
-                {
-                    for (j=0; j<CELL; j+=2)
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFF8080);
-                    if (emap[y][x])
-                    {
-                        cr = 255;
-                        cg = 32;
-                        cb = 8;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_EWALL)
-                {
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 128;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                        for (j=0; j<CELL; j++)
-                            for (i=0; i<CELL; i++)
-                                if (i&j&1)
-                                    vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                    }
-                    else
-                    {
-                        for (j=0; j<CELL; j++)
-                            for (i=0; i<CELL; i++)
-                                pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                        for (j=0; j<CELL; j++)
-                            for (i=0; i<CELL; i++)
-                                if (!(i&j&1))
-                                    vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                    }
-                }
-                if (bmap[y][x]==WL_WALLELEC)
-                {
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                        {
-                            pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                            if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
-                            else
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
-                        }
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWALLELEC)
-                {
-                    for (j=0; j<CELL; j++)
-                        for (i=0; i<CELL; i++)
-                        {
-                            //pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
-                            if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFFFF22);
+						}
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWGAS)
+				{
+					for (j=0; j<CELL; j+=2)
+					{
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x579777);
+							drawblob(vid, (x*CELL+i), (y*CELL+j), 0x57, 0x97, 0x77);
+						}
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWAIR)
+				{
+					for (j=0; j<CELL; j+=2)
+					{
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x3C3C3C);
+							drawblob(vid, (x*CELL+i), (y*CELL+j), 0x3C, 0x3C, 0x3C);
+						}
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWSOLID)
+				{
+					for (j=0; j<CELL; j+=2)
+					{
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x575757);
+							drawblob(vid, (x*CELL+i), (y*CELL+j), 0x57, 0x57, 0x57);
+						}
+					}
+				}
+				if (bmap[y][x]==WL_EHOLE)
+				{
+					if (emap[y][x])
+					{
+						for (j=0; j<CELL; j++)
+						{
+							for (i=(j)&1; i<CELL; i++)
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
+								drawblob(vid, (x*CELL+i), (y*CELL+j), 0x24, 0x24, 0x24);
+							}
+						}
+						for (j=0; j<CELL; j+=2)
+						{
+							for (i=(j)&1; i<CELL; i+=2)
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x000000);
+							}
+						}
+					}
+					else
+					{
+						for (j=0; j<CELL; j+=2)
+						{
+							for (i=(j)&1; i<CELL; i+=2)
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
+								drawblob(vid, (x*CELL+i), (y*CELL+j), 0x24, 0x24, 0x24);
+							}
+						}
+					}
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (emap[y][x] && (!sys_pause||framerender))
+					emap[y][x] --;
+			}
+		}
+	}
+	else
+	{
+		for (y=0; y<YRES/CELL; y++)
+		{
+			for (x=0; x<XRES/CELL; x++)
+			{
+				if (bmap[y][x]==WL_WALL)
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+						{
+							pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+						}
+				if (bmap[y][x]==WL_DESTROYALL)
+					for (j=0; j<CELL; j+=2)
+						for (i=(j>>1)&1; i<CELL; i+=2)
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+				if (bmap[y][x]==WL_ALLOWLIQUID)
+				{
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+							if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_FAN)
+					for (j=0; j<CELL; j+=2)
+						for (i=(j>>1)&1; i<CELL; i+=2)
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x8080FF);
+				if (bmap[y][x]==WL_DETECT)
+				{
+					for (j=0; j<CELL; j+=2)
+						for (i=(j>>1)&1; i<CELL; i+=2)
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFF8080);
+					if (emap[y][x])
+					{
+						cr = 255;
+						cg = 32;
+						cb = 8;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_EWALL)
+				{
+					if (emap[y][x])
+					{
+						cr = cg = cb = 128;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+						for (j=0; j<CELL; j++)
+							for (i=0; i<CELL; i++)
+								if (i&j&1)
+									vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+					}
+					else
+					{
+						for (j=0; j<CELL; j++)
+							for (i=0; i<CELL; i++)
+								pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+						for (j=0; j<CELL; j++)
+							for (i=0; i<CELL; i++)
+								if (!(i&j&1))
+									vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+					}
+				}
+				if (bmap[y][x]==WL_WALLELEC)
+				{
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+						{
+							pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+							if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xC0C0C0);
+							else
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x808080);
+						}
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWALLELEC)
+				{
+					for (j=0; j<CELL; j++)
+						for (i=0; i<CELL; i++)
+						{
+							//pmap[y*CELL+j][x*CELL+i] = 0x7FFFFFFF;
+							if (!((y*CELL+j)%2) && !((x*CELL+i)%2))
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0xFFFF22);
 
-                        }
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWAIR)
-                {
-                    for (j=0; j<CELL; j+=2)
-                    {
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x3C3C3C);
-                        }
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWGAS)
-                {
-                    for (j=0; j<CELL; j+=2)
-                    {
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x579777);
-                        }
-                    }
-                }
-                if (bmap[y][x]==WL_ALLOWSOLID)
-                {
-                    for (j=0; j<CELL; j+=2)
-                    {
-                        for (i=(j>>1)&1; i<CELL; i+=2)
-                        {
-                            vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x575757);
-                        }
-                    }
-                }
-                if (bmap[y][x]==WL_EHOLE)
-                {
-                    if (emap[y][x])
-                    {
-                        for (j=0; j<CELL; j++)
-                        {
-                            for (i=(j)&1; i<CELL; i++)
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
-                            }
-                        }
-                        for (j=0; j<CELL; j+=2)
-                        {
-                            for (i=(j)&1; i<CELL; i+=2)
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x000000);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (j=0; j<CELL; j+=2)
-                        {
-                            for (i=(j)&1; i<CELL; i+=2)
-                            {
-                                vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
-                            }
-                        }
-                    }
-                    if (emap[y][x])
-                    {
-                        cr = cg = cb = 16;
-                        cr += fire_r[y][x];
-                        if (cr > 255) cr = 255;
-                        fire_r[y][x] = cr;
-                        cg += fire_g[y][x];
-                        if (cg > 255) cg = 255;
-                        fire_g[y][x] = cg;
-                        cb += fire_b[y][x];
-                        if (cb > 255) cb = 255;
-                        fire_b[y][x] = cb;
-                    }
-                }
-                if (emap[y][x] && (!sys_pause||framerender))
-                    emap[y][x] --;
-            }
-        }
-    }
+						}
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWAIR)
+				{
+					for (j=0; j<CELL; j+=2)
+					{
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x3C3C3C);
+						}
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWGAS)
+				{
+					for (j=0; j<CELL; j+=2)
+					{
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x579777);
+						}
+					}
+				}
+				if (bmap[y][x]==WL_ALLOWSOLID)
+				{
+					for (j=0; j<CELL; j+=2)
+					{
+						for (i=(j>>1)&1; i<CELL; i+=2)
+						{
+							vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x575757);
+						}
+					}
+				}
+				if (bmap[y][x]==WL_EHOLE)
+				{
+					if (emap[y][x])
+					{
+						for (j=0; j<CELL; j++)
+						{
+							for (i=(j)&1; i<CELL; i++)
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
+							}
+						}
+						for (j=0; j<CELL; j+=2)
+						{
+							for (i=(j)&1; i<CELL; i+=2)
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x000000);
+							}
+						}
+					}
+					else
+					{
+						for (j=0; j<CELL; j+=2)
+						{
+							for (i=(j)&1; i<CELL; i+=2)
+							{
+								vid[(y*CELL+j)*(XRES+BARSIZE)+(x*CELL+i)] = PIXPACK(0x242424);
+							}
+						}
+					}
+					if (emap[y][x])
+					{
+						cr = cg = cb = 16;
+						cr += fire_r[y][x];
+						if (cr > 255) cr = 255;
+						fire_r[y][x] = cr;
+						cg += fire_g[y][x];
+						if (cg > 255) cg = 255;
+						fire_g[y][x] = cg;
+						cb += fire_b[y][x];
+						if (cb > 255) cb = 255;
+						fire_b[y][x] = cb;
+					}
+				}
+				if (emap[y][x] && (!sys_pause||framerender))
+					emap[y][x] --;
+			}
+		}
+	}
 
-    update_particles_i(vid, 0, 1);
+	update_particles_i(vid, 0, 1);
 
-    for (y=0; y<YRES/CELL; y++)
-        for (x=0; x<XRES/CELL; x++)
-            if (bmap[y][x]==WL_STREAM)
-            {
-                lx = x*CELL + CELL*0.5f;
-                ly = y*CELL + CELL*0.5f;
-                for (t=0; t<1024; t++)
-                {
-                    nx = (int)(lx+0.5f);
-                    ny = (int)(ly+0.5f);
-                    if (nx<0 || nx>=XRES || ny<0 || ny>=YRES)
-                        break;
-                    addpixel(vid, nx, ny, 255, 255, 255, 64);
-                    i = nx/CELL;
-                    j = ny/CELL;
-                    lx += vx[j][i]*0.125f;
-                    ly += vy[j][i]*0.125f;
-                    if (bmap[j][i]==WL_STREAM && i!=x && j!=y)
-                        break;
-                }
-                drawtext(vid, x*CELL, y*CELL-2, "\x8D", 255, 255, 255, 128);
-            }
+	for (y=0; y<YRES/CELL; y++)
+		for (x=0; x<XRES/CELL; x++)
+			if (bmap[y][x]==WL_STREAM)
+			{
+				lx = x*CELL + CELL*0.5f;
+				ly = y*CELL + CELL*0.5f;
+				for (t=0; t<1024; t++)
+				{
+					nx = (int)(lx+0.5f);
+					ny = (int)(ly+0.5f);
+					if (nx<0 || nx>=XRES || ny<0 || ny>=YRES)
+						break;
+					addpixel(vid, nx, ny, 255, 255, 255, 64);
+					i = nx/CELL;
+					j = ny/CELL;
+					lx += vx[j][i]*0.125f;
+					ly += vy[j][i]*0.125f;
+					if (bmap[j][i]==WL_STREAM && i!=x && j!=y)
+						break;
+				}
+				drawtext(vid, x*CELL, y*CELL-2, "\x8D", 255, 255, 255, 128);
+			}
 
-}
-
-void rotate_area(int area_x, int area_y, int area_w, int area_h, int invert)
-{
-    //TODO: MSCC doesn't like arrays who's size is determined at runtime.
-#if !(defined(WIN32) && !defined(__GNUC__))
-    int cx = 0;
-    int cy = 0;
-    unsigned tpmap[area_h][area_w];
-    unsigned rtpmap[area_w][area_h];
-    unsigned char tbmap[area_h/CELL][area_w/CELL];
-    unsigned char rtbmap[area_w/CELL][area_h/CELL];
-    float tfvy[area_h/CELL][area_w/CELL];
-    float tfvx[area_h/CELL][area_w/CELL];
-    for (cy=0; cy<area_h; cy++)
-    {
-        for (cx=0; cx<area_w; cx++)//save walls to temp
-        {
-            if (area_x + cx<XRES&&area_y + cy<YRES)
-            {
-                if (bmap[(cy+area_y)/CELL][(cx+area_x)/CELL])
-                {
-                    tbmap[cy/CELL][cx/CELL] = bmap[(cy+area_y)/CELL][(cx+area_x)/CELL];
-                    if (bmap[(cy+area_y)/CELL][(cx+area_x)/CELL]==WL_FAN)
-                    {
-                        tfvx[cy/CELL][cx/CELL] = fvx[(cy+area_y)/CELL][(cx+area_x)/CELL];
-                        tfvy[cy/CELL][cx/CELL] = fvy[(cy+area_y)/CELL][(cx+area_x)/CELL];
-                    }
-                }
-                else
-                {
-                    tbmap[cy/CELL][cx/CELL] = 0;
-                    tfvx[cy/CELL][cx/CELL] = 0;
-                    tfvy[cy/CELL][cx/CELL] = 0;
-                }
-            }
-        }
-    }
-    for (cy=0; cy<area_h; cy++)
-    {
-        for (cx=0; cx<area_w; cx++)//save particles to temp
-        {
-            if ((area_x + cx<XRES&&area_y + cy<YRES))
-            {
-                tpmap[cy][cx] = pmap[(int)(cy+area_y+0.5f)][(int)(cx+area_x+0.5f)];
-            }
-            else
-                tpmap[(int)(cy+0.5f)][(int)(cx+0.5f)] = 0;
-        }
-    }
-    for (cy=0; cy<area_w; cy++)
-    {
-        for (cx=0; cx<area_h; cx++)//rotate temp arrays
-        {
-            if (invert)
-            {
-                rtbmap[cy/CELL][((area_h-1)-cx)/CELL] = tbmap[cy/CELL][cx/CELL];
-                rtpmap[cy][(area_h-1)-cx] = tpmap[(int)(cy+0.5f)][(int)(cx+0.5f)];
-                tfvx[cy/CELL][((area_h-1)-cx)/CELL] = -tfvx[cy/CELL][cx/CELL];
-                tfvy[cy/CELL][((area_h-1)-cx)/CELL] = tfvy[cy/CELL][cx/CELL];
-            }
-            else
-            {
-                rtbmap[((area_h-1)-cx)/CELL][cy/CELL] = tbmap[cy/CELL][cx/CELL];
-                rtpmap[(area_h-1)-cx][cy] = tpmap[(int)(cy+0.5f)][(int)(cx+0.5f)];
-                tfvy[((area_h-1)-cx)/CELL][cy/CELL] = -tfvx[cy/CELL][cx/CELL];
-                tfvx[((area_h-1)-cx)/CELL][cy/CELL] = tfvy[cy/CELL][cx/CELL];
-            }
-        }
-    }
-    for (cy=0; cy<area_w; cy++)
-    {
-        for (cx=0; cx<area_h; cx++)//move particles and walls
-        {
-            if (area_x + cx<XRES&&area_y + cy<YRES)
-            {
-                if ((rtpmap[cy][cx]>>8)<=NPART&&rtpmap[cy][cx])
-                {
-                    parts[rtpmap[(int)(cy+0.5f)][(int)(cx+0.5f)]>>8].x = area_x +cx;
-                    parts[rtpmap[(int)(cy+0.5f)][(int)(cx+0.5f)]>>8].y = area_y +cy;
-                }
-                bmap[(area_y+cy)/CELL][(area_x+cx)/CELL] = rtbmap[cy/CELL][cx/CELL];
-                fvy[(area_y+cy)/CELL][(area_x+cx)/CELL] = tfvy[cy/CELL][cx/CELL];
-                fvx[(area_y+cy)/CELL][(area_x+cx)/CELL] = tfvx[cy/CELL][cx/CELL];
-            }
-        }
-    }
-#endif
 }
 
 void clear_area(int area_x, int area_y, int area_w, int area_h)
 {
-    int cx = 0;
-    int cy = 0;
-    for (cy=0; cy<area_h; cy++)
-    {
-        for (cx=0; cx<area_w; cx++)
-        {
-            bmap[(cy+area_y)/CELL][(cx+area_x)/CELL] = 0;
-            delete_part(cx+area_x, cy+area_y);
-        }
-    }
+	int cx = 0;
+	int cy = 0;
+	for (cy=0; cy<area_h; cy++)
+	{
+		for (cx=0; cx<area_w; cx++)
+		{
+			bmap[(cy+area_y)/CELL][(cx+area_x)/CELL] = 0;
+			delete_part(cx+area_x, cy+area_y);
+		}
+	}
 }
 
 void create_box(int x1, int y1, int x2, int y2, int c)
 {
-    int i, j;
-    if (x1>x2)
-    {
-        i = x2;
-        x2 = x1;
-        x1 = i;
-    }
-    if (y1>y2)
-    {
-        j = y2;
-        y2 = y1;
-        y1 = j;
-    }
-    for (j=y1; j<=y2; j++)
-        for (i=x1; i<=x2; i++)
-            create_parts(i, j, 0, 0, c);
+	int i, j;
+	if (x1>x2)
+	{
+		i = x2;
+		x2 = x1;
+		x1 = i;
+	}
+	if (y1>y2)
+	{
+		j = y2;
+		y2 = y1;
+		y1 = j;
+	}
+	for (j=y1; j<=y2; j++)
+		for (i=x1; i<=x2; i++)
+			create_parts(i, j, 0, 0, c);
 }
 
 int flood_parts(int x, int y, int c, int cm, int bm)
 {
-    int x1, x2, dy = (c<PT_NUM)?1:CELL;
-    int co = c, wall;
-    if (cm==PT_INST&&co==PT_SPRK)
-        if ((pmap[y][x]&0xFF)==PT_SPRK)
-            return 0;
-    if (c>=UI_WALLSTART&&c<=UI_WALLSTART+UI_WALLCOUNT)
-    {
-        wall = c-100;
-    }
-    if (cm==-1)
-    {
-        if (c==0)
-        {
-            cm = pmap[y][x]&0xFF;
-            if (!cm)
-                return 0;
-            if (REPLACE_MODE && cm!=SLALT)
-                return 0;
-        }
-        else
-            cm = 0;
-    }
-    if (bm==-1)
-    {
-        if (wall==WL_ERASE)
-        {
-            bm = bmap[y/CELL][x/CELL];
-            if (!bm)
-                return 0;
-            if (bm==WL_WALL)
-                cm = 0xFF;
-        }
-        else
-            bm = 0;
-    }
+	int x1, x2, dy = (c<PT_NUM)?1:CELL;
+	int co = c;
+	if (cm==PT_INST&&co==PT_SPRK)
+		if ((pmap[y][x]&0xFF)==PT_SPRK)
+			return 0;
+	if (cm==-1)
+	{
+		if (c==0)
+		{
+			cm = pmap[y][x]&0xFF;
+			if (!cm)
+				return 0;
+			if (REPLACE_MODE && cm!=SLALT)
+				return 0;
+		}
+		else
+			cm = 0;
+	}
+	if (bm==-1)
+	{
+		if (c-UI_WALLSTART+UI_ACTUALSTART==WL_ERASE)
+		{
+			bm = bmap[y/CELL][x/CELL];
+			if (!bm)
+				return 0;
+			if (bm==WL_WALL)
+				cm = 0xFF;
+		}
+		else
+			bm = 0;
+	}
 
-    if (((pmap[y][x]&0xFF)!=cm || bmap[y/CELL][x/CELL]!=bm )||( (sdl_mod & (KMOD_CAPS)) && cm!=SLALT))
-        return 1;
+	if (((pmap[y][x]&0xFF)!=cm || bmap[y/CELL][x/CELL]!=bm )||( (sdl_mod & (KMOD_CAPS)) && cm!=SLALT && !(cm==PT_INST&&co==PT_SPRK)))
+		return 1;
 
-    // go left as far as possible
-    x1 = x2 = x;
-    while (x1>=CELL)
-    {
-        if ((pmap[y][x1-1]&0xFF)!=cm || bmap[y/CELL][(x1-1)/CELL]!=bm)
-        {
-            break;
-        }
-        x1--;
-    }
-    while (x2<XRES-CELL)
-    {
-        if ((pmap[y][x2+1]&0xFF)!=cm || bmap[y/CELL][(x2+1)/CELL]!=bm)
-        {
-            break;
-        }
-        x2++;
-    }
+	// go left as far as possible
+	x1 = x2 = x;
+	while (x1>=CELL)
+	{
+		if ((pmap[y][x1-1]&0xFF)!=cm || bmap[y/CELL][(x1-1)/CELL]!=bm)
+		{
+			break;
+		}
+		x1--;
+	}
+	while (x2<XRES-CELL)
+	{
+		if ((pmap[y][x2+1]&0xFF)!=cm || bmap[y/CELL][(x2+1)/CELL]!=bm)
+		{
+			break;
+		}
+		x2++;
+	}
 
-    // fill span
-    for (x=x1; x<=x2; x++)
-    {
-        if (!create_parts(x, y, 0, 0, co))
-            return 0;
-    }
-    // fill children
-    if (cm==PT_INST&&co==PT_SPRK)//wire crossing for INST
-    {
-        if (y>=CELL+dy && x1==x2 &&
-                ((pmap[y-1][x1-1]&0xFF)==PT_INST||(pmap[y-1][x1-1]&0xFF)==PT_SPRK) && ((pmap[y-1][x1]&0xFF)==PT_INST||(pmap[y-1][x1]&0xFF)==PT_SPRK) && ((pmap[y-1][x1+1]&0xFF)==PT_INST || (pmap[y-1][x1+1]&0xFF)==PT_SPRK) &&
-                (pmap[y-2][x1-1]&0xFF)!=PT_INST && ((pmap[y-2][x1]&0xFF)==PT_INST ||(pmap[y-2][x1]&0xFF)==PT_SPRK) && (pmap[y-2][x1+1]&0xFF)!=PT_INST)
-            flood_parts(x1, y-2, co, cm, bm);
-        else if (y>=CELL+dy)
-            for (x=x1; x<=x2; x++)
-                if ((pmap[y-1][x]&0xFF)!=PT_SPRK)
-                {
-                    if (x==x1 || x==x2 || y>=YRES-CELL-1 ||
-                            (pmap[y-1][x-1]&0xFF)==PT_INST || (pmap[y-1][x+1]&0xFF)==PT_INST ||
-                            (pmap[y+1][x-1]&0xFF)==PT_INST || ((pmap[y+1][x]&0xFF)!=PT_INST&&(pmap[y+1][x]&0xFF)!=PT_SPRK) || (pmap[y+1][x+1]&0xFF)==PT_INST)
-                        flood_parts(x, y-dy, co, cm, bm);
+	// fill span
+	for (x=x1; x<=x2; x++)
+	{
+		if(cm==PT_INST&&co==PT_SPRK)
+		{
+			if(create_part(-1,x, y, co)==-1)
+				return 0;
+		}
+		else if (!create_parts(x, y, 0, 0, co))
+			return 0;
+	}
+	// fill children
+	if (cm==PT_INST&&co==PT_SPRK)//wire crossing for INST
+	{
+		if (y>=CELL+dy && x1==x2 &&
+		        ((pmap[y-1][x1-1]&0xFF)==PT_INST||(pmap[y-1][x1-1]&0xFF)==PT_SPRK) && ((pmap[y-1][x1]&0xFF)==PT_INST||(pmap[y-1][x1]&0xFF)==PT_SPRK) && ((pmap[y-1][x1+1]&0xFF)==PT_INST || (pmap[y-1][x1+1]&0xFF)==PT_SPRK) &&
+		        (pmap[y-2][x1-1]&0xFF)!=PT_INST && ((pmap[y-2][x1]&0xFF)==PT_INST ||(pmap[y-2][x1]&0xFF)==PT_SPRK) && (pmap[y-2][x1+1]&0xFF)!=PT_INST)
+			flood_parts(x1, y-2, co, cm, bm);
+		else if (y>=CELL+dy)
+			for (x=x1; x<=x2; x++)
+				if ((pmap[y-1][x]&0xFF)!=PT_SPRK)
+				{
+					if (x==x1 || x==x2 || y>=YRES-CELL-1 ||
+					        (pmap[y-1][x-1]&0xFF)==PT_INST || (pmap[y-1][x+1]&0xFF)==PT_INST ||
+					        (pmap[y+1][x-1]&0xFF)==PT_INST || ((pmap[y+1][x]&0xFF)!=PT_INST&&(pmap[y+1][x]&0xFF)!=PT_SPRK) || (pmap[y+1][x+1]&0xFF)==PT_INST)
+						flood_parts(x, y-dy, co, cm, bm);
 
-                }
+				}
 
-        if (y<YRES-CELL-dy && x1==x2 &&
-                ((pmap[y+1][x1-1]&0xFF)==PT_INST||(pmap[y+1][x1-1]&0xFF)==PT_SPRK) && ((pmap[y+1][x1]&0xFF)==PT_INST||(pmap[y+1][x1]&0xFF)==PT_SPRK) && ((pmap[y+1][x1+1]&0xFF)==PT_INST || (pmap[y+1][x1+1]&0xFF)==PT_SPRK) &&
-                (pmap[y+2][x1-1]&0xFF)!=PT_INST && ((pmap[y+2][x1]&0xFF)==PT_INST ||(pmap[y+2][x1]&0xFF)==PT_SPRK) && (pmap[y+2][x1+1]&0xFF)!=PT_INST)
-            flood_parts(x1, y+2, co, cm, bm);
-        else if (y<YRES-CELL-dy)
-            for (x=x1; x<=x2; x++)
-                if ((pmap[y+1][x]&0xFF)!=PT_SPRK)
-                {
-                    if (x==x1 || x==x2 || y<0 ||
-                            (pmap[y+1][x-1]&0xFF)==PT_INST || (pmap[y+1][x+1]&0xFF)==PT_INST ||
-                            (pmap[y-1][x-1]&0xFF)==PT_INST || ((pmap[y-1][x]&0xFF)!=PT_INST&&(pmap[y-1][x]&0xFF)!=PT_SPRK) || (pmap[y-1][x+1]&0xFF)==PT_INST)
-                        flood_parts(x, y+dy, co, cm, bm);
+		if (y<YRES-CELL-dy && x1==x2 &&
+		        ((pmap[y+1][x1-1]&0xFF)==PT_INST||(pmap[y+1][x1-1]&0xFF)==PT_SPRK) && ((pmap[y+1][x1]&0xFF)==PT_INST||(pmap[y+1][x1]&0xFF)==PT_SPRK) && ((pmap[y+1][x1+1]&0xFF)==PT_INST || (pmap[y+1][x1+1]&0xFF)==PT_SPRK) &&
+		        (pmap[y+2][x1-1]&0xFF)!=PT_INST && ((pmap[y+2][x1]&0xFF)==PT_INST ||(pmap[y+2][x1]&0xFF)==PT_SPRK) && (pmap[y+2][x1+1]&0xFF)!=PT_INST)
+			flood_parts(x1, y+2, co, cm, bm);
+		else if (y<YRES-CELL-dy)
+			for (x=x1; x<=x2; x++)
+				if ((pmap[y+1][x]&0xFF)!=PT_SPRK)
+				{
+					if (x==x1 || x==x2 || y<0 ||
+					        (pmap[y+1][x-1]&0xFF)==PT_INST || (pmap[y+1][x+1]&0xFF)==PT_INST ||
+					        (pmap[y-1][x-1]&0xFF)==PT_INST || ((pmap[y-1][x]&0xFF)!=PT_INST&&(pmap[y-1][x]&0xFF)!=PT_SPRK) || (pmap[y-1][x+1]&0xFF)==PT_INST)
+						flood_parts(x, y+dy, co, cm, bm);
 
-                }
-    }
-    else
-    {
-        if (y>=CELL+dy)
-            for (x=x1; x<=x2; x++)
-                if ((pmap[y-dy][x]&0xFF)==cm && bmap[(y-dy)/CELL][x/CELL]==bm)
-                    if (!flood_parts(x, y-dy, co, cm, bm))
-                        return 0;
-        if (y<YRES-CELL-dy)
-            for (x=x1; x<=x2; x++)
-                if ((pmap[y+dy][x]&0xFF)==cm && bmap[(y+dy)/CELL][x/CELL]==bm)
-                    if (!flood_parts(x, y+dy, co, cm, bm))
-                        return 0;
-    }
-    if (!(cm==PT_INST&&co==PT_SPRK))
-        return 1;
+				}
+	}
+	else
+	{
+		if (y>=CELL+dy)
+			for (x=x1; x<=x2; x++)
+				if ((pmap[y-dy][x]&0xFF)==cm && bmap[(y-dy)/CELL][x/CELL]==bm)
+					if (!flood_parts(x, y-dy, co, cm, bm))
+						return 0;
+		if (y<YRES-CELL-dy)
+			for (x=x1; x<=x2; x++)
+				if ((pmap[y+dy][x]&0xFF)==cm && bmap[(y+dy)/CELL][x/CELL]==bm)
+					if (!flood_parts(x, y+dy, co, cm, bm))
+						return 0;
+	}
+	if (!(cm==PT_INST&&co==PT_SPRK))
+		return 1;
 }
 
 int create_parts(int x, int y, int rx, int ry, int c)
@@ -3004,10 +2843,14 @@ int create_parts(int x, int y, int rx, int ry, int c)
 			for (j=-ry; j<=ry; j++)
 				for (i=-rx; i<=rx; i++)
 					if ((CURRENT_BRUSH==CIRCLE_BRUSH && (pow(i,2))/(pow(rx,2))+(pow(j,2))/(pow(ry,2))<=1)||(CURRENT_BRUSH==SQUARE_BRUSH&&i*j<=ry*rx))
+					{
+						if( x+i<0 || y+j<0 || x+i>=XRES || y+j>=YRES)
+							continue;
 						if (!REPLACE_MODE)
 							create_part(-2, x+i, y+j, c);
 						else if ((pmap[y+j][x+i]&0xFF)==SLALT&&SLALT!=0)
 							create_part(-2, x+i, y+j, c);
+					}
 		return 1;
 	}
 
@@ -3046,6 +2889,8 @@ int create_parts(int x, int y, int rx, int ry, int c)
 				for (i=-rx; i<=rx; i++)
 					if ((CURRENT_BRUSH==CIRCLE_BRUSH && (pow(i,2))/(pow(rx,2))+(pow(j,2))/(pow(ry,2))<=1)||(CURRENT_BRUSH==SQUARE_BRUSH&&i*j<=ry*rx))
 					{
+						if( x+i<0 || y+j<0 || x+i>=XRES || y+j>=YRES)
+							continue;
 						if ((pmap[y+j][x+i]&0xFF)!=SLALT&&SLALT!=0)
 							continue;
 						if ((pmap[y+j][x+i]))
@@ -3074,53 +2919,199 @@ int create_parts(int x, int y, int rx, int ry, int c)
 
 void create_line(int x1, int y1, int x2, int y2, int rx, int ry, int c)
 {
-    int cp=abs(y2-y1)>abs(x2-x1), x, y, dx, dy, sy;
-    float e, de;
-    if (cp)
-    {
-        y = x1;
-        x1 = y1;
-        y1 = y;
-        y = x2;
-        x2 = y2;
-        y2 = y;
-    }
-    if (x1 > x2)
-    {
-        y = x1;
-        x1 = x2;
-        x2 = y;
-        y = y1;
-        y1 = y2;
-        y2 = y;
-    }
-    dx = x2 - x1;
-    dy = abs(y2 - y1);
-    e = 0.0f;
-    if (dx)
-        de = dy/(float)dx;
-    else
-        de = 0.0f;
-    y = y1;
-    sy = (y1<y2) ? 1 : -1;
-    for (x=x1; x<=x2; x++)
-    {
-        if (cp)
-            create_parts(y, x, rx, ry, c);
-        else
-            create_parts(x, y, rx, ry, c);
-        e += de;
-        if (e >= 0.5f)
-        {
-            y += sy;
-            if (c==WL_EHOLE || c==WL_ALLOWGAS || c==WL_ALLOWALLELEC || c==WL_ALLOWSOLID || c==WL_ALLOWAIR || c==WL_WALL || c==WL_DESTROYALL || c==WL_ALLOWLIQUID || c==WL_FAN || c==WL_STREAM || c==WL_DETECT || c==WL_EWALL || c==WL_WALLELEC || !(rx+ry))
-            {
-                if (cp)
-                    create_parts(y, x, rx, ry, c);
-                else
-                    create_parts(x, y, rx, ry, c);
-            }
-            e -= 1.0f;
-        }
-    }
+	int cp=abs(y2-y1)>abs(x2-x1), x, y, dx, dy, sy;
+	float e, de;
+	if (cp)
+	{
+		y = x1;
+		x1 = y1;
+		y1 = y;
+		y = x2;
+		x2 = y2;
+		y2 = y;
+	}
+	if (x1 > x2)
+	{
+		y = x1;
+		x1 = x2;
+		x2 = y;
+		y = y1;
+		y1 = y2;
+		y2 = y;
+	}
+	dx = x2 - x1;
+	dy = abs(y2 - y1);
+	e = 0.0f;
+	if (dx)
+		de = dy/(float)dx;
+	else
+		de = 0.0f;
+	y = y1;
+	sy = (y1<y2) ? 1 : -1;
+	for (x=x1; x<=x2; x++)
+	{
+		if (cp)
+			create_parts(y, x, rx, ry, c);
+		else
+			create_parts(x, y, rx, ry, c);
+		e += de;
+		if (e >= 0.5f)
+		{
+			y += sy;
+			if (c==WL_EHOLE || c==WL_ALLOWGAS || c==WL_ALLOWALLELEC || c==WL_ALLOWSOLID || c==WL_ALLOWAIR || c==WL_WALL || c==WL_DESTROYALL || c==WL_ALLOWLIQUID || c==WL_FAN || c==WL_STREAM || c==WL_DETECT || c==WL_EWALL || c==WL_WALLELEC || !(rx+ry))
+			{
+				if (cp)
+					create_parts(y, x, rx, ry, c);
+				else
+					create_parts(x, y, rx, ry, c);
+			}
+			e -= 1.0f;
+		}
+	}
 }
+
+void *transform_save(void *odata, int *size, matrix2d transform, vector2d translate)
+{
+	void *ndata;
+	unsigned char bmapo[YRES/CELL][XRES/CELL], bmapn[YRES/CELL][XRES/CELL];
+	particle *partst;
+	sign signst[MAXSIGNS];
+	unsigned pmapt[YRES][XRES];
+	float fvxo[YRES/CELL][XRES/CELL], fvyo[YRES/CELL][XRES/CELL];
+	float fvxn[YRES/CELL][XRES/CELL], fvyn[YRES/CELL][XRES/CELL];
+	int i, x, y, nx, ny, w, h, nw, nh;
+	vector2d pos, tmp, ctl, cbr;
+	vector2d cornerso[4];
+	unsigned char *odatac = odata;
+	memset(bmapo, 0, sizeof(bmapo));
+	memset(bmapn, 0, sizeof(bmapn));
+	memset(signst, 0, sizeof(signst));
+	memset(pmapt, 0, sizeof(pmapt));
+	memset(fvxo, 0, sizeof(fvxo));
+	memset(fvxn, 0, sizeof(fvxn));
+	memset(fvyo, 0, sizeof(fvyo));
+	memset(fvyn, 0, sizeof(fvyn));
+	partst = calloc(sizeof(particle), NPART);
+	if (parse_save(odata, *size, 0, 0, 0, bmapo, fvxo, fvyo, signst, partst, pmapt))
+	{
+		free(partst);
+		return odata;
+	}
+	w = odatac[6]*CELL;
+	h = odatac[7]*CELL;
+	// undo any translation caused by rotation
+	cornerso[0] = v2d_new(0,0);
+	cornerso[1] = v2d_new(w-1,0);
+	cornerso[2] = v2d_new(0,h-1);
+	cornerso[3] = v2d_new(w-1,h-1);
+	for (i=0;i<4;i++)
+	{
+		tmp = m2d_multiply_v2d(transform,cornerso[i]);
+		if (i==0) ctl = cbr = tmp; // top left, bottom right corner
+		if (tmp.x<ctl.x) ctl.x = tmp.x;
+		if (tmp.y<ctl.y) ctl.y = tmp.y;
+		if (tmp.x>cbr.x) cbr.x = tmp.x;
+		if (tmp.y>cbr.y) cbr.y = tmp.y;
+	}
+	// casting as int doesn't quite do what we want with negative numbers, so use floor()
+	tmp = v2d_new(floor(ctl.x+0.5f),floor(ctl.y+0.5f));
+	translate = v2d_sub(translate,tmp);
+	nw = floor(cbr.x+0.5f)-floor(ctl.x+0.5f)+1;
+	nh = floor(cbr.y+0.5f)-floor(ctl.y+0.5f)+1;
+	if (nw>XRES) nw = XRES;
+	if (nh>YRES) nh = YRES;
+	// rotate and translate signs, parts, walls
+	for (i=0; i<MAXSIGNS; i++)
+	{
+		if (!signst[i].text[0]) continue;
+		pos = v2d_new(signst[i].x, signst[i].y);
+		pos = v2d_add(m2d_multiply_v2d(transform,pos),translate);
+		nx = floor(pos.x+0.5f);
+		ny = floor(pos.y+0.5f);
+		if (nx<0 || nx>=nw || ny<0 || ny>=nh)
+		{
+			signst[i].text[0] = 0;
+			continue;
+		}
+		signst[i].x = nx;
+		signst[i].y = ny;
+	}
+	for (i=0; i<NPART; i++)
+	{
+		if (!partst[i].type) continue;
+		pos = v2d_new(partst[i].x, partst[i].y);
+		pos = v2d_add(m2d_multiply_v2d(transform,pos),translate);
+		nx = floor(pos.x+0.5f);
+		ny = floor(pos.y+0.5f);
+		if (nx<0 || nx>=nw || ny<0 || ny>=nh)
+		{
+			partst[i].type = PT_NONE;
+			continue;
+		}
+		partst[i].x = nx;
+		partst[i].y = ny;
+	}
+	for (y=0;y<YRES/CELL;y++)
+		for (x=0;x<XRES/CELL;x++)
+		{
+			pos = v2d_new(x*CELL+CELL*0.4f, y*CELL+CELL*0.4f);
+			pos = v2d_add(m2d_multiply_v2d(transform,pos),translate);
+			nx = pos.x/CELL;
+			ny = pos.y/CELL;
+			if (nx<0 || nx>=nw || ny<0 || ny>=nh)
+				continue;
+			if (bmapo[y][x])
+			{
+				bmapn[ny][nx] = bmapo[y][x];
+				if (bmapo[y][x]==WL_FAN)
+				{
+					fvxn[ny][nx] = fvxo[y][x];
+					fvyn[ny][nx] = fvyo[y][x];
+				}
+			}
+		}
+	ndata = build_save(size,0,0,nw,nh,bmapn,fvxn,fvyn,signst,partst);
+	free(partst);
+	return ndata;
+}
+
+#if defined(WIN32) && !defined(__GNUC__)
+_inline void orbitalparts_get(int block1, int block2, int resblock1[], int resblock2[])
+#else
+inline void orbitalparts_get(int block1, int block2, int resblock1[], int resblock2[])
+#endif
+{
+	resblock1[0] = (block1&0x000000FF);
+	resblock1[1] = (block1&0x0000FF00)>>8;
+	resblock1[2] = (block1&0x00FF0000)>>16;
+	resblock1[3] = (block1&0xFF000000)>>24;
+
+	resblock2[0] = (block2&0x000000FF);
+	resblock2[1] = (block2&0x0000FF00)>>8;
+	resblock2[2] = (block2&0x00FF0000)>>16;
+	resblock2[3] = (block2&0xFF000000)>>24;
+}
+
+#if defined(WIN32) && !defined(__GNUC__)
+_inline void orbitalparts_set(int *block1, int *block2, int resblock1[], int resblock2[])
+#else
+inline void orbitalparts_set(int *block1, int *block2, int resblock1[], int resblock2[])
+#endif
+{
+	int block1tmp = 0;
+	int block2tmp = 0;
+
+	block1tmp = (resblock1[0]&0xFF);
+	block1tmp |= (resblock1[1]&0xFF)<<8;
+	block1tmp |= (resblock1[2]&0xFF)<<16;
+	block1tmp |= (resblock1[3]&0xFF)<<24;
+
+	block2tmp = (resblock2[0]&0xFF);
+	block2tmp |= (resblock2[1]&0xFF)<<8;
+	block2tmp |= (resblock2[2]&0xFF)<<16;
+	block2tmp |= (resblock2[3]&0xFF)<<24;
+
+	*block1 = block1tmp;
+	*block2 = block2tmp;
+}
+

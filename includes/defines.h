@@ -7,15 +7,21 @@
 #define PATH_SEP "/"
 #endif
 
-#define SAVE_VERSION 46
-#define MINOR_VERSION 4
+#define SAVE_VERSION 47
+#define MINOR_VERSION 0
 #define MOD_VERSION 4
 #define IDENT_VERSION "G" //Change this if you're not Simon! It should be a single letter.
-//#define BETA
+#define BETA
 
 #define SERVER "powdertoy.co.uk"
 
 #define THUMB_CACHE_SIZE 256
+
+//#define pyconsole
+
+#ifndef M_PI
+#define M_PI 3.14159265f
+#endif
 
 #define IMGCONNS 3
 #define TIMEOUT 100
@@ -65,6 +71,11 @@ extern unsigned char ZSIZE;
 #define CIRCLE_BRUSH 0
 #define SQUARE_BRUSH 1
 #define BRUSH_NUM 2
+
+#define PYCONSOLE
+//#define PYEXT
+//WARNING pyext must be defined on 64bit!
+//also, don't add a comment on that line, it breaks
 
 #ifdef PIX16
 typedef unsigned short pixel;
@@ -155,6 +166,8 @@ int player2spawn;
 int death2;
 int ISSPAWN1;
 int ISSPAWN2;
+extern char pyready;
+extern char pygood;
 extern sign signs[MAXSIGNS];
 extern stamp stamps[STAMP_MAX];
 extern int stamp_count;
@@ -175,8 +188,10 @@ void thumb_cache_inval(char *id);
 void thumb_cache_add(char *id, void *thumb, int size);
 int thumb_cache_find(char *id, void **thumb, int *size);
 void *build_thumb(int *size, int bzip2);
-void *build_save(int *size, int x0, int y0, int w, int h);
-int parse_save(void *save, int size, int replace, int x0, int y0);
+void *build_save(int *size, int x0, int y0, int w, int h, unsigned char bmap[YRES/CELL][XRES/CELL], float fvx[YRES/CELL][XRES/CELL], float fvy[YRES/CELL][XRES/CELL], sign signs[MAXSIGNS], void* partsptr);
+int parse_save(void *save, int size, int replace, int x0, int y0, unsigned char bmap[YRES/CELL][XRES/CELL], float fvx[YRES/CELL][XRES/CELL], float fvy[YRES/CELL][XRES/CELL], sign signs[MAXSIGNS], void* partsptr, unsigned pmap[YRES][XRES]);
+void clear_sim(void);
 void del_stamp(int d);
 void sdl_seticon(void);
+//int process_command(pixel *vid_buf, char *console, char *console_error, PyObject *pfunc);
 #endif

@@ -8,6 +8,7 @@
 #include "interface.h"
 #include "graphics.h"
 #include "powder.h"
+#include <Windows.h>
 
 //Signum function
 #if defined(WIN32) && !defined(__GNUC__)
@@ -306,3 +307,152 @@ int cpu_check(void)
 #endif
 	return 0;
 }
+
+matrix2d m2d_multiply_m2d(matrix2d m1, matrix2d m2)
+{
+	matrix2d result = {
+		m1.a*m2.a+m1.b*m2.c, m1.a*m2.b+m1.b*m2.d,
+		m1.c*m2.a+m1.d*m2.c, m1.c*m2.b+m1.d*m2.d
+	};
+	return result;
+}
+vector2d m2d_multiply_v2d(matrix2d m, vector2d v)
+{
+	vector2d result = {
+		m.a*v.x+m.b*v.y,
+		m.c*v.x+m.d*v.y
+	};
+	return result;
+}
+matrix2d m2d_multiply_float(matrix2d m, float s)
+{
+	matrix2d result = {
+		m.a*s, m.b*s,
+		m.c*s, m.d*s,
+	};
+	return result;
+}
+
+vector2d v2d_multiply_float(vector2d v, float s)
+{
+	vector2d result = {
+		v.x*s,
+		v.y*s
+	};
+	return result;
+}
+
+vector2d v2d_add(vector2d v1, vector2d v2)
+{
+	vector2d result = {
+		v1.x+v2.x,
+		v1.y+v2.y
+	};
+	return result;
+}
+vector2d v2d_sub(vector2d v1, vector2d v2)
+{
+	vector2d result = {
+		v1.x-v2.x,
+		v1.y-v2.y
+	};
+	return result;
+}
+
+matrix2d m2d_new(float me0, float me1, float me2, float me3)
+{
+	matrix2d result = {me0,me1,me2,me3};
+	return result;
+}
+vector2d v2d_new(float x, float y)
+{
+	vector2d result = {x, y};
+	return result;
+}
+
+void clipboard_push_text(char * text)
+{
+	printf("Not implemented: put text on clipboard \"%s\"\n", text);
+}
+
+char * clipboard_pull_text()
+{
+	printf("Not implemented: get text from clipboard\n");
+	return "";
+}
+
+int register_extension()
+{
+#if defined WIN32
+
+	LONG rresult;
+	HKEY newkey;
+	char *currentfilename;
+	char *iconname;
+	char *opencommand;
+	currentfilename = exe_name();
+	iconname = malloc(strlen(currentfilename)+3);
+	opencommand = malloc(strlen(currentfilename)+13);
+	sprintf(iconname, "%s,1", currentfilename);
+	sprintf(opencommand, "\"%s\" open:\"%%1\"", currentfilename);
+
+	//Create extension entry
+	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\.cps", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
+	if(rresult != ERROR_SUCCESS){
+		return 0;
+	}
+	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)"PowderToySave", strlen("PowderToySave")+1);
+	if(rresult != ERROR_SUCCESS){
+		RegCloseKey(newkey);
+		return 0;
+	}
+	RegCloseKey(newkey);
+
+	//Create program entry
+	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\PowderToySave", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
+	if(rresult != ERROR_SUCCESS){
+		return 0;
+	}
+	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)"Powder Toy Save", strlen("Powder Toy Save")+1);
+	if(rresult != ERROR_SUCCESS){
+		RegCloseKey(newkey);
+		return 0;
+	}
+	RegCloseKey(newkey);
+
+	//Set DefaultIcon
+	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\PowderToySave\\DefaultIcon", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
+	if(rresult != ERROR_SUCCESS){
+		return 0;
+	}
+	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)iconname, strlen(iconname)+1);
+	if(rresult != ERROR_SUCCESS){
+		RegCloseKey(newkey);
+		return 0;
+	}
+	RegCloseKey(newkey);
+
+	//Set Launch command
+	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\PowderToySave\\shell\\open\\command", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
+	if(rresult != ERROR_SUCCESS){
+		return 0;
+	}
+	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)opencommand, strlen(opencommand)+1);
+	if(rresult != ERROR_SUCCESS){
+		RegCloseKey(newkey);
+		return 0;
+	}
+	RegCloseKey(newkey);
+
+	return 1;
+#elif defined LIN32
+	return 0;
+#elif defined LIN64
+	return 0;
+#elif defined MACOSX
+	return 0;
+#endif
+}
+
+vector2d v2d_zero = {0,0};
+matrix2d m2d_identity = {1,0,0,1};
