@@ -8,7 +8,6 @@
 #include "interface.h"
 #include "graphics.h"
 #include "powder.h"
-#include <Windows.h>
 
 //Signum function
 #if defined(WIN32) && !defined(__GNUC__)
@@ -380,7 +379,7 @@ char * clipboard_pull_text()
 	printf("Not implemented: get text from clipboard\n");
 	return "";
 }
-
+/*
 int register_extension()
 {
 #if defined WIN32
@@ -453,6 +452,6 @@ int register_extension()
 	return 0;
 #endif
 }
-
+*/
 vector2d v2d_zero = {0,0};
 matrix2d m2d_identity = {1,0,0,1};

@@ -18,12 +18,11 @@
 #define PT_HGEN		OFFCOUNT + 16
 #define PT_HWAV		OFFCOUNT + 17
 #define PT_CHLN		OFFCOUNT + 18
-#define PT_RTNN		OFFCOUNT + 19
+#define PT_TUNN		OFFCOUNT + 19
 #define PT_VTNN		OFFCOUNT + 20
 #define PT_EXPL     OFFCOUNT + 21
 #define PT_PRSN     OFFCOUNT + 22
 #define PT_CSTR     OFFCOUNT + 23
-#define PT_LTNN     OFFCOUNT + 24
 //Unofficial Count
-#define PT_NUM		OFFCOUNT + 25
+#define PT_NUM		OFFCOUNT + 24
 
