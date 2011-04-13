@@ -8,6 +8,15 @@
 #include "interface.h"
 #include "graphics.h"
 #include "powder.h"
+#include <icondoc.h>
+#if defined WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+#ifdef MACOSX
+#include <ApplicationServices/ApplicationServices.h>
+#endif
 
 //Signum function
 #if defined(WIN32) && !defined(__GNUC__)
@@ -122,7 +131,7 @@ int sregexp(const char *str, char *pattern)
 {
 	int result;
 	regex_t patternc;
-	if(regcomp(&patternc, pattern,  0)!=0)
+	if (regcomp(&patternc, pattern,  0)!=0)
 		return 1;
 	result = regexec(&patternc, str, 0, NULL, 0);
 	regfree(&patternc);
@@ -158,7 +167,7 @@ void load_presets(void)
 		remove("powder.def");
 		return;
 	}
-	if(sig[3]==0x66){
+	if (sig[3]==0x66) {
 		if (load_string(f, svf_user, 63))
 			goto fail;
 		if (load_string(f, svf_pass, 63))
@@ -371,7 +380,35 @@ vector2d v2d_new(float x, float y)
 
 void clipboard_push_text(char * text)
 {
+#ifdef MACOSX
+	PasteboardRef newclipboard;
+
+	if (PasteboardCreate(kPasteboardClipboard, &newclipboard)!=noErr) return;
+	if (PasteboardClear(newclipboard)!=noErr) return;
+	PasteboardSynchronize(newclipboard);
+
+	CFDataRef data = CFDataCreate(kCFAllocatorDefault, text, strlen(text));
+	PasteboardPutItemFlavor(newclipboard, (PasteboardItemID)1, CFSTR("com.apple.traditional-mac-plain-text"), data, 0);
+#elif defined WIN32
+	if (OpenClipboard(NULL))
+	{
+		HGLOBAL cbuffer;
+		char * glbuffer;
+
+		EmptyClipboard();
+
+		cbuffer = GlobalAlloc(GMEM_DDESHARE, strlen(text)+1);
+		glbuffer = (char*)GlobalLock(cbuffer);
+
+		strcpy(glbuffer, text);
+
+		GlobalUnlock(cbuffer);
+		SetClipboardData(CF_TEXT, cbuffer);
+		CloseClipboard();
+	}
+#else
 	printf("Not implemented: put text on clipboard \"%s\"\n", text);
+#endif
 }
 
 char * clipboard_pull_text()
@@ -383,37 +420,58 @@ char * clipboard_pull_text()
 int register_extension()
 {
 #if defined WIN32
+<<<<<<< HEAD
 
+=======
+>>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
 	LONG rresult;
 	HKEY newkey;
-	char *currentfilename;
+	char *currentfilename = exe_name();
 	char *iconname;
 	char *opencommand;
-	currentfilename = exe_name();
-	iconname = malloc(strlen(currentfilename)+3);
+	iconname = malloc(strlen(currentfilename)+6);
 	opencommand = malloc(strlen(currentfilename)+13);
+<<<<<<< HEAD
 	sprintf(iconname, "%s,1", currentfilename);
 	sprintf(opencommand, "\"%s\" open:\"%%1\"", currentfilename);
+=======
+	sprintf(iconname, "%s,-102", currentfilename);
+	sprintf(opencommand, "\"%s\" open \"%%1\"", currentfilename);
+>>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
 
 	//Create extension entry
 	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\.cps", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		return 0;
 	}
 	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)"PowderToySave", strlen("PowderToySave")+1);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		RegCloseKey(newkey);
 		return 0;
 	}
 	RegCloseKey(newkey);
 
+<<<<<<< HEAD
+=======
+	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\.stm", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
+	if (rresult != ERROR_SUCCESS) {
+		return 0;
+	}
+	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)"PowderToySave", strlen("PowderToySave")+1);
+	if (rresult != ERROR_SUCCESS) {
+		RegCloseKey(newkey);
+		return 0;
+	}
+	RegCloseKey(newkey);
+
+>>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
 	//Create program entry
 	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\PowderToySave", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		return 0;
 	}
 	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)"Powder Toy Save", strlen("Powder Toy Save")+1);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		RegCloseKey(newkey);
 		return 0;
 	}
@@ -421,11 +479,11 @@ int register_extension()
 
 	//Set DefaultIcon
 	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\PowderToySave\\DefaultIcon", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		return 0;
 	}
 	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)iconname, strlen(iconname)+1);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		RegCloseKey(newkey);
 		return 0;
 	}
@@ -433,21 +491,76 @@ int register_extension()
 
 	//Set Launch command
 	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\PowderToySave\\shell\\open\\command", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		return 0;
 	}
 	rresult = RegSetValueEx(newkey, 0, 0, REG_SZ, (LPBYTE)opencommand, strlen(opencommand)+1);
-	if(rresult != ERROR_SUCCESS){
+	if (rresult != ERROR_SUCCESS) {
 		RegCloseKey(newkey);
 		return 0;
 	}
 	RegCloseKey(newkey);
 
+<<<<<<< HEAD
+=======
 	return 1;
-#elif defined LIN32
-	return 0;
-#elif defined LIN64
-	return 0;
+#elif defined(LIN32) || defined(LIN64)
+	char *currentfilename = exe_name();
+	FILE *f;
+	char *mimedata =
+"<?xml version=\"1.0\"?>\n"
+"	<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>\n"
+"	<mime-type type=\"application/vnd.powdertoy.save\">\n"
+"		<comment>Powder Toy save</comment>\n"
+"		<glob pattern=\"*.cps\"/>\n"
+"		<glob pattern=\"*.stm\"/>\n"
+"	</mime-type>\n"
+"</mime-info>\n";
+	f = fopen("powdertoy-save.xml", "wb");
+	if (!f)
+		return 0;
+	fwrite(mimedata, 1, strlen(mimedata), f);
+	fclose(f);
+
+	char *desktopfiledata_tmp =
+"[Desktop Entry]\n"
+"Type=Application\n"
+"Name=Powder Toy\n"
+"Comment=Physics sandbox game\n"
+"MimeType=application/vnd.powdertoy.save;\n"
+"NoDisplay=true\n";
+	char *desktopfiledata = malloc(strlen(desktopfiledata_tmp)+strlen(currentfilename)+100);
+	strcpy(desktopfiledata, desktopfiledata_tmp);
+	strappend(desktopfiledata, "Exec=");
+	strappend(desktopfiledata, currentfilename);
+	strappend(desktopfiledata, " open %f\n");
+	f = fopen("powdertoy-tpt.desktop", "wb");
+	if (!f)
+		return 0;
+	fwrite(desktopfiledata, 1, strlen(desktopfiledata), f);
+	fclose(f);
+	system("xdg-mime install powdertoy-save.xml");
+	system("xdg-desktop-menu install powdertoy-tpt.desktop");
+	f = fopen("powdertoy-save-32.png", "wb");
+	if (!f)
+		return 0;
+	fwrite(icon_doc_32_png, 1, sizeof(icon_doc_32_png), f);
+	fclose(f);
+	f = fopen("powdertoy-save-16.png", "wb");
+	if (!f)
+		return 0;
+	fwrite(icon_doc_16_png, 1, sizeof(icon_doc_16_png), f);
+	fclose(f);
+	system("xdg-icon-resource install --noupdate --context mimetypes --size 32 powdertoy-save-32.png application-vnd.powdertoy.save");
+	system("xdg-icon-resource install --noupdate --context mimetypes --size 16 powdertoy-save-16.png application-vnd.powdertoy.save");
+	system("xdg-icon-resource forceupdate");
+	system("xdg-mime default powdertoy-tpt.desktop application/vnd.powdertoy.save");
+	unlink("powdertoy-save-32.png");
+	unlink("powdertoy-save-16.png");
+	unlink("powdertoy-save.xml");
+	unlink("powdertoy-tpt.desktop");
+>>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
+	return 1;
 #elif defined MACOSX
 	return 0;
 #endif

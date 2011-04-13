@@ -7,7 +7,7 @@ PY_INCPATH := $(shell $(PY_BIN) -c "import os.path,sys;print os.path.join(sys.ex
 PY_LDFLAGS := $(shell $(PY_BIN) -c "import distutils.sysconfig;print distutils.sysconfig.get_config_var('LINKFORSHARED')")
 PYCOMMAND := $(PY_BIN) getheader.py
 
-CFLAGS := -w -std=c99 -D_POSIX_C_SOURCE=200112L -Iincludes/ 
+CFLAGS := -std=c99 -D_POSIX_C_SOURCE=200112L -Iincludes/ 
 OFLAGS := -O3 -ffast-math -ftree-vectorize -funsafe-math-optimizations
 LFLAGS := -lSDL -lm -lbz2 -lutil -lpython$(PY_VERSION) -L$(PY_LIBPATH) -I$(PY_INCPATH) $(PY_LDFLAGS)
 LFLAGS_X := -lm -lbz2 -lSDLmain -I/Library/Frameworks/Python.framework/Versions/$(PY_VERSION)/include/python$(PY_VERSION)
@@ -18,6 +18,18 @@ FLAGS_DBUG := -Wall -std=c99 -D_POSIX_C_SOURCE=200112L -pg -DX86 -DX86_SSE3 -mss
 COMPILER := gcc
 LINUX_TARG := powder-64-sse2 powder-sse powder-sse2
 WIN32_TARG := powder-sse.exe powder-sse2.exe
+
+render: $(SOURCES)
+	$(PYCOMMAND)
+	$(COMPILER) -m32 -o$@ $(CFLAGS) $(OFLAGS) $(LFLAGS) $(MFLAGS_SSE3) $(SOURCES) -DLIN32 -DRENDERER
+	strip $@
+	mv $@ build
+
+render-x: $(SOURCES)
+	$(PYCOMMAND)
+	$(COMPILER) -o $@ $(CFLAGS) $(OFLAGS) $(LFLAGS_X) -lSDL $(MFLAGS) $(SOURCES) -framework Cocoa -DMACOSX -DRENDERER -arch x86_64
+	strip $@
+	mv $@ build
 
 powder: $(SOURCES)
 	$(PYCOMMAND)
@@ -31,6 +43,7 @@ powder-debug: $(SOURCES)
 	$(PYCOMMAND)
 	$(COMPILER) -DINTERNAL -o$@ $(CFLAGS) $(OFLAGS) $(MFLAGS_SSE3) $(SOURCES) $(LFLAGS) -DLIN64 $(FLAGS_DBUG)
 	mv $@ build
+
 powder-sse3: $(SOURCES)
 	$(PYCOMMAND)
 	$(COMPILER) -m32 -o$@ $(CFLAGS) $(OFLAGS) $(MFLAGS_SSE3) $(SOURCES) $(LFLAGS) -DLIN32
@@ -46,6 +59,7 @@ powder-sse: $(SOURCES)
 	$(COMPILER) -m32 -o$@ $(CFLAGS) $(OFLAGS) $(MFLAGS_SSE) $(SOURCES) $(LFLAGS) -DLIN32
 	strip $@
 	mv $@ build
+
 powder-64-sse3-opengl: $(SOURCES)
 	$(PYCOMMAND)
 	$(COMPILER) -m64 -o$@ $(CFLAGS) $(OFLAGS) $(MFLAGS_SSE3) $(SOURCES) $(LFLAGS) -DLIN64 -lGL -lGLU -DOpenGL
@@ -67,7 +81,6 @@ powder-icc: $(SOURCES)
 
 powder-res.o: powder-res.rc powder.ico
 	i586-mingw32msvc-windres powder-res.rc powder-res.o
-
 powder-sse3.exe: $(SOURCES) powder-res.o
 	$(PYCOMMAND)
 	i586-mingw32msvc-gcc -o$@ $(CFLAGS) $(OFLAGS) $(MFLAGS_SSE3) $(SOURCES) powder-res.o -lmingw32 -llibregex -lws2_32 -lSDLmain $(LFLAGS) -mwindows -DWIN32
@@ -86,6 +99,7 @@ powder-sse.exe: $(SOURCES) powder-res.o
 	strip $@
 	chmod 0644 $@
 	mv $@ build
+
 powder-x: $(SOURCES)
 	$(PYCOMMAND) --64bit
 	gcc -o $@ $(CFLAGS) $(OFLAGS) $(LFLAGS_X) $(MFLAGS) $(SOURCES) -DMACOSX -DPIX32BGRA -arch x86_64 -framework Cocoa -framework SDL -framework Python

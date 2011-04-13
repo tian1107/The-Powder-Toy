@@ -209,3 +209,4 @@ def step():
             tpt.draw_text(604-tpt.get_width(item[0]),yy,item[0],item[1],item[2],item[3],item[4])
             yy+=8
 
+

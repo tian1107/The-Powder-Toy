@@ -58,7 +58,7 @@ static menu_wall mwalls[] =
 #define SC_CRACKER2 13
 #define SC_TOTAL 12
 
-static menu_section msections[] =
+static menu_section msections[] = //itemcount and doshow do not do anything currently.
 {
 	{"\xC1", "Walls", 0, 1},
 	{"\xC2", "Electronics", 0, 1},
@@ -83,6 +83,14 @@ struct ui_edit
 	int focus, cursor, hide, multiline;
 };
 typedef struct ui_edit ui_edit;
+
+struct ui_copytext
+{
+	int x, y, width, height;
+	char text[256];
+	int state, hover;
+};
+typedef struct ui_copytext ui_copytext;
 
 struct save_info
 {
@@ -173,11 +181,17 @@ void ui_checkbox_draw(pixel *vid_buf, ui_checkbox *ed);
 
 void ui_checkbox_process(int mx, int my, int mb, int mbq, ui_checkbox *ed);
 
+void ui_copytext_draw(pixel *vid_buf, ui_copytext *ed);
+
+void ui_copytext_process(int mx, int my, int mb, int mbq, ui_copytext *ed);
+
 void draw_svf_ui(pixel *vid_buf);
 
 void error_ui(pixel *vid_buf, int err, char *txt);
 
 void info_ui(pixel *vid_buf, char *top, char *txt);
+
+void copytext_ui(pixel *vid_buf, char *top, char *txt, char *copytxt);
 
 void info_box(pixel *vid_buf, char *msg);
 
