@@ -24,6 +24,7 @@
 #define PT_PRSN     OFFCOUNT + 22
 #define PT_CSTR     OFFCOUNT + 23
 #define PT_MERC     OFFCOUNT + 24
+#define PT_FLCT     OFFCOUNT + 25
 //Unofficial Count
-#define PT_NUM		OFFCOUNT + 25
+#define PT_NUM		OFFCOUNT + 26
 
