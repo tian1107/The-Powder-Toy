@@ -19,6 +19,9 @@ int update_PRSN(UPDATE_FUNC_ARGS)
                     if ((r&0xFF)==PT_PLUT)  //If on plut
                         parts[i].life -= 1;
 
+                    if ((r&0xFF)==PT_MERC)
+                        parts[i].life -= 2;
+
                     if((r&0xFF)==PT_SPRK && r && (r>>8)<NPART)  //If on charge
                     {
                         parts[i].life -= (int)(rand()/1000)+38;

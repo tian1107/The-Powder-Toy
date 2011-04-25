@@ -412,6 +412,8 @@ int update_STKM2(UPDATE_FUNC_ARGS) {
 
     if ((r&0xFF)==PT_CHLN)
         parts[i].life -= 2;
+    if ((r&0xFF)==PT_MERC)
+        parts[i].life -= 2;
 
 	isplayer2 = 1;
 	return 0;

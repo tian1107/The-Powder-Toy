@@ -2,7 +2,7 @@
 
 int update_TUNN(UPDATE_FUNC_ARGS)
 {
-    int nx, ny, r;
+    /*int nx, ny, r;
     int ceiling = PT_WOOD;
     int ceiling2 = PT_IRON;
 
@@ -60,12 +60,12 @@ int update_TUNN(UPDATE_FUNC_ARGS)
             kill_part(r>>8);
             kill_part(i);
         }
-    }
+    }*/
 }
 
 int update_VTNN(UPDATE_FUNC_ARGS)
 {
-    int nx, ny, r;
+    /*int nx, ny, r;
     int ceiling = PT_IRON;
     int ceiling2 = PT_BMTL;
     if(parts[i].vy > 0)
@@ -128,5 +128,5 @@ int update_VTNN(UPDATE_FUNC_ARGS)
         }
         kill_part(r>>8);
         kill_part(i);
-    }
+    }*/
 }
