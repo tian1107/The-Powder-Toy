@@ -42,11 +42,11 @@ if(t==PT_HWAV)
 {
     parts[i].life = 50;
 }
-if(t==PT_TUNN)
+/*if(t==PT_TUNN)
 {
     parts[i].vx = 1;
     parts[i].vy = 0;
-}
+}*/
 if(t==PT_PRSN)
 {
     parts[i].life = 100;
@@ -59,8 +59,16 @@ if(t==PT_CSTR)
     parts[i].any = 0;
     parts[i].any2 = 0;
 }
-if(t==PT_VTNN)
+if(t==PT_MERC)
+{
+    parts[i].any = (int)(parts[i].temp/200.0);
+}
+if(t==PT_FLCT)
+{
+    parts[i].life = rand()%150+50;
+}
+/*if(t==PT_VTNN)
 {
     parts[i].vx = 0;
     parts[i].vy = 1;
-}
+}*/
