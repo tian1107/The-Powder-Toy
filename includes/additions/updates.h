@@ -1,0 +1,19 @@
+
+//Additions
+int update_FPLT(UPDATE_FUNC_ARGS);
+int update_SOAP(UPDATE_FUNC_ARGS);
+int update_RREC(UPDATE_FUNC_ARGS);
+int update_PROT(UPDATE_FUNC_ARGS);
+int update_EWAVE(UPDATE_FUNC_ARGS);
+int update_PGLOW(UPDATE_FUNC_ARGS);
+int update_HGEN(UPDATE_FUNC_ARGS);
+int update_IREC(UPDATE_FUNC_ARGS);
+int update_HWAV(UPDATE_FUNC_ARGS);
+int update_CHLN(UPDATE_FUNC_ARGS);
+int update_TUNN(UPDATE_FUNC_ARGS);
+int update_VTNN(UPDATE_FUNC_ARGS);
+int update_PRSN(UPDATE_FUNC_ARGS);
+int update_EXPL(UPDATE_FUNC_ARGS);
+int update_CSTR(UPDATE_FUNC_ARGS);
+int update_MERC(UPDATE_FUNC_ARGS);
+int update_FLCT(UPDATE_FUNC_ARGS);
