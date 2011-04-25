@@ -1255,6 +1255,30 @@ void draw_air(pixel *vid)
 		}
 }
 
+void draw_grav(pixel *vid)
+{
+	int x, y, i;
+	float nx, ny, dist;
+
+	for (y=0; y<YRES/CELL; y++)
+	{
+		for (x=0; x<XRES/CELL; x++)
+		{
+			if(fabsf(gravx[y][x]) <= 0.001f && fabsf(gravy[y][x]) <= 0.001f)
+				continue;
+			nx = x*CELL;
+			ny = y*CELL;
+			dist = fabsf(gravx[y][x])+fabsf(gravy[y][x]);
+			for(i = 0; i < 4; i++)
+			{
+				nx -= gravx[y][x]*0.5f;
+				ny -= gravy[y][x]*0.5f;
+				addpixel(vid, (int)(nx+0.5f), (int)(ny+0.5f), 255, 255, 255, (int)(dist*20.0f));
+			}
+		}
+	}
+}
+
 void draw_line(pixel *vid, int x1, int y1, int x2, int y2, int r, int g, int b, int a)  //Draws a line
 {
 	int dx, dy, i, sx, sy, check, e, x, y;
@@ -2516,7 +2540,7 @@ void draw_parts(pixel *vid)
 				}
 				else if (t==PT_LCRY)
 				{
-					uint8 GR = 0x50+(parts[i].life*10);
+					uint8 GR = 0x50+((parts[i].life>10?10:parts[i].life)*10);
 					vid[ny*(XRES+BARSIZE)+nx] = PIXRGB(GR, GR, GR);
 					if (cmode == CM_BLOB) {
 						blendpixel(vid, nx+1, ny, GR, GR, GR, 223);
@@ -2532,7 +2556,7 @@ void draw_parts(pixel *vid)
 				}
 				else if (t==PT_PCLN)
 				{
-					uint8 GR = 0x3B+(parts[i].life*19);
+					uint8 GR = 0x3B+((parts[i].life>10?10:parts[i].life)*19);
 					vid[ny*(XRES+BARSIZE)+nx] = PIXRGB(GR, GR, 10);
 					if (cmode == CM_BLOB) {
 						blendpixel(vid, nx+1, ny, GR, GR, 10, 223);
@@ -2548,7 +2572,7 @@ void draw_parts(pixel *vid)
 				}
 				else if (t==PT_HSWC)
 				{
-					uint8 GR = 0x3B+(parts[i].life*19);
+					uint8 GR = 0x3B+((parts[i].life>10?10:parts[i].life)*19);
 					vid[ny*(XRES+BARSIZE)+nx] = PIXRGB(GR, 10, 10);
 					if (cmode == CM_BLOB) {
 						blendpixel(vid, nx+1, ny, GR, 10, 10, 223);
@@ -2564,7 +2588,7 @@ void draw_parts(pixel *vid)
 				}
 				else if (t==PT_PUMP)
 				{
-					uint8 GR = 0x3B+(parts[i].life*19);
+					uint8 GR = 0x3B+((parts[i].life>10?10:parts[i].life)*19);
 					vid[ny*(XRES+BARSIZE)+nx] = PIXRGB(10, 10, GR);
 					if (cmode == CM_BLOB) {
 						blendpixel(vid, nx+1, ny, 10, 10, GR, 223);
@@ -3032,6 +3056,18 @@ void draw_parts(pixel *vid)
 	glFlush ();
 #endif
 
+}
+void draw_decorations(pixel *vid_buf,pixel *decorations)
+{
+	int i,r,g,b;
+	for (i=0; i<(XRES+BARSIZE)*YRES; i++)
+	{
+		r = PIXR(decorations[i]);
+		g = PIXG(decorations[i]);
+		b = PIXB(decorations[i]);
+		if (r>0 || g>0 || b>0)
+			vid_buf[i] = PIXRGB(r,g,b);
+	}
 }
 
 //draws the photon colors in the HUD

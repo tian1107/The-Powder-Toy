@@ -9,6 +9,7 @@
 #include "graphics.h"
 #include "powder.h"
 #include <icondoc.h>
+#include <update.h>
 #if defined WIN32
 #include <windows.h>
 #else
@@ -416,14 +417,10 @@ char * clipboard_pull_text()
 	printf("Not implemented: get text from clipboard\n");
 	return "";
 }
-/*
+
 int register_extension()
 {
 #if defined WIN32
-<<<<<<< HEAD
-
-=======
->>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
 	LONG rresult;
 	HKEY newkey;
 	char *currentfilename = exe_name();
@@ -431,13 +428,8 @@ int register_extension()
 	char *opencommand;
 	iconname = malloc(strlen(currentfilename)+6);
 	opencommand = malloc(strlen(currentfilename)+13);
-<<<<<<< HEAD
-	sprintf(iconname, "%s,1", currentfilename);
-	sprintf(opencommand, "\"%s\" open:\"%%1\"", currentfilename);
-=======
 	sprintf(iconname, "%s,-102", currentfilename);
 	sprintf(opencommand, "\"%s\" open \"%%1\"", currentfilename);
->>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
 
 	//Create extension entry
 	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\.cps", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
@@ -451,8 +443,6 @@ int register_extension()
 	}
 	RegCloseKey(newkey);
 
-<<<<<<< HEAD
-=======
 	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\.stm", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
 	if (rresult != ERROR_SUCCESS) {
 		return 0;
@@ -464,7 +454,6 @@ int register_extension()
 	}
 	RegCloseKey(newkey);
 
->>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
 	//Create program entry
 	rresult = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Classes\\PowderToySave", 0, 0, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &newkey, NULL);
 	if (rresult != ERROR_SUCCESS) {
@@ -501,8 +490,6 @@ int register_extension()
 	}
 	RegCloseKey(newkey);
 
-<<<<<<< HEAD
-=======
 	return 1;
 #elif defined(LIN32) || defined(LIN64)
 	char *currentfilename = exe_name();
@@ -559,12 +546,81 @@ int register_extension()
 	unlink("powdertoy-save-16.png");
 	unlink("powdertoy-save.xml");
 	unlink("powdertoy-tpt.desktop");
->>>>>>> f20bedd3dea9b6cab23d60412290af0f97b02d49
 	return 1;
 #elif defined MACOSX
 	return 0;
 #endif
 }
-*/
+
+void HSV_to_RGB(int h,int s,int v,int *r,int *g,int *b)//convert 0-255 HSV values to 0-255 RGB
+{
+	float hh, ss, vv, c, x;
+	int m;
+	hh = h/42.667f;//normalize values
+	ss = s/256.0f;
+	vv = v/256.0f;
+	c = vv * ss;
+	x = c * ( 1 - fabsf(fmod(hh,2.0) -1) );
+	if(hh<1){
+		*r = (int)(c*256.0);
+		*g = (int)(x*256.0);
+		*b = 0;
+	}
+	else if(hh<2){
+		*r = (int)(x*256.0);
+		*g = (int)(c*256.0);
+		*b = 0;
+	}
+	else if(hh<3){
+		*r = 0;
+		*g = (int)(c*256.0);
+		*b = (int)(x*256.0);
+	}
+	else if(hh<4){
+		*r = 0;
+		*g = (int)(x*256.0);
+		*b = (int)(c*256.0);
+	}
+	else if(hh<5){
+		*r = (int)(x*256.0);
+		*g = 0;
+		*b = (int)(c*256.0);
+	}
+	else if(hh<6){
+		*r = (int)(c*256.0);
+		*g = 0;
+		*b = (int)(x*256.0);
+	}
+	m = (int)((vv-c)*256.0);
+	*r += m;
+	*g += m;
+	*b += m;
+}
+
+void RGB_to_HSV(int r,int g,int b,int *h,int *s,int *v)//convert 0-255 HSV values to 0-255 RGB
+{
+	float rr, gg, bb, a,x,c,d;
+	rr = r/256.0f;//normalize values
+	gg = g/256.0f;
+	bb = b/256.0f;
+	a = fmin(rr,gg);
+	a = fmin(a,bb);
+	x = fmax(rr,gg);
+	x = fmax(x,bb);
+	if (a==x)//greyscale
+	{
+		*h = 0;
+		*s = 0;
+		*v = a;
+	}
+	else
+	{
+ 		c = (rr==a) ? gg-bb : ((bb==a) ? rr-gg : bb-rr);
+ 		d = (rr==a) ? 3 : ((bb==a) ? 1 : 5);
+ 		*h = (int)(42.667*(d - c/(x - a)));
+ 		*s = (int)(256.0*((x - a)/x));
+ 		*v = (int)(256.0*x);
+	}
+}
 vector2d v2d_zero = {0,0};
 matrix2d m2d_identity = {1,0,0,1};

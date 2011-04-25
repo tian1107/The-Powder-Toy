@@ -207,7 +207,7 @@ int save_name_ui(pixel *vid_buf);
 
 void menu_ui(pixel *vid_buf, int i, int *sl, int *sr);
 
-void menu_ui_v3(pixel *vid_buf, int i, int *sl, int *sr, int b, int bq, int mx, int my);
+void menu_ui_v3(pixel *vid_buf, int i, int *sl, int *sr, int *dae, int b, int bq, int mx, int my);
 
 int sdl_poll(void);
 
@@ -246,5 +246,6 @@ int console_parse_coords(char *txt, int *x, int *y, char *err);
 int console_parse_type(char *txt, int *element, char *err);
 int console_parse_partref(char *txt, int *which, char *err);
 
+void decorations_ui(pixel *vid_buf,pixel *decorations,int *bsx,int *bsy);
 #endif
 
